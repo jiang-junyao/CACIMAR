@@ -17,7 +17,8 @@ Imports:
     pheatmap,
     ggtree,
     pbapply,
-    psych
+    psych,
+    ROCR
 Depends: 
     R (>= 4.0),
     Seurat

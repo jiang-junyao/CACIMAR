@@ -6,7 +6,7 @@
 #' @param genes.use gene to be tested
 #' @param print.bar use which apply function
 #' @param assay.type ???
-#'
+#' @importFrom Seurat GetAssayData
 #' @return Returns a 'predictive power' (abs(AUC-0.5) * 2) ranked matrix of
 # putative differentially expressed genes.
 #'

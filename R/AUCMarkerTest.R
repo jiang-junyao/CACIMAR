@@ -6,6 +6,7 @@
 #' @param data2 cell in cluster 2
 #' @param mygenes gene used
 #' @param print.bar which apply function
+#' @importFrom pbapply pbapply
 AUCMarkerTest <- function(data1, data2, mygenes, print.bar = TRUE) {
   myAUC <- unlist(x = lapply(
     X = mygenes,

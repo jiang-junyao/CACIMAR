@@ -3,9 +3,6 @@
 #'
 #' @param MarkerRoc01 MarkerRoc01
 #'
-#' @return ???
-#'
-#'
 #' @examples
 Cal_JointPower2 <- function(MarkerRoc01) {
 

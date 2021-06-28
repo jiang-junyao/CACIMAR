@@ -11,9 +11,6 @@ Cal_MarkersRoc(pbmc01, marker01)
 
 \item{marker01}{marker gene list}
 }
-\value{
-???
-}
 \description{
 Calculate the power of each marker gene
 }

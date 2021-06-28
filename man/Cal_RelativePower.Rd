@@ -9,9 +9,6 @@ Cal_RelativePower(power01)
 \arguments{
 \item{power01}{power}
 }
-\value{
-/??
-}
 \description{
 Calculate the relative power
 }

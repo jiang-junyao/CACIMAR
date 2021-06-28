@@ -9,9 +9,6 @@ Cal_JointPower2(MarkerRoc01)
 \arguments{
 \item{MarkerRoc01}{MarkerRoc01}
 }
-\value{
-???
-}
 \description{
 Calculate the joint power
 }

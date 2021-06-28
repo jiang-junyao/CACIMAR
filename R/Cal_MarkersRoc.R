@@ -5,8 +5,6 @@
 #' @param pbmc01 seurat object
 #' @param marker01 marker gene list
 #'
-#' @return ???
-#'
 #'
 #' @examples
 Cal_MarkersRoc <- function(pbmc01, marker01) {

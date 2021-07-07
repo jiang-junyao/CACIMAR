@@ -15,7 +15,7 @@ Refine_Markers(Seurat_obejct, Spec1, GeneSymb1, Marker, FracThr1 = 3)
 
 \item{Marker}{Marker gene list}
 
-\item{FracThr1}{}
+\item{FracThr1}{????}
 }
 \value{
 

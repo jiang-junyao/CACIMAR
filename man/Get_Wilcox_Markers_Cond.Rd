@@ -4,7 +4,12 @@
 \alias{Get_Wilcox_Markers_Cond}
 \title{Inner function to get wilcox markers cond}
 \usage{
-Get_Wilcox_Markers_Cond(Marker1, Cor1)
+Get_Wilcox_Markers_Cond(
+  Marker1,
+  Cor1,
+  CorThr1 = 0.2,
+  CorType1 = "Cor_mmNMDA_mmLD"
+)
 }
 \description{
 Inner function to get wilcox markers cond

@@ -18,7 +18,9 @@ Imports:
     ggtree,
     pbapply,
     psych,
-    ROCR
+    ROCR,
+    gridExtra
 Depends: 
     R (>= 4.0),
-    Seurat
+    Seurat,
+    ggplot2

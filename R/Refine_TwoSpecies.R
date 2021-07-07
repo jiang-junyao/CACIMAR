@@ -17,7 +17,7 @@ Refine_TwoSpecies<-function(ShMarker11,CellT11,CellT12,Species){
   SpecInd12 <- grep(paste0(Species[2],'.*\\.AllCluster'), colnames(ShMarker11))
   UsedID1 <- paste0('Used_',Species,'_ID'); ShMarker4 <- c()
   for(i in 1:length(uCellT2)){ ShMarker22 <- list()
-  for(i1 in 1:2){
+  for(i1 in 1:1){
     if(i1==1){ ShMarker1 <- ShMarker11
     SpecInd31 <- SpecInd11; SpecInd32 <- SpecInd12;
     }else{ ShMarker1 <- ShMarker12

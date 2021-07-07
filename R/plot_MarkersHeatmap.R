@@ -22,7 +22,9 @@ plot_MarkersHeatmap<-function(scRNA1,Color1=NULL,ModuleColor1=NULL,Gene1=NULL){
     Col2 <- c(rgb(247/255,147/255,30/255), rgb(248/255,115/255,106/255), rgb(220/255,20/255,60/255), rgb(169/255,169/255,169/255), rgb(150/255,206/255,180/255), rgb(163/255,165/255,0/255), rgb(192/255,193/255,48/255), rgb(157/255,115/255,194/255), rgb(183/255,76/255,171/255), rgb(230/255,134/255,201/255), rgb(140/255,198/255,63/255), rgb(255/255,191/255,15/255), rgb(103/255,199/255,193/255), rgb(3/255,161/255,198/255), rgb(97/255,156/255,255/255), rgb(129/255,70/255,58/255), rgb(0/255,114/255,189/255), rgb(74/255,76/255,191/255), rgb(103/255,97/255,156/255), rgb(42/255,122/255,155/255))
   }else{Col2=ModuleColor1}
   scRNA2 <- scRNA12[, 2:ncol(scRNA12)]
-  scRNA3 <- Kmeans_heatmap(scRNA2, K1=1, RowGroup1=RowGroup1, Scale1=Scale1, Gene1=Gene1, clustering_distance_rows='correlation', NumRowBlank1=NumRowBlank1, show_colnames=show_colnames, legend1=legend1, cluster_cols=F, Show.Module=T, Color1=Color1, ModuleColor1=Col2, ModuleScale1=ModuleScale1, RevOrder1=RevOrder1)
+  scRNA21<-apply(scRNA2, 2, as.numeric)
+  rownames(scRNA21)<-rownames(scRNA2)
+  scRNA3 <- Kmeans_heatmap(scRNA21, K1=1, RowGroup1=RowGroup1, Scale1=Scale1, Gene1=Gene1, clustering_distance_rows='correlation', NumRowBlank1=NumRowBlank1, show_colnames=show_colnames, legend1=legend1, cluster_cols=F, Show.Module=T, Color1=Color1, ModuleColor1=Col2, ModuleScale1=ModuleScale1, RevOrder1=RevOrder1)
   }
 
 

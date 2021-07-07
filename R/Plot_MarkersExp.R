@@ -16,14 +16,14 @@
 #' @export
 #'
 #' @examples
-Plot_MarkersExp<-function(Seurat_object,Gene1,Marker_list,File1,Spec1,ident.include=NULL,width=12,height=10,PlotType1=c('ggPlot', 'DotPlot', 'VlnPlot', 'FeaturePlot')){
+Plot_MarkersExp<-function(Seurat_object,Gene1,Marker_list,File1,ident.include=NULL,width=12,height=10,PlotType1=c('ggPlot', 'DotPlot', 'VlnPlot', 'FeaturePlot')){
   print('Plot single-cell gene expression')
   if (is.null(ident.include)) {
     ident.include <- as.numeric(levels(Seurat_object@active.ident))
   }
 
   CellType1<-'VascularEndothelialCells';
-  plot_MarkersExp(Seurat_object, File1=File1, Marker_list = Marker_list,Spec1,Gene1=Gene1, PlotType1=PlotType1, ident.include=ident.include, width=width, height=height)
+  plot_MarkersExp(Seurat_object, File1=File1, Marker_list = Marker_list,Gene1=Gene1, PlotType1=PlotType1, ident.include=ident.include, width=width, height=height)
 }
 
 
@@ -33,14 +33,11 @@ Plot_MarkersExp<-function(Seurat_object,Gene1,Marker_list,File1,Spec1,ident.incl
 
 #' Inner function to plot MarkersExp
 
-plot_MarkersExp <- function(pbmc1, File1, Spec1, Marker_list, PlotType1=c('FeaturePlot', 'DotPlot', 'VlnPlot', 'ggPlot'), Gene1='', CellType1='', ident.include=NULL, group.by=NULL, width=12, height=10, nrow=3, RedMeth1='tSNE', no.legend=F, legend.text.size=12, legend.label=T, size.title.use=10, size.axis.text=10, point.size.use=2, Xtick1=T, dot.scale=10, IDtype1=c('EnsID', 'Symbol'), Col02=NULL){
+plot_MarkersExp <- function(pbmc1, File1, Marker_list, PlotType1=c('FeaturePlot', 'DotPlot', 'VlnPlot', 'ggPlot'), Gene1='', CellType1='', ident.include=NULL, group.by=NULL, width=12, height=10, nrow=3, RedMeth1='tSNE', no.legend=F, legend.text.size=12, legend.label=T, size.title.use=10, size.axis.text=10, point.size.use=2, Xtick1=T, dot.scale=10, IDtype1=c('EnsID', 'Symbol'), Col2=NULL){
 
   Col1 <- c(rgb(169/255,169/255,169/255), rgb(103/255,199/255,193/255), rgb(3/255,161/255,198/255), rgb(97/255,156/255,255/255), rgb(0/255,114/255,189/255), rgb(140/255,198/255,63/255), rgb(192/255,193/255,48/255), rgb(247/255,147/255,30/255), rgb(220/255,20/255,60/255), rgb(230/255,134/255,201/255), rgb(157/255,115/255,194/255), rgb(143/255,72/255,156/255), rgb(97/255,156/255,255/255), rgb(163/255,165/255,0/255), rgb(82/255,24/255,74/255), rgb(129/255,70/255,58/255))
-  if(is.null(Col02)){ Col02 <- c(rgb(247/255,147/255,30/255), rgb(248/255,115/255,106/255), rgb(220/255,20/255,60/255), rgb(169/255,169/255,169/255), rgb(150/255,206/255,180/255), rgb(163/255,165/255,0/255), rgb(192/255,193/255,48/255), rgb(157/255,115/255,194/255), rgb(183/255,76/255,171/255), rgb(230/255,134/255,201/255), rgb(140/255,198/255,63/255), rgb(255/255,191/255,15/255), rgb(103/255,199/255,193/255), rgb(3/255,161/255,198/255), rgb(97/255,156/255,255/255), rgb(129/255,70/255,58/255), rgb(0/255,114/255,189/255), rgb(74/255,76/255,191/255), rgb(103/255,97/255,156/255), rgb(42/255,122/255,155/255)) }
-  if(Spec1=='Mm'){ Col2 <- Col02[c(1:2,4:18)]
-  }else if(Spec1=='Ch'){ Col2 <- Col02[c(1:2,4,6,8,10:11,19:20)]
-  }else if(Sepc1=='Zf'){ Col2 <- Col02[c(1:4,6:14,16:17)]
-  }else{ Col2 <- Col02; }
+  if(is.null(Col2)){ Col2 <- c(rgb(247/255,147/255,30/255), rgb(248/255,115/255,106/255), rgb(220/255,20/255,60/255), rgb(169/255,169/255,169/255), rgb(150/255,206/255,180/255), rgb(163/255,165/255,0/255), rgb(192/255,193/255,48/255), rgb(157/255,115/255,194/255), rgb(183/255,76/255,171/255), rgb(230/255,134/255,201/255), rgb(140/255,198/255,63/255), rgb(255/255,191/255,15/255), rgb(103/255,199/255,193/255), rgb(3/255,161/255,198/255), rgb(97/255,156/255,255/255), rgb(129/255,70/255,58/255), rgb(0/255,114/255,189/255), rgb(74/255,76/255,191/255), rgb(103/255,97/255,156/255), rgb(42/255,122/255,155/255)) }
+
 
   if(is.element(PlotType1[1], colnames(pbmc1@meta.data))){
     if(RedMeth1=='UMAP'){
@@ -72,7 +69,7 @@ plot_MarkersExp <- function(pbmc1, File1, Spec1, Marker_list, PlotType1=c('Featu
     pbmc2 <- pbmc1
     if(length(GeneID1)==1){
       if(IDtype1[1]=='EnsID'){
-        pbmc2@data <- t(as.matrix(pbmc2@assays$RNA@data[GeneID1, ])); rownames(pbmc2@assays$RNA@data) <- Symb1
+        pbmc2@assays$RNA@data <- t(as.matrix(pbmc2@assays$RNA@data[GeneID1, ])); rownames(pbmc2@assays$RNA@data) <- Symb1
       }else{ pbmc2@assays$RNA@data <- t(as.matrix(pbmc2@assays$RNA@data[Symb1, ])) }
     }else if(length(GeneID1)>1){
       if(IDtype1[1]=='EnsID'){

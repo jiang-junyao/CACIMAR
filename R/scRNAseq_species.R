@@ -32,8 +32,14 @@ Get_Wilcox_Markers_Cond<-function(Marker1, Cor1, CorThr1 = 0.2, CorType1 = 'Cor_
   return(Marker8)
 }
 
-#' Inner function to format markers
 
+
+#' Title
+#'
+#' @param RNA1
+#' @export
+#'
+#' @examples
 Format_Markers_Frac<-function(RNA1){
   Cluster1 <- t(apply(RNA1, 1, function(x1){
     x21 <- strsplit(x1[1],',')[[1]]; x22 <- strsplit(x1[2],',')[[1]]

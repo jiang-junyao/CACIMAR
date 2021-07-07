@@ -2,10 +2,10 @@
 % Please edit documentation in R/scRNAseq_species.R
 \name{Format_Markers_Frac}
 \alias{Format_Markers_Frac}
-\title{Inner function to format markers}
+\title{Title}
 \usage{
 Format_Markers_Frac(RNA1)
 }
 \description{
-Inner function to format markers
+Title
 }

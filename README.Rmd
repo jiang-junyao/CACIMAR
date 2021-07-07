@@ -34,3 +34,14 @@ And the development version from [GitHub](https://github.com/) with:
 # install.packages("devtools")
 devtools::install_github("jiang-junyao/CCtMR")
 ```
+
+## Example
+### Identify markers
+```{r}
+library(CCtMR)
+setwd('D:\\GIBH\\platform\\test data')
+a<-readRDS('Zebrafishdata.rds')
+### I only use 3 clusters here to reduce the running time
+a<-subset(a,idents = c(1,2,3))
+Marker1<-Identify_Markers(a,Spec1='Zf')
+```

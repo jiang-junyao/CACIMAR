@@ -27,6 +27,6 @@ Identify_Markers<-function(Seurat_object, PowerThr1=0.4, Spec1=NULL, GeneSymb1=N
   MarkerRoc<-Identify_Markers1(Seurat_object,PowerThr1)
   MarkerRoc<-as.data.frame(MarkerRoc)
   Marker<-Identify_Markers2(Seurat_object,MarkerRoc,GeneSymb1=GeneSymb1,PowerThr1=PowerThr1)
-  final_Markers<-Refine_Markers(Seurat_obejct,Spec1,GeneSymb1,FracThr1)
+  final_Markers<-Refine_Markers(Seurat_object,Spec1,GeneSymb1,Marker,FracThr1)
   return(final_Markers)
 }

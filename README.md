@@ -65,3 +65,20 @@ OrthG<-read.delim('D:/GIBH/platform/test data/RNA_genes_mmVSzf.txt')
 ShMarker<-Get_Used_OrthG(OrthG,mmMarker,zfMarker,Species = c('mm','zf'))
 refined_markers<-Refine_TwoSpecies(ShMarker,mmCelltype,zfCelltype,Species = c('mm','zf'))
 ```
+
+### Identify Cell types
+
+``` r
+Marker<-read.table('D:\\GIBH\\platform\\test data/Retinal_markersZf.txt',header = T)
+rownames(Marker)<-Marker[,1];Marker<-Marker[,-1]
+zfcelltype<-Identy_CellType(a,Marker)
+```
+
+### Cross-species celltype heamtmap
+
+``` r
+expression<-read.table('D:\\GIBH\\platform\\CellType_Comp\\CellType_Comp\\Data/mmP60RmmNMDA_chP10chNMDA_zfAdzfNMDA_Power01_SharedMarkers_Frac.txt')
+celltypes<-read.delim("D:/GIBH/platform/CellType_Comp/CellType_Comp/Data/mmP60RmmNMDA_chP10chNMDA_zfAdzfNMDA_Cell_Types.txt")
+a<-Heatmap_Cor(expression,celltypes,cluster_cols=T, cluster_rows=F)
+Plot_tree(a)
+```

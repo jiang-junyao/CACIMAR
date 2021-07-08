@@ -9,7 +9,7 @@
 #' @export
 #'
 #' @examples
-plot_MarkersHeatmap<-function(scRNA1,Color1=NULL,ModuleColor1=NULL,Gene1=NULL){
+Plot_MarkersHeatmap<-function(scRNA1,Color1=NULL,ModuleColor1=NULL,Gene1=NULL){
   Scale1='none'; ModuleScale1=10; show_colnames=F; legend1=T; RevOrder1=-1
   scRNA12 <- scRNA1[, c(grep('Symbol', colnames(scRNA1)), grep('C\\d', colnames(scRNA1)))]
   RowGroup1 <- as.numeric(apply(scRNA1, 1, function(x1){ x2 <- gsub('C','', x1[1]) }))

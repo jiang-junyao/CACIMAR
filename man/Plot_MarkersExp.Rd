@@ -7,7 +7,6 @@
 plot_MarkersExp(
   pbmc1,
   File1,
-  Spec1,
   Marker_list,
   PlotType1 = c("FeaturePlot", "DotPlot", "VlnPlot", "ggPlot"),
   Gene1 = "",
@@ -27,7 +26,7 @@ plot_MarkersExp(
   Xtick1 = T,
   dot.scale = 10,
   IDtype1 = c("EnsID", "Symbol"),
-  Col02 = NULL
+  Col2 = NULL
 )
 }
 \description{

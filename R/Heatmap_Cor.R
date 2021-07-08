@@ -8,7 +8,7 @@
 #' @param cluster_cols boolean values determining if columns should be clustered or hclust object
 #' @param cluster_rows boolean values determining if rows should be clustered or hclust object
 #' @param Color1 vector of colors used in heatmap
-#'
+#' @export
 #' @importFrom pheatmap pheatmap
 #' @return return a list used in Plot_tree
 #'
@@ -42,4 +42,12 @@ Heatmap_Cor <- function(RNA1, CellType, RowType1='', ColType1='', cluster_cols=F
   Hier1 <- pheatmap(as.matrix(RNA2), cluster_cols =cluster_cols, cluster_rows =cluster_rows, color = colorRampPalette(Color1)(50), border_color=rgb(200/255,200/255,200/255))
 
   return(Hier1)
+}
+
+Handle_CellType<-function(RNA1,CellT1){
+  CellT2 <- cbind(apply(CellT1, 1, function(x1){ x2 <- paste0(x1[1],x1[2]) }), CellT1)
+  colnames(RNA1) <- apply(CellT2[match(colnames(RNA1), CellT2[, 1]), ], 1, function(x1){ x2 <- paste(c(x1[2],'.',x1[4]),collapse='') })
+  rownames(RNA1) <- apply(CellT2[match(rownames(RNA1), CellT2[, 1]), ], 1, function(x1){ x2 <- paste(c(x1[2],'.',x1[4]),collapse='') })
+  RNA1[RNA1==1] <- NA
+  return(RNA1)
 }

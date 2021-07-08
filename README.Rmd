@@ -44,6 +44,7 @@ a<-readRDS('D:\\GIBH\\platform\\test data/Zebrafishdata.rds')
 ### I only use 3 clusters here to reduce the running time
 a<-subset(a,idents = c(1,2,3))
 Marker1<-Identify_Markers(a,Spec1='Zf')
+cc<-Seurat_Markers(a,Spec1 = 'Zf')
 ```
 
 ### plot MarkersHeaptmap
@@ -87,3 +88,5 @@ celltypes<-read.delim("D:/GIBH/platform/CellType_Comp/CellType_Comp/Data/mmP60Rm
 a<-Heatmap_Cor(expression,celltypes,cluster_cols=T, cluster_rows=F)
 Plot_tree(a)
 ```
+
+### 

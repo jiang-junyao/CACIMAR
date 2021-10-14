@@ -55,10 +55,10 @@ plot_MarkersHeatmap(Marker1_plot)
 
 ### Get cross-species markers
 ```r
-###Get_Wilcox_Markers_Cond
+###Get_Wilcox_Markers_Cond ###???usage???
 wilcox<-read.table('D:\\GIBH\\platform\\test data/mmP60RmmNMDA_mmP60mmLD_wilcoxMG_MarkerGenes.txt')
 Cor<-read.table('D:\\GIBH\\platform\\test data/mmP60RmmNMDA_mmLD_pbmcSubC_MG_Bin50_R5_GeneCor.txt',header = T)
-wilcox_result<-Get_Wilcox_Markers_Cond(wilcox,Cor)
+wilcox_result<-get_Wilcox_Markers_Cond(wilcox,Cor)
 ###Overlap_Markers_Cond
 mmMarkers3_F3F0 <- read.delim("D:/GIBH/platform/test data/mmP60RmmNMDA_mmP60mmLD_P03_Markers3_F3F0.txt")
 zfMarkers3_F3F0 <- read.delim("D:/GIBH/platform/test data/zfAdzfNMDA_zfAdzfLD_zfAdzfTR_P03_Markers3_F3F0.txt")

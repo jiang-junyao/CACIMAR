@@ -2,18 +2,27 @@
 % Please edit documentation in R/Identy_CellType.R
 \name{Identy_CellType}
 \alias{Identy_CellType}
-\title{Title}
+\title{Identify cell type of each cluster}
 \usage{
 Identy_CellType(object, Marker1)
 }
 \arguments{
 \item{object}{seurat object}
 
-\item{Marker1}{marker gene list rownames is symbol first column is ENS ID second column is cell type}
+\item{Marker1}{marker gene list rownames is symbol first column is ENS ID
+second column is cell type}
 }
 \value{
-a lsit with cell type
+Cell type with the highest power in each cluster
 }
 \description{
-Title
+This function has three steps to identify cell type of each cluster.
+(1) Calculate the power of each known marker based on AUC
+(area under the receiver operating characteristic curve of gene expression)
+which indicates the capability of marker i from cell type m to distinguish
+cluster j and the other clusters. (2) Calculate the united power (UP)
+for cell type m across each cluster j. (3) For each cluster j we determine
+the cell type according to UP. Generally, the cluster beongs to the cell
+type which have the highest united power or higher than the threshold of
+the united power (for example > 0.9 power).
 }

@@ -6,26 +6,39 @@
 \usage{
 Identify_Markers(
   Seurat_object,
-  PowerThr1 = 0.4,
+  RocThr = 0.4,
+  DiffThr = 1/3,
   Spec1 = NULL,
   GeneSymb1 = NULL,
-  FracThr1 = 3
+  FracThr = 3
 )
 }
 \arguments{
 \item{Seurat_object}{Seurat object, should contain cluster information}
 
-\item{PowerThr1}{numeric, indicating}
+\item{RocThr}{numeric, indicating the cutoff of Roc to identify marker genes}
 
-\item{Spec1}{character, When GeneSymb1 == NULL, inner file will be used for iD changing, this parameter indicate the species of}
+\item{DiffThr}{numeric, indicating the cutoff of difference in marker genes between
+clusters}
 
-\item{GeneSymb1}{Gene correspondence that is used for ID chaning. first column should be ENSEMBLE ID, second column should be Symbol, third column should be NCBIID and fourth column should be officalsymbol.}
+\item{Spec1}{character, When GeneSymb1 == NULL, inner file will be used for
+ID changing, this parameter indicate the species of}
 
-\item{FracThr1}{numeric, indicating}
+\item{GeneSymb1}{Gene correspondence that is used for ID chaning. first
+column should be ENSEMBLE ID, second column should be Symbol, third column
+should be NCBIID and fourth column should be officalsymbol.}
+
+\item{FracThr1}{numeric, indicating the threshold of estimate of the odds
+ratio}
 }
 \value{
 
 }
 \description{
-Identify markers of each cluster
+This function first identify marker genes in each cluster
+with Roc threshold > RocThr. Then, based on the marker genes identified above,
+this function calculates the difference and power of marker genes in each
+cluster, and marker genes with Difference threshold > DiffThr will be retained.
+Next, gene with the largest power in which cluster will be the marker
+gene in this cluster. Finally, marker genes with
 }

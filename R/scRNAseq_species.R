@@ -1,7 +1,7 @@
 #' Inner function to get wilcox markers cond
 #'
 
-Get_Wilcox_Markers_Cond<-function(Marker1, Cor1, CorThr1 = 0.2, CorType1 = 'Cor_mmNMDA_mmLD'){
+get_Wilcox_Markers_Cond<-function(Marker1, Cor1, CorThr1 = 0.2, CorType1 = 'Cor_mmNMDA_mmLD'){
   ShMarker1 <- c(); Marker3 <- list()
   Marker2 <- Marker1[Marker1[, grep('avg_logFC',colnames(Marker1))]>0 & Marker1[, grep('p_val_adj',colnames(Marker1))]<0.01, ]
   Marker2<-na.omit(Marker2)
@@ -34,26 +34,3 @@ Get_Wilcox_Markers_Cond<-function(Marker1, Cor1, CorThr1 = 0.2, CorType1 = 'Cor_
 
 
 
-#' Title
-#'
-#' @param RNA1
-#' @export
-#'
-#' @examples
-Format_Markers_Frac<-function(RNA1){
-  Cluster1 <- t(apply(RNA1, 1, function(x1){
-    x21 <- strsplit(x1[1],',')[[1]]; x22 <- strsplit(x1[2],',')[[1]]
-    x31 <- paste(x21[1:(length(x21)-1)], collapse=',')
-    x32 <- paste(x22[1:(length(x22)-1)], collapse=',')
-    return(c(x21[1], x31, x32))
-  }))
-  colnames(Cluster1) <- c('Cluster','AllCluster','Power')
-  RNA2 <- cbind(Cluster1, RNA1[,3:ncol(RNA1)])
-  if(grepl('TRUE', paste(grepl('^[Rr]p[ls]\\d', RNA2[, 'Symbol']), collapse=''))){
-    RNA3 <- RNA2[-grep('^[Rr]p[ls]\\d', RNA2[, 'Symbol']), ]
-  }else{ RNA3 <- RNA2 }
-  RNA3 <- RNA3[order(RNA3[, 'Power'], decreasing=T), ]
-  RNA3 <- RNA3[order(RNA3[, 'AllCluster']), ]
-  RNA3 <- RNA3[order(RNA3[, 'Cluster']), ]; print(c(nrow(RNA2), nrow(RNA3)))
-  return(RNA3)
-}

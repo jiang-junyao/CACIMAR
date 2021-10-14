@@ -36,7 +36,7 @@ Cal_SinlgeCell_Cor_SmoothByBin<-function(){
         for(k in 1:length(SubS1)){
           Meta11 <- rbind(Meta11, Meta1[Meta1[, SubG1]==SubS1[k], ])
         }
-        Pseudotime1 <- rbind(Pseudotime1, c(min(Meta11$Pseudotime), max(Meta11$Pseudotime)))
+        Pseudotime1 <- rbind(Pseudotime1, c(min(Meta1$Pseudotime), max(Meta1$Pseudotime)))
         Meta12[[j]] <- Meta11
       }
       Pseudotime12 <- c(max(Pseudotime1[,1]), min(Pseudotime1[,2]))

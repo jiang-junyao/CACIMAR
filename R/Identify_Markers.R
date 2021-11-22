@@ -189,22 +189,6 @@ Identify_Markers2 <- function(pbmc, Marker, GeneSymb1=NULL, PowerThr1=1/3){
 }
 
 
-Markertest <- function(object, cells.1, cells.2, genes.use = NULL, print.bar = TRUE,
-                       assay.type = "RNA") {
-  data.test <- Seurat::GetAssayData(
-    object = object,
-    slot = "data"
-  )
-  if (is.null(genes.use)) {
-    genes.use <- rownames(x = data.test)
-  }
-  to.return <- AUCMarkerTest(
-    data1 = data.test[, cells.1],
-    data2 = data.test[, cells.2], mygenes = genes.use, print.bar = print.bar
-  )
-  to.return$power <- abs(x = to.return$myAUC - 0.5) * 2
-  return(to.return)
-}
 
 
 

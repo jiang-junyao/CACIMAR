@@ -16,27 +16,32 @@
 #' @export
 #'
 #' @examples
-Identy_CellType <- function(object, Marker1) {
+Identify_CellType <- function(object, Marker1) {
   MarkerRoc1 <- Identify_CellTypes1(object, Marker1)
   ClusterCellT1 <- Identify_CellTypes2(MarkerRoc1)
+  #write.table(MarkerRoc1, 'MarkerRoc.txt')
+
   return(ClusterCellT1)
 }
 
-Identify_CellTypes1 <- function(pbmc, Marker1) {
+
+Identify_CellTypes1 <- function(object, Marker1) {
+  ## calculate the power of each marker on distinguishing cell types
   NumCellType <- apply(Marker1, 1, function(X1) {
     length(strsplit(as.character(X1[3]), ";")[[1]])
   })
   Marker2 <- cbind(Marker1, NumCellType)
 
-  MarkerRoc1 <- Cal_MarkersRoc(pbmc, rownames(Marker1))
+  MarkerRoc1 <- Cal_MarkersRoc(object, rownames(Marker1))
   MarkerRoc2 <- cbind(Marker2[order(rownames(Marker2)), ], MarkerRoc1[order(rownames(MarkerRoc1)), ])
   MarkerRoc2 <- MarkerRoc2[order(MarkerRoc2$CellType), ]
 
   return(MarkerRoc2)
 }
 
+
 Identify_CellTypes2 <- function(MarkerRoc1) {
-  print("Identify list of cell types")
+  ## Get the list of cell types
   CellType1 <- strsplit(levels(as.factor(MarkerRoc1$CellType)), ",")
   CellType2 <- c()
   for (i in 1:length(CellType1)) {
@@ -51,7 +56,9 @@ Identify_CellTypes2 <- function(MarkerRoc1) {
     return(x2)
   })))
   colnames(MarkerRoc2) <- colnames(MarkerRoc1)
+  #write.table(MarkerRoc2, 'MarkerRoc2.txt')
 
+  ## Calculate the joint power for each cluster
   MarkerRoc5 <- c()
   for (i in 1:length(uCellType2)) {
     uCellType3 <- uCellType2[i]
@@ -63,13 +70,15 @@ Identify_CellTypes2 <- function(MarkerRoc1) {
       Ind1 <- c(Ind1, Ind11, Ind12, Ind13)
     }
     MarkerRoc3 <- MarkerRoc2[unique(Ind1), ]
-    MarkerRoc4 <- Cal_JointPower2(MarkerRoc3[, 4:ncol(MarkerRoc3)])
+    MarkerRoc4 <- Cal_JointPower2(MarkerRoc3[, 5:ncol(MarkerRoc3)])
     MarkerRoc4 <- t(as.matrix(MarkerRoc4))
     colnames(MarkerRoc4) <- gsub("_power", "", colnames(MarkerRoc4))
     MarkerRoc5 <- rbind(MarkerRoc5, MarkerRoc4)
   }
   rownames(MarkerRoc5) <- uCellType2
+  #write.table(MarkerRoc5, 'MarkerRoc3.txt')
 
+  ## Sort assigned cell types according to the joint power for each cluster
   MarkerRoc8 <- c()
   for (i in 1:dim(MarkerRoc5)[2]) {
     print(colnames(MarkerRoc5)[i])
@@ -78,7 +87,9 @@ Identify_CellTypes2 <- function(MarkerRoc1) {
     MarkerRoc8 <- rbind(MarkerRoc8, MarkerRoc7)
   }
   rownames(MarkerRoc8) <- colnames(MarkerRoc5)
-  colnames(MarkerRoc8) <- c("Cell.Type", "Power", "Difference")
+  colnames(MarkerRoc8) <- c("Cell.types", "Corresponding.powers", 'Predicted.cell.type')
 
   return(MarkerRoc8)
 }
+
+

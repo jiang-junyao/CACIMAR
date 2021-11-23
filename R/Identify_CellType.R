@@ -9,7 +9,8 @@
 #' type which have the highest united power or higher than the threshold of
 #' the united power (for example > 0.9 power).
 #' @param object seurat object
-#' @param Marker1 marker gene list rownames is symbol first column is ENS ID
+#' @param Marker1 data.frame, indicating marker gene and its corresponding cell type,
+#' rownames is ENS ID, first column is Symbol ID,
 #' second column is cell type
 #'
 #' @return Cell type with the highest power in each cluster

@@ -6,25 +6,31 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of CCtMR is to …
+CCtMR is an R package to identify cross-species marker genes, cell types
+and gene regulatory networks based on single cell sequencing.
 
 ## Installation
 
-You can install the released version of CCtMR from
-[CRAN](https://CRAN.R-project.org) with:
-
-``` r
-install.packages("CCtMR")
-```
-
-And the development version from [GitHub](https://github.com/) with:
+Install CCtMR from github, run:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("jiang-junyao/CCtMR")
+devtools::install_github("jiangjunyao123/CCtMR")
 ```
 
 ## Example
+
+### Identify Cell types
+
+First, using known marker genes to annotate each cluster. This method is
+based on AUC (area under the receiver operating characteristic curve of
+gene expression), and is very sensitive to the marker genes input.
+
+``` r
+Marker<-read.table('D:\\GIBH\\platform\\test data/Retinal_markersZf.txt',header = T)
+rownames(Marker)<-Marker[,1];Marker<-Marker[,-1]
+zfcelltype<-Identify_CellType(a,Marker)
+```
 
 ### Identify markers
 
@@ -36,13 +42,6 @@ a<-readRDS('D:\\GIBH\\platform\\test data/Zebrafishdata.rds')
 a<-subset(a,idents = c(1,2,3))
 Marker1<-Identify_Markers(a,Spec1='Zf')
 cc<-Seurat_Markers(a,Spec1 = 'Zf')
-```
-
-### plot MarkersHeaptmap
-
-``` r
-Marker1_plot<-Format_Markers_Frac(Marker1)
-plot_MarkersHeatmap(Marker1_plot)
 ```
 
 ### Get cross-species markers
@@ -67,12 +66,11 @@ ShMarker<-Get_Used_OrthG(OrthG,mmMarker,zfMarker,Species = c('mm','zf'))
 refined_markers<-Refine_TwoSpecies(ShMarker,mmCelltype,zfCelltype,Species = c('mm','zf'))
 ```
 
-### Identify Cell types
+### plot MarkersHeaptmap
 
 ``` r
-Marker<-read.table('D:\\GIBH\\platform\\test data/Retinal_markersZf.txt',header = T)
-rownames(Marker)<-Marker[,1];Marker<-Marker[,-1]
-zfcelltype<-Identify_CellType(a,Marker)
+Marker1_plot<-Format_Markers_Frac(Marker1)
+plot_MarkersHeatmap(Marker1_plot)
 ```
 
 ### Cross-species celltype heamtmap
@@ -84,4 +82,4 @@ a<-Heatmap_Cor(expression,celltypes,cluster_cols=T, cluster_rows=F)
 Plot_tree(a)
 ```
 
-### 
+### Cross-species regulatory networks

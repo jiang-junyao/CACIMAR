@@ -9,16 +9,16 @@
 #' type which have the highest united power or higher than the threshold of
 #' the united power (for example > 0.9 power).
 #' @param object seurat object
-#' @param Marker1 data.frame, indicating marker gene and its corresponding cell type,
-#' rownames is ENS ID, first column is Symbol ID,
-#' second column is cell type
+#' @param Marker_gene_table data.frame, indicating marker gene and its corresponding cell type,
+#' rownames of Marker genes table should be the same format as the
+#' rownames format of seurat object, and should contain CellType column
 #'
 #' @return Cell type with the highest power in each cluster
 #' @export
 #'
 #' @examples
-Identify_CellType <- function(object, Marker1) {
-  MarkerRoc1 <- Identify_CellTypes1(object, Marker1)
+Identify_CellType <- function(object, Marker_gene_table) {
+  MarkerRoc1 <- Identify_CellTypes1(object, Marker_gene_table)
   ClusterCellT1 <- Identify_CellTypes2(MarkerRoc1)
   #write.table(MarkerRoc1, 'MarkerRoc.txt')
 
@@ -71,7 +71,8 @@ Identify_CellTypes2 <- function(MarkerRoc1) {
       Ind1 <- c(Ind1, Ind11, Ind12, Ind13)
     }
     MarkerRoc3 <- MarkerRoc2[unique(Ind1), ]
-    MarkerRoc4 <- Cal_JointPower2(MarkerRoc3[, 4:ncol(MarkerRoc3)])
+    startidx <- grep('Cluster1_myAUC',colnames(MarkerRoc3))
+    MarkerRoc4 <- Cal_JointPower2(MarkerRoc3[, startidx:ncol(MarkerRoc3)])
     MarkerRoc4 <- t(as.matrix(MarkerRoc4))
     colnames(MarkerRoc4) <- gsub("_power", "", colnames(MarkerRoc4))
     MarkerRoc5 <- rbind(MarkerRoc5, MarkerRoc4)

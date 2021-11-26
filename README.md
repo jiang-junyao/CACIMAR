@@ -7,7 +7,7 @@
 <!-- badges: end -->
 
 CCtMR is an R package to identify cross-species marker genes, cell types
-and gene regulatory networks based on single cell sequencing.
+and gene regulatory networks based on scRNA-seq data.
 
 ## Installation
 
@@ -18,21 +18,46 @@ Install CCtMR from github, run:
 devtools::install_github("jiangjunyao123/CCtMR")
 ```
 
-## Example
+## Tutorial
 
-### Identify Cell types
+### 1.Identify Cell types
 
-First, using known marker genes to annotate each cluster. This method is
-based on AUC (area under the receiver operating characteristic curve of
-gene expression), and is very sensitive to the marker genes input.
+Using known marker genes to annotate each cluster. This method is based
+on AUC (area under the receiver operating characteristic curve of gene
+expression), and is very sensitive to the marker genes input.
+
+#### Inputs data
+
+1.  Seurat object Seurat object should have clustering information in
+    active.ident slot and meta.data slot
+
+2.  Marker genes table Rownames of Marker genes table should be the same
+    format as the rownames format of seurat object, and should contain
+    CellType column
+
+#### Example
 
 ``` r
 Marker<-read.table('D:\\GIBH\\platform\\test data/Retinal_markersZf.txt',header = T)
-rownames(Marker)<-Marker[,1];Marker<-Marker[,-1]
-zfcelltype<-Identify_CellType(a,Marker)
+head(Marker)
+#>            EnsemblID  Symbol            CellType
+#> 1 ENSDARG00000045904   nr2e3 Rods,Rodprogenitors
+#> 2 ENSDARG00000019566 neurod1      RodProgenitors
+#> 3 ENSDARG00000099572   hmgn2      RodProgenitors
+#> 4 ENSDARG00000002193     rho                Rods
+#> 5 ENSDARG00000100466     nrl                Rods
+#> 6 ENSDARG00000011235    otx2                Rods
 ```
 
-### Identify markers
+``` r
+### I only use 3 clusters here to reduce the running time
+seurat_object<-readRDS('D:\\GIBH\\platform\\test data/Zebrafishdata.rds')
+seurat_object<-subset(a,idents = c(1,2,3))
+rownames(Marker)<-Marker[,1];Marker<-Marker[,-1]
+zfcelltype<-Identify_CellType(seurat_object,Marker)
+```
+
+### 2.Identify markers
 
 ``` r
 library(CCtMR)
@@ -44,7 +69,7 @@ Marker1<-Identify_Markers(a,Spec1='Zf')
 cc<-Seurat_Markers(a,Spec1 = 'Zf')
 ```
 
-### Get cross-species markers
+### 3.Get cross-species markers
 
 ``` r
 ###Get_Wilcox_Markers_Cond ###???usage???
@@ -66,14 +91,14 @@ ShMarker<-Get_Used_OrthG(OrthG,mmMarker,zfMarker,Species = c('mm','zf'))
 refined_markers<-Refine_TwoSpecies(ShMarker,mmCelltype,zfCelltype,Species = c('mm','zf'))
 ```
 
-### plot MarkersHeaptmap
+### 4.plot MarkersHeaptmap
 
 ``` r
 Marker1_plot<-Format_Markers_Frac(Marker1)
 plot_MarkersHeatmap(Marker1_plot)
 ```
 
-### Cross-species celltype heamtmap
+### 5.Cross-species celltype heamtmap
 
 ``` r
 expression<-read.table('D:\\GIBH\\platform\\CellType_Comp\\CellType_Comp\\Data/mmP60RmmNMDA_chP10chNMDA_zfAdzfNMDA_Power01_SharedMarkers_Frac.txt')
@@ -82,4 +107,4 @@ a<-Heatmap_Cor(expression,celltypes,cluster_cols=T, cluster_rows=F)
 Plot_tree(a)
 ```
 
-### Cross-species regulatory networks
+\#\#\#6. Cross-species regulatory networks

@@ -4,14 +4,14 @@
 \alias{Identify_CellType}
 \title{Identify cell type of each cluster}
 \usage{
-Identify_CellType(object, Marker1)
+Identify_CellType(object, Marker_gene_table)
 }
 \arguments{
 \item{object}{seurat object}
 
-\item{Marker1}{data.frame, indicating marker gene and its corresponding cell type,
-rownames is ENS ID, first column is Symbol ID,
-second column is cell type}
+\item{Marker_gene_table}{data.frame, indicating marker gene and its corresponding cell type,
+rownames of Marker genes table should be the same format as the
+rownames format of seurat object, and should contain CellType column}
 }
 \value{
 Cell type with the highest power in each cluster

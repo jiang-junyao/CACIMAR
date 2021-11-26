@@ -33,20 +33,21 @@ expression), and is very sensitive to the marker genes input.
 
 2.  Marker genes table Rownames of Marker genes table should be the same
     format as the rownames format of seurat object, and should contain
-    CellType column
+    CellType column (Marker genes table can also contain other columns,
+    which will not affect this function)
 
 #### Example
 
 ``` r
 Marker<-read.table('D:\\GIBH\\platform\\test data/Retinal_markersZf.txt',header = T)
 head(Marker)
-#>            EnsemblID  Symbol            CellType
-#> 1 ENSDARG00000045904   nr2e3 Rods,Rodprogenitors
-#> 2 ENSDARG00000019566 neurod1      RodProgenitors
-#> 3 ENSDARG00000099572   hmgn2      RodProgenitors
-#> 4 ENSDARG00000002193     rho                Rods
-#> 5 ENSDARG00000100466     nrl                Rods
-#> 6 ENSDARG00000011235    otx2                Rods
+#>                     Symbol            CellType
+#> ENSDARG00000045904   nr2e3 Rods,Rodprogenitors
+#> ENSDARG00000019566 neurod1      RodProgenitors
+#> ENSDARG00000099572   hmgn2      RodProgenitors
+#> ENSDARG00000002193     rho                Rods
+#> ENSDARG00000100466     nrl                Rods
+#> ENSDARG00000011235    otx2                Rods
 ```
 
 ``` r

@@ -38,7 +38,7 @@ Using known marker genes to annotate each cluster. This method is based on AUC (
 Seurat object should have clustering information in active.ident slot and meta.data slot
 
 (2) Marker genes table
-Rownames of Marker genes table should be the same format as the rownames format of seurat object, and should contain CellType column
+Rownames of Marker genes table should be the same format as the rownames format of seurat object, and should contain CellType column (Marker genes table can also contain other columns, which will not affect this function)
 
 #### Example
 ```{r}

@@ -15,7 +15,7 @@ Install CCtMR from github, run:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("jiangjunyao123/CCtMR")
+devtools::install_github("jiang-junyao/CCtMR")
 ```
 
 ## Tutorial

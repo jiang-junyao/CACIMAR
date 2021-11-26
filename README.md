@@ -54,7 +54,6 @@ head(Marker)
 ### I only use 3 clusters here to reduce the running time
 seurat_object<-readRDS('D:\\GIBH\\platform\\test data/Zebrafishdata.rds')
 seurat_object<-subset(a,idents = c(1,2,3))
-rownames(Marker)<-Marker[,1];Marker<-Marker[,-1]
 zfcelltype<-Identify_CellType(seurat_object,Marker)
 ```
 

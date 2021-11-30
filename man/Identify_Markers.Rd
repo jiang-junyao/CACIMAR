@@ -21,10 +21,10 @@ Identify_Markers(
 \item{DiffThr}{numeric, indicating the cutoff of difference in marker genes between
 clusters}
 
-\item{Spec1}{character, When GeneSymb1 == NULL, inner file will be used for
-ID changing, this parameter indicate the species of}
+\item{Spec1}{character, When parameter GeneSymb1 == NULL, inner database will be used for
+ID changing, this parameter indicate the species of data}
 
-\item{GeneSymb1}{Gene correspondence that is used for ID chaning. first
+\item{GeneSymb1}{Gene correspondence that is used for ID changing. first
 column should be ENSEMBLE ID, second column should be Symbol, third column
 should be NCBIID and fourth column should be officalsymbol.}
 
@@ -36,9 +36,10 @@ ratio}
 }
 \description{
 This function first identify marker genes in each cluster
-with Roc threshold > RocThr. Then, based on the marker genes identified above,
+with Roc threshold > RocThr. Then, based on marker genes identified above,
 this function calculates the difference and power of marker genes in each
 cluster, and marker genes with Difference threshold > DiffThr will be retained.
 Next, gene with the largest power in which cluster will be the marker
-gene in this cluster. Finally, marker genes with
+gene in this cluster. Eventually, make fisher test for power of each cluster,
+cluster with p.value < 0.05 will be retained as the final cluster for marker gene
 }

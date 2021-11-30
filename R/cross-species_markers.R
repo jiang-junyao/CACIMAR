@@ -3,14 +3,14 @@
 #' @param markers_expression marker genes information with expression
 #' @param celltype cell type data.frame, first column should be samples, second
 #' column should be cluster, thrid column should be cell type
-#' @param Species character, indicating the species of your data
+#' @param Spec1 character, indicating the species of your data
 #'
 #' @return marker genes information in different samples
 #' @export
 #'
 #' @examples
-Overlap_Markers_Cond<-function(markers_expression, celltype, Species){
-  CellT1 = celltype  ; Spec2 = Species ; RNA2 <- marker_expression
+Overlap_Markers_Cond<-function(markers_expression, celltype, Spec1){
+  CellT1 = celltype  ; Spec2 = Spec1 ; RNA2 <- markers_expression
   Cluster1 <- apply(CellT1, 1, function(x1){ x2 <- paste(x1[1:2], collapse='.') })
   CellT12 <- cbind(CellT1, Cluster1)
   uCellT1 <- unique(CellT12$CellType)
@@ -48,7 +48,7 @@ Overlap_Markers_Cond<-function(markers_expression, celltype, Species){
   return(RNA5)
 }
 
-#' Identify orthologs for two species according to power
+#' Identify orthologs genes based on orthologs database
 #'
 #' @param OrthG1
 #' @param Species1_expression
@@ -64,7 +64,9 @@ Get_Used_OrthG<-function(OrthG1,Species1_expression,Species2_expression,Species)
                                                colnames(Species1_expression)[1:2])
   colnames(Species2_expression)[1:2] <- paste0(Species[2],
                                                colnames(Species2_expression)[1:2])
-  for(i in 1:2){
+  Species1_expression2 <- Species1_expression
+  Species2_expression2 <- Species2_expression
+  for(i in 1:2){##average the marker gene power in each condition
     if(i==1){ Exp01 <- Species1_expression
     }else{ Exp01 <- Species2_expression }
     Ind1 <- grep('Power', colnames(Exp01))
@@ -79,15 +81,21 @@ Get_Used_OrthG<-function(OrthG1,Species1_expression,Species2_expression,Species)
     if(i==1){ Species1_expression <- as.data.frame(Power1);
     }else{ Species2_expression <- as.data.frame(Power1) }
   }
+  ### only marker genes in orthG database will be retained
   Exp2 <- Get_OrthG(OrthG1, Species1_expression, Species2_expression, Species)
-  Type1 <- paste0('Used_',Species[1],'_ID'); Type2 <- paste0('Used_',Species[2],'_ID');
-  Species1_expression <- mmExp1[match(Exp2[, Type1], rownames(Species1_expression)), ]
-  Species2_expression <- zfExp1[match(Exp2[, Type2], rownames(Species2_expression)), ]
+  Type1 <- paste0('Used_',Species[1],'_ID')
+  Type2 <- paste0('Used_',Species[2],'_ID')
+  Species1_expression <- Species1_expression[match(Exp2[, Type1],
+                                                   rownames(Species1_expression)), ]
+  Species2_expression <- Species2_expression[match(Exp2[, Type2],
+                                                   rownames(Species2_expression)), ]
   Exp3 <- cbind(Exp2, Species1_expression, Species2_expression)
   Exp4 <- Exp3[!is.na(Exp3[, dim(Exp2)[2]+1]) & !is.na(Exp3[, dim(Exp2)[2]+dim(Species1_expression)[2]+1]), ]
-  Exp5 <- cbind(Exp4[,1:7], mmExp01[match(Exp4[,Type1], rownames(mmExp01)), ], zfExp01[match(Exp4[,Type2], rownames(zfExp01)), ])
-  Exp5 <- Refine_Used_OrthG(Exp5,Species)
-  return(Exp5)
+  Exp5 <- cbind(Exp4[,1:7], Species1_expression2[match(Exp4[,Type1],
+                                                      rownames(Species1_expression2)), ],Species2_expression2[match(Exp4[,Type2], rownames(Species2_expression2)), ])
+ ###For each marker gene, if appear in the same cluster of two species, it will be retained
+   Exp6 <- Refine_Used_OrthG(Exp5,Species)
+  return(Exp6)
 }
 
 

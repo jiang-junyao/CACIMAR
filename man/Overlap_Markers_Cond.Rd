@@ -4,7 +4,7 @@
 \alias{Overlap_Markers_Cond}
 \title{Overlap markers from different conditions of the same species}
 \usage{
-Overlap_Markers_Cond(markers_expression, celltype, Species)
+Overlap_Markers_Cond(markers_expression, celltype, Spec1)
 }
 \arguments{
 \item{markers_expression}{marker genes information with expression}
@@ -12,7 +12,7 @@ Overlap_Markers_Cond(markers_expression, celltype, Species)
 \item{celltype}{cell type data.frame, first column should be samples, second
 column should be cluster, thrid column should be cell type}
 
-\item{Species}{character, indicating the species of your data}
+\item{Spec1}{character, indicating the species of your data}
 }
 \value{
 marker genes information in different samples

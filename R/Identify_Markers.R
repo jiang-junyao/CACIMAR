@@ -1,18 +1,19 @@
 #' Identify markers of each cluster
 #' @description This function first identify marker genes in each cluster
-#' with Roc threshold > RocThr. Then, based on the marker genes identified above,
+#' with Roc threshold > RocThr. Then, based on marker genes identified above,
 #' this function calculates the difference and power of marker genes in each
 #' cluster, and marker genes with Difference threshold > DiffThr will be retained.
 #' Next, gene with the largest power in which cluster will be the marker
-#' gene in this cluster. Finally, marker genes with
+#' gene in this cluster. Eventually, make fisher test for power of each cluster,
+#' cluster with p.value < 0.05 will be retained as the final cluster for marker gene
 #'
 #' @param Seurat_object Seurat object, should contain cluster information
 #' @param RocThr numeric, indicating the cutoff of Roc to identify marker genes
 #' @param DiffThr numeric, indicating the cutoff of difference in marker genes between
 #' clusters
-#' @param Spec1 character, When GeneSymb1 == NULL, inner file will be used for
-#' ID changing, this parameter indicate the species of
-#' @param GeneSymb1 Gene correspondence that is used for ID chaning. first
+#' @param Spec1 character, When parameter GeneSymb1 == NULL, inner database will be used for
+#' ID changing, this parameter indicate the species of data
+#' @param GeneSymb1 Gene correspondence that is used for ID changing. first
 #' column should be ENSEMBLE ID, second column should be Symbol, third column
 #' should be NCBIID and fourth column should be officalsymbol.
 #' @param FracThr1 numeric, indicating the threshold of estimate of the odds
@@ -192,9 +193,9 @@ Identify_Markers2 <- function(pbmc, Marker, GeneSymb1=NULL, PowerThr1=1/3){
 
 
 
-Refine_Markers<-function(Seurat_obejct, Spec1, GeneSymb1, Marker, FracThr1=3){
+Refine_Markers<-function(Seurat_object, Spec1, GeneSymb1, Marker, FracThr1=3){
   if(Spec1=='Zf'){ Cluster1 <- 'res.0.2' }else{ Cluster1 <- 'res.0.1' }
-  MarkerRoc3 <- Identify_Markers3(Seurat_obejct, Marker, Cluster1, GeneSymb1, FracThr1=FracThr1)
+  MarkerRoc3 <- Identify_Markers3(Seurat_object, Marker, Cluster1, GeneSymb1, FracThr1=FracThr1)
   Ind1 <- grep('Symbol', colnames(MarkerRoc3))
   if(length(Ind1)>1){ MarkerRoc3 <- MarkerRoc3[, -Ind1[2]] }
   MarkerRoc4 <- MarkerRoc3[MarkerRoc3[,'Pvalue'] < 0.01, -grep('EnsemblID', colnames(MarkerRoc3))]
@@ -209,10 +210,10 @@ Identify_Markers3 <- function(pbmc, MarkerRoc2, Cluster1, Symb1, FracThr1=5){
   pbmc@assays$RNA@data <- GetAssayData(pbmc)[rownames(MarkerRoc2), ]
   Frac1 <- Get_scRNA_AggExp(pbmc, Symb1, Cluster1=Cluster1, ExpType1='fraction')
   colnames(Frac1) <- gsub('_0', '', colnames(Frac1))
-  colnames(Frac1) <- gsub('Frac', '', colnames(Frac1))
+  colnames(Frac1) <- gsub('FracC', 'Cluster', colnames(Frac1))
   MarkerRoc3 <- cbind(MarkerRoc2, Frac1)
   AllCluster1 <- as.matrix(table(pbmc@active.ident))
-  rownames(AllCluster1) <- paste0('C', rownames(AllCluster1))
+  rownames(AllCluster1) <- paste0('Cluster', rownames(AllCluster1))
 
   MarkerRoc31 <- apply(MarkerRoc3, 1, function(x1){
     x11 <- strsplit(x1[1], ',')[[1]]
@@ -244,7 +245,6 @@ Identify_Markers3 <- function(pbmc, MarkerRoc2, Cluster1, Symb1, FracThr1=5){
 
 Get_scRNA_AggExp <- function(pbmc, Symb1, Cluster1=c('all', 'res.0.1'), Group1=c('all', 'protocol'), ExpType1=c('expression', 'fraction')){
 
-  source('../Markers_Programs/Programs/Converse_GeneIDSymbol.R')
 
   if(Cluster1[1]=='all'){ pbmc@meta.data[,'all'] <- 0
   }else if(!is.element(Cluster1, colnames(pbmc@meta.data))){

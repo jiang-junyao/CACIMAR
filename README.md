@@ -1,21 +1,21 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# CCtMR
+# CACIMAR
 
 <!-- badges: start -->
 <!-- badges: end -->
 
-CCtMR is an R package to identify cross-species marker genes, cell types
-and gene regulatory networks based on scRNA-seq data.
+CACIMAR is an R package to identify cross-species marker genes, cell
+types and gene regulatory networks based on scRNA-seq data.
 
 ## Installation
 
-Install CCtMR from github, run:
+Install CACIMAR from github, run:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("jiang-junyao/CCtMR")
+devtools::install_github("jiang-junyao/CACIMAR")
 ```
 
 ## Inputs data
@@ -41,7 +41,7 @@ on AUC (area under the receiver operating characteristic curve of gene
 expression), and is very sensitive to the marker genes input.
 
 ``` r
-library(CCtMR)
+library(CACIMAR)
 Marker<-read.table('D:\\GIBH\\platform\\test data/Retinal_markersZf.txt',header = T)
 head(Marker)
 #>                     Symbol            CellType
@@ -62,20 +62,23 @@ zfcelltype<-Identify_CellType(seurat_object,Marker)
 
 ### 2.Identify markers
 
-In this part, CCtMR first uses ROC analysis in ‘FindAllMarkers’ function
-of [Seurat](https://satijalab.org/seurat/articles/get_started.html) to
+In this part, CACIMAR first uses ROC analysis in ‘FindAllMarkers’
+function of
+[Seurat](https://satijalab.org/seurat/articles/get_started.html) to
 identify marker genes in each cluster. Then, based on marker genes
-identified above, CCtMR calculates the power of marker gene in each and
-differences of marker gene between clusters, and marker genes with high
-differences between clusters will be retained. Finally, CCtMR uses
-fisher test to identify significant cluster related to this marker gene
-(p.value &lt;0.05).
+identified above, CACIMAR calculates the power of marker gene in each
+and differences of marker gene between clusters, and marker genes with
+high differences between clusters will be retained. Finally, CACIMAR
+uses fisher test to identify significant cluster related to this marker
+gene (p.value &lt;0.05).
 
 ``` r
 Marker1<-Identify_Markers(seurat_object,Spec1='Zf')
 ```
 
-### 3.Get cross-species markers
+### 3.Identify cross-species marker genes
+
+CACIMAR uses
 
 ``` r
 ###usage???
@@ -91,6 +94,8 @@ zfCelltype<-read.table('D:/GIBH/platform/test data/zfAdzfNMDA_zfAdzfLD_zfAdzfTR_
 mmMarker<-Overlap_Markers_Cond(mmMarkers3_F3F0,mmCelltype,Spec1='mm')
 zfMarker<-Overlap_Markers_Cond(zfMarkers3_F3F0,zfCelltype,Spec1='zf')
 ```
+
+#### Identify cross-species marker genes in two species
 
 ``` r
 ###Get_Used_OrthG

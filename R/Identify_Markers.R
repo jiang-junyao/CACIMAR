@@ -164,7 +164,7 @@ Identify_Markers2 <- function(pbmc, Marker, GeneSymb1=NULL, PowerThr1=1/3){
 
   Num1 <- c(); MarkerRoc5 <- c()
   for(i in 1:length(uCluster3)){ print(uCluster3[i])
-    Cluster4 <- gsub('C','',uCluster3[i])
+    Cluster4 <- uCluster3[i]
     MarkerRoc4 <- MarkerRoc3[grep(paste0(uCluster3[i],','),MarkerRoc3$Cluster),]
     Num1 <- rbind(Num1,c(uCluster3[i],dim(MarkerRoc4)[1]))
     if(dim(MarkerRoc4)[1]>0){

@@ -78,7 +78,29 @@ Marker1<-Identify_Markers(seurat_object,Spec1='Zf')
 
 ### 3.Identify cross-species marker genes
 
-CACIMAR uses
+#### Identify cross-species marker genes in two species
+
+In this part, CACIMAR first uses **ortholog genes database of two
+species** to refine marker genes, marker genes in orthologs database
+will be retained. Then, CACIMAR selects marker genes that are in the
+same cell type of two species as cross-species marker genes of two
+species.
+
+``` r
+###Get_Used_OrthG
+rownames(mmMarker)<-mmMarkers3_F3F0[,1]
+rownames(zfMarker)<-zfMarkers3_F3F0[,1]
+OrthG<-read.delim('D:/GIBH/platform/test data/RNA_genes_mmVSzf.txt')
+ShMarker<-Get_Used_OrthG(OrthG,mmMarker,zfMarker,Species = c('mm','zf'))
+```
+
+#### Identify cross-species marker genes in three species
+
+``` r
+refined_markers<-Refine_ThreeSpecies(ShMarker,mmCelltype,zfCelltype,Species = c('mm','zf'))
+```
+
+Unkown codes
 
 ``` r
 ###usage???
@@ -93,17 +115,6 @@ mmCelltype<-read.table('D:/GIBH/platform/test data/mmP60RmmNMDA_mmP60mmLD_Cell_T
 zfCelltype<-read.table('D:/GIBH/platform/test data/zfAdzfNMDA_zfAdzfLD_zfAdzfTR_Cell_Types.txt',header = T)
 mmMarker<-Overlap_Markers_Cond(mmMarkers3_F3F0,mmCelltype,Spec1='mm')
 zfMarker<-Overlap_Markers_Cond(zfMarkers3_F3F0,zfCelltype,Spec1='zf')
-```
-
-#### Identify cross-species marker genes in two species
-
-``` r
-###Get_Used_OrthG
-rownames(mmMarker)<-mmMarkers3_F3F0[,1]
-rownames(zfMarker)<-zfMarkers3_F3F0[,1]
-OrthG<-read.delim('D:/GIBH/platform/test data/RNA_genes_mmVSzf.txt')
-ShMarker<-Get_Used_OrthG(OrthG,mmMarker,zfMarker,Species = c('mm','zf'))
-refined_markers<-Refine_TwoSpecies(ShMarker,mmCelltype,zfCelltype,Species = c('mm','zf'))
 ```
 
 ### 4.plot MarkersHeaptmap

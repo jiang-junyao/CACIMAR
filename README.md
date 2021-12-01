@@ -90,7 +90,7 @@ species.
 ###Get_Used_OrthG
 Mm_marker_cell_type <- read.delim2("D:/GIBH/platform/test data/Mm_marker_cell_type.txt")
 head(Mm_marker_cell_type)###This table must contain 'CellType' column
-#>                    Symbol          CellType
+#>                    Symbol        AllCluster
 #> ENSMUSG00000070348  Ccnd1           RPCs,MG
 #> ENSMUSG00000006728   Cdk4              RPCs
 #> ENSMUSG00000027168   Pax6 RPCs,MG,HC,AC,RGC
@@ -98,8 +98,10 @@ head(Mm_marker_cell_type)###This table must contain 'CellType' column
 #> ENSMUSG00000000247   Lhx2    PrimaryPRCs,MG
 #> ENSMUSG00000031073  Fgf15       PrimaryPRCs
 Zf_marker_cell_type <- read.delim2("D:/GIBH/platform/test data/Zf_marker_cell_type.txt")
-OrthG <- read.delim('D:/GIBH/platform/test data/RNA_genes_mmVSzf.txt')
-ShMarker <- OrthG_TwoSpecies(OrthG,Mm_marker_cell_type,Zf_marker_cell_type,Species_name = c('mm','zf'))
+Ch_marker_cell_type <- read.delim2("D:/GIBH/platform/test data/Ch_marker_cell_type.txt")
+OrthG_Mm_Zf <- read.delim('D:/GIBH/platform/test data/RNA_genes_mmVSzf.txt')
+OrthG_Zf_Ch <- read.delim('D:/GIBH/platform/test data/RNA_genes_chVSzf.txt')
+OrthG_TwoSpecies1 <- OrthG_TwoSpecies(OrthG_Mm_Zf,Mm_marker_cell_type,Zf_marker_cell_type,Species_name = c('mm','zf'))
 #> 
 #> mm_zf_0T1 mm_zf_1T0 mm_zf_1T1 mm_zf_1TN mm_zf_NT1 mm_zf_NTN 
 #>     14207     37432     10353      3238       273       128 
@@ -109,12 +111,25 @@ ShMarker <- OrthG_TwoSpecies(OrthG,Mm_marker_cell_type,Zf_marker_cell_type,Speci
 #> [1] "mm_zf_1TN"
 #> [1] "mm_zf_NT1"
 #> [1] "mm_zf_NTN"
+OrthG_TwoSpecies2 <- OrthG_TwoSpecies(OrthG_Zf_Ch,Ch_marker_cell_type,Zf_marker_cell_type,Species_name = c('ch','zf'))
+#> 
+#> ch_zf_0T1 ch_zf_1T0 ch_zf_1T1 ch_zf_1TN ch_zf_NT1 ch_zf_NTN 
+#>     14171     11921      9056      2957       119       170 
+#> [1] "ch_zf_0T1"
+#> [1] "ch_zf_1T0"
+#> [1] "ch_zf_1T1"
+#> [1] "ch_zf_1TN"
+#> [1] "ch_zf_NT1"
+#> [1] "ch_zf_NTN"
 ```
 
 #### Identify cross-species marker genes in three species
 
+Identify orthologs genes for three species based on the result of
+OrthG\_Twospecies
+
 ``` r
-refined_markers<-Refine_ThreeSpecies(ShMarker,mmCelltype,zfCelltype,Species = c('mm','zf'))
+OrthG_ThreeSpecies<-OrthG_ThreeSpecies(OrthG_TwoSpecies1,OrthG_TwoSpecies2,c('mm','zf','zf','ch'))
 ```
 
 Unkown codes

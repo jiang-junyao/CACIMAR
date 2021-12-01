@@ -2,33 +2,33 @@
 % Please edit documentation in R/cross-species_markers.R
 \name{OrthG_TwoSpecies}
 \alias{OrthG_TwoSpecies}
-\title{Identify orthologs genes based on orthologs database}
+\title{Identify orthologs marker genes for two species}
 \usage{
 OrthG_TwoSpecies(
   OrthG,
-  Species1,
-  Species2,
+  Species1_Marker,
+  Species2_Marker,
   Species_name,
-  smiliar_cell_name = NULL
+  match_cell_name = NULL
 )
 }
 \arguments{
 \item{OrthG}{orthologs database}
 
-\item{Species1}{data.frame, rownames should be ENSEMBEL ID of first species,
-and should contains column "CellType".}
+\item{Species1_Marker}{data.frame, rownames should be ENSEMBEL ID of first species,
+and should contains column "AllCluster".}
 
-\item{Species2}{data.frame, rownames should be ENSEMBEL ID of second species,
-and should contains column "CellType".}
+\item{Species2_Marker}{data.frame, rownames should be ENSEMBEL ID of second species,
+and should contains column "AllCluster".}
 
 \item{Species_name}{character, indicating the names of two species}
 
-\item{smiliar_cell_name}{characters contained in both cell names
+\item{match_cell_name}{characters contained in both cell names
 to match similar cell types}
 }
 \value{
 
 }
 \description{
-Identify orthologs genes based on orthologs database
+Identify orthologs marker genes for two species based on orthologs database
 }

@@ -66,12 +66,16 @@ In this part, CACIMAR first uses **ortholog genes database of two species** to r
 Mm_marker_cell_type <- read.delim2("D:/GIBH/platform/test data/Mm_marker_cell_type.txt")
 head(Mm_marker_cell_type)###This table must contain 'CellType' column
 Zf_marker_cell_type <- read.delim2("D:/GIBH/platform/test data/Zf_marker_cell_type.txt")
-OrthG <- read.delim('D:/GIBH/platform/test data/RNA_genes_mmVSzf.txt')
-ShMarker <- OrthG_TwoSpecies(OrthG,Mm_marker_cell_type,Zf_marker_cell_type,Species_name = c('mm','zf'))
+Ch_marker_cell_type <- read.delim2("D:/GIBH/platform/test data/Ch_marker_cell_type.txt")
+OrthG_Mm_Zf <- read.delim('D:/GIBH/platform/test data/RNA_genes_mmVSzf.txt')
+OrthG_Zf_Ch <- read.delim('D:/GIBH/platform/test data/RNA_genes_chVSzf.txt')
+OrthG_TwoSpecies1 <- OrthG_TwoSpecies(OrthG_Mm_Zf,Mm_marker_cell_type,Zf_marker_cell_type,Species_name = c('mm','zf'))
+OrthG_TwoSpecies2 <- OrthG_TwoSpecies(OrthG_Zf_Ch,Ch_marker_cell_type,Zf_marker_cell_type,Species_name = c('ch','zf'))
 ```
 #### Identify cross-species marker genes in three species 
-```r
-refined_markers<-Refine_ThreeSpecies(ShMarker,mmCelltype,zfCelltype,Species = c('mm','zf'))
+Identify orthologs genes for three species based on the result of OrthG_Twospecies
+```{r message=F}
+OrthG_ThreeSpecies<-OrthG_ThreeSpecies(OrthG_TwoSpecies1,OrthG_TwoSpecies2,c('mm','zf','zf','ch'))
 ```
 Unkown codes
 ```r

@@ -42,7 +42,7 @@ expression), and is very sensitive to the marker genes input.
 
 ``` r
 library(CACIMAR)
-Marker<-read.table('D:\\GIBH\\platform\\test data/Retinal_markersZf.txt',header = T)
+Marker <- read.table('D:\\GIBH\\platform\\test data/Retinal_markersZf.txt',header = T)
 head(Marker)
 #>                     Symbol            CellType
 #> ENSDARG00000045904   nr2e3 Rods,Rodprogenitors
@@ -55,9 +55,9 @@ head(Marker)
 
 ``` r
 ### I identify cell type for 3 clusters here to reduce the running time
-seurat_object<-readRDS('D:\\GIBH\\platform\\test data/Zebrafishdata.rds')
-seurat_object<-subset(seurat_object,idents = c(1,2,3))
-zfcelltype<-Identify_CellType(seurat_object,Marker)
+seurat_object <- readRDS('D:\\GIBH\\platform\\test data/Zebrafishdata.rds')
+seurat_object <- subset(seurat_object,idents = c(1,2,3))
+zfcelltype <- Identify_CellType(seurat_object,Marker)
 ```
 
 ### 2.Identify markers
@@ -73,7 +73,7 @@ uses fisher test to identify significant cluster related to this marker
 gene (p.value &lt;0.05).
 
 ``` r
-Marker1<-Identify_Markers(seurat_object,Spec1='Zf')
+Marker1 <- Identify_Markers(seurat_object,Spec1='Zf')
 ```
 
 ### 3.Identify cross-species marker genes
@@ -88,10 +88,27 @@ species.
 
 ``` r
 ###Get_Used_OrthG
-rownames(mmMarker)<-mmMarkers3_F3F0[,1]
-rownames(zfMarker)<-zfMarkers3_F3F0[,1]
-OrthG<-read.delim('D:/GIBH/platform/test data/RNA_genes_mmVSzf.txt')
-ShMarker<-Get_Used_OrthG(OrthG,mmMarker,zfMarker,Species = c('mm','zf'))
+Mm_marker_cell_type <- read.delim2("D:/GIBH/platform/test data/Mm_marker_cell_type.txt")
+head(Mm_marker_cell_type)###This table must contain 'CellType' column
+#>                    Symbol          CellType
+#> ENSMUSG00000070348  Ccnd1           RPCs,MG
+#> ENSMUSG00000006728   Cdk4              RPCs
+#> ENSMUSG00000027168   Pax6 RPCs,MG,HC,AC,RGC
+#> ENSMUSG00000021239   Vsx2 PrimaryPRCs,BC,MG
+#> ENSMUSG00000000247   Lhx2    PrimaryPRCs,MG
+#> ENSMUSG00000031073  Fgf15       PrimaryPRCs
+Zf_marker_cell_type <- read.delim2("D:/GIBH/platform/test data/Zf_marker_cell_type.txt")
+OrthG <- read.delim('D:/GIBH/platform/test data/RNA_genes_mmVSzf.txt')
+ShMarker <- OrthG_TwoSpecies(OrthG,Mm_marker_cell_type,Zf_marker_cell_type,Species_name = c('mm','zf'))
+#> 
+#> mm_zf_0T1 mm_zf_1T0 mm_zf_1T1 mm_zf_1TN mm_zf_NT1 mm_zf_NTN 
+#>     14207     37432     10353      3238       273       128 
+#> [1] "mm_zf_0T1"
+#> [1] "mm_zf_1T0"
+#> [1] "mm_zf_1T1"
+#> [1] "mm_zf_1TN"
+#> [1] "mm_zf_NT1"
+#> [1] "mm_zf_NTN"
 ```
 
 #### Identify cross-species marker genes in three species

@@ -42,31 +42,32 @@ Using known marker genes to annotate each cluster. This method is based on AUC (
 
 ```{r warning=F,message=F}
 library(CACIMAR)
-Marker<-read.table('D:\\GIBH\\platform\\test data/Retinal_markersZf.txt',header = T)
+Marker <- read.table('D:\\GIBH\\platform\\test data/Retinal_markersZf.txt',header = T)
 head(Marker)
 ```
 ```r
 ### I identify cell type for 3 clusters here to reduce the running time
-seurat_object<-readRDS('D:\\GIBH\\platform\\test data/Zebrafishdata.rds')
-seurat_object<-subset(seurat_object,idents = c(1,2,3))
-zfcelltype<-Identify_CellType(seurat_object,Marker)
+seurat_object <- readRDS('D:\\GIBH\\platform\\test data/Zebrafishdata.rds')
+seurat_object <- subset(seurat_object,idents = c(1,2,3))
+zfcelltype <- Identify_CellType(seurat_object,Marker)
 ```
 
 ### 2.Identify markers
 In this part, CACIMAR first uses ROC analysis in 'FindAllMarkers' function of [Seurat](https://satijalab.org/seurat/articles/get_started.html) to identify marker genes in each cluster. Then, based on marker genes identified above, CACIMAR calculates the power of marker gene in each and differences of marker gene between clusters, and marker genes with high differences between clusters will be retained. Finally, CACIMAR uses fisher test to identify significant cluster related to this marker gene (p.value <0.05).
 ```r
-Marker1<-Identify_Markers(seurat_object,Spec1='Zf')
+Marker1 <- Identify_Markers(seurat_object,Spec1='Zf')
 ```
 
 ### 3.Identify cross-species marker genes
 #### Identify cross-species marker genes in two species 
 In this part, CACIMAR first uses **ortholog genes database of two species** to refine marker genes, marker genes in orthologs database will be retained. Then, CACIMAR selects marker genes that are in the same cell type of two species as cross-species marker genes of two species.
-```r
+```{r message=FALSE}
 ###Get_Used_OrthG
-rownames(mmMarker)<-mmMarkers3_F3F0[,1]
-rownames(zfMarker)<-zfMarkers3_F3F0[,1]
-OrthG<-read.delim('D:/GIBH/platform/test data/RNA_genes_mmVSzf.txt')
-ShMarker<-Get_Used_OrthG(OrthG,mmMarker,zfMarker,Species = c('mm','zf'))
+Mm_marker_cell_type <- read.delim2("D:/GIBH/platform/test data/Mm_marker_cell_type.txt")
+head(Mm_marker_cell_type)###This table must contain 'CellType' column
+Zf_marker_cell_type <- read.delim2("D:/GIBH/platform/test data/Zf_marker_cell_type.txt")
+OrthG <- read.delim('D:/GIBH/platform/test data/RNA_genes_mmVSzf.txt')
+ShMarker <- OrthG_TwoSpecies(OrthG,Mm_marker_cell_type,Zf_marker_cell_type,Species_name = c('mm','zf'))
 ```
 #### Identify cross-species marker genes in three species 
 ```r

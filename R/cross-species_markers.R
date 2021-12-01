@@ -153,10 +153,27 @@ Get_OrthG <- function(OrthG1, MmRNA1, ZfRNA1, Spec1, MmPattern1='', ZfPattern1='
 }
 
 
-Refine_Used_OrthG<-function(ShMarker1,Species){
-  Type1 <- paste0(Species[1],'.*\\.AllCluster'); Type2 <- paste0(Species[2], '.*\\.AllCluster')
+Refine_Used_OrthG<-function(ShMarker1,Species,smiliar_cell_name){
+  Type1 <- paste0(Species[1],'.*\\CellType'); Type2 <- paste0(Species[2], '.*\\CellType')
   Spec1Type1 <- grep(Type1, colnames(ShMarker1))
   Spec1Type2 <- grep(Type2, colnames(ShMarker1))
+  if (is.null(smiliar_cell_name)) {
+    ShMarker2 <- apply(ShMarker1, 1, function(x1){
+      x11 <- x1[Spec1Type1]; x12 <- x1[Spec1Type2]; x2 <- F
+      for(i in 1:length(x11)){
+        if(!is.na(x11[i])){
+          x112 <- strsplit(x11[i], ',')[[1]]
+          for(i1 in 1:length(x112)){
+            for(j in 1:length(x12)){
+              if(!is.na(x12[j])){
+                x122 <- strsplit(x12[j], ',')[[1]]
+                for(j1 in 1:length(x122)){
+                  if(x112[i1]==x122[j1]){
+                    x2 <- T
+                  } } } } } } }
+      return(x2)
+    })
+  }else{
   ShMarker2 <- apply(ShMarker1, 1, function(x1){
     x11 <- x1[Spec1Type1]; x12 <- x1[Spec1Type2]; x2 <- F
     for(i in 1:length(x11)){
@@ -167,17 +184,54 @@ Refine_Used_OrthG<-function(ShMarker1,Species){
             if(!is.na(x12[j])){
               x122 <- strsplit(x12[j], ',')[[1]]
               for(j1 in 1:length(x122)){
-                if(x112[i1]==x122[j1] | grepl('BC',x112[i1]) & grepl('BC',x122[j1])){
+                if(x112[i1]==x122[j1] | grepl(smiliar_cell_name,x112[i1]) & grepl(smiliar_cell_name,x122[j1])){
                   x2 <- T
                 } } } } } } }
     return(x2)
-  })
+  })}
   ShMarker3 <- ShMarker1[ShMarker2, ]
-  ShMarker4 <- ShMarker3[order(ShMarker3[, grep('Power', colnames(ShMarker3))[1]], decreasing=T), ]
-  ShMarker4 <- ShMarker4[order(ShMarker4[, Spec1Type1[1]]), ]
+  ShMarker4 <- ShMarker3[order(ShMarker3[, Spec1Type1[1]]), ]
   return(ShMarker4)
 }
-
+#' Identify orthologs genes based on orthologs database
+#'
+#' @param OrthG orthologs database
+#' @param Species1 data.frame, rownames should be ENSEMBEL ID of first species,
+#' and should contains column "CellType".
+#' @param Species2 data.frame, rownames should be ENSEMBEL ID of second species,
+#' and should contains column "CellType".
+#' @param Species_name character, indicating the names of two species
+#' @param smiliar_cell_name characters contained in both cell names
+#'  to match similar cell types
+#'
+#' @return
+#' @export
+#'
+#' @examples
+OrthG_TwoSpecies<-function(OrthG,Species1,Species2,Species_name,
+                           smiliar_cell_name=NULL){
+  colnames(Species1) <- paste0(Species_name[1],colnames(Species1))
+  colnames(Species2) <- paste0(Species_name[2],colnames(Species2))
+  Species12 <- Species1
+  Species22 <- Species2
+  Spec1_gene <- data.frame(rep(0,nrow(Species12)),
+                           rep(1,nrow(Species12)))
+  rownames(Spec1_gene) <- rownames(Species12)
+  Spec2_gene <- data.frame(rep(0,nrow(Species22)),
+                           rep(1,nrow(Species22)))
+  rownames(Spec2_gene) <- rownames(Species22)
+  Exp2 <- Get_OrthG(OrthG, Spec1_gene, Spec2_gene, Species_name)
+  Type1 <- paste0('Used_',Species_name[1],'_ID')
+  Type2 <- paste0('Used_',Species_name[2],'_ID')
+  Species1 <- Species1[match(Exp2[, Type1],rownames(Species1)), ]
+  Species2 <- Species2[match(Exp2[, Type2],rownames(Species2)), ]
+  Exp3 <- cbind(Exp2, Species1, Species2)
+  Exp4 <- Exp3[!is.na(Exp3[, dim(Exp2)[2]+1]) & !is.na(Exp3[,dim(Exp2)[2]+dim(Species1)[2]+1]), ]
+  Exp5 <- cbind(Exp4[,1:7], Species12[match(Exp4[,Type1],
+                                            rownames(Species12)), ],
+                Species22[match(Exp4[,Type2], rownames(Species22)), ])
+  Exp6 <- Refine_Used_OrthG(Exp5,Species_name,smiliar_cell_name)
+}
 
 #' Refine cluster markers between two species
 #'

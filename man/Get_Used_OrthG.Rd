@@ -2,7 +2,7 @@
 % Please edit documentation in R/cross-species_markers.R
 \name{Get_Used_OrthG}
 \alias{Get_Used_OrthG}
-\title{Identify orthologs for two species according to power}
+\title{Identify orthologs genes based on orthologs database}
 \usage{
 Get_Used_OrthG(OrthG1, Species1_expression, Species2_expression, Species)
 }
@@ -13,5 +13,5 @@ Get_Used_OrthG(OrthG1, Species1_expression, Species2_expression, Species)
 
 }
 \description{
-Identify orthologs for two species according to power
+Identify orthologs genes based on orthologs database
 }

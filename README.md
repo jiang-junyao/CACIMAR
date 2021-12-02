@@ -80,7 +80,7 @@ plot Marker genes with Heaptmap
 
     Plot_MarkersHeatmap(Marker1)
 
-![](D:\GIBH\platform\CCtMR\Readme%20figure\Marker_pheatmap.png)
+![Marker](Readme%20figure\Marker_pheatmap.png)
 
 ### 3.Identify cross-species marker genes
 

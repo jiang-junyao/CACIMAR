@@ -234,6 +234,7 @@ Seurat_SubsetData <- function(pbmc1, SubG1, SubS1=NULL, ExSubS1=NULL){
 #' @param Color1 vector of colors used in heatmap
 #' @param ModuleColor1 colors for each moudle
 #' @param Gene1 genes that you want to show in the pheatmap
+#' @param NumRowBlank the blank between each group
 #' @param show_colnames logic, indicating whether show column names
 #' @param legend1 logic, indicating whether show the legend
 #' @return
@@ -242,12 +243,13 @@ Seurat_SubsetData <- function(pbmc1, SubG1, SubS1=NULL, ExSubS1=NULL){
 #' @examples
 Plot_MarkersHeatmap<-function(scRNA1, ModuleScale1=10,
                               Color1=NULL, ModuleColor1=NULL, Gene1=NULL,
-                              show_colnames=F, legend1=T, Scale1='none'){
-  Scale1='none'
-  RevOrder1=-1
-  scRNA12 <- scRNA1[, c(grep('Symbol', colnames(scRNA1)), grep('C\\d', colnames(scRNA1)))]
-  RowGroup1 <- as.numeric(apply(scRNA1, 1, function(x1){ x2 <- gsub('C','', x1[1]) }))
-  FigWH1 <- c(ncol(scRNA12)/5, 10); NumRowBlank1=ceiling(nrow(scRNA12)/100)
+                              NumRowBlank=0,show_colnames=F, legend1=T,
+                              Scale='none'){
+  Scale1 <- Scale
+  RevOrder1 <- -1
+  scRNA12 <- scRNA1[, c(grep('Symbol', colnames(scRNA1)), grep('Cluster\\d', colnames(scRNA1)))]
+  RowGroup1 <- as.numeric(apply(scRNA1, 1, function(x1){ x2 <- gsub('Cluster','', x1[1]) }))
+  FigWH1 <- c(ncol(scRNA12)/5, 10); NumRowBlank1=NumRowBlank
   white1 <- rgb(230/255,230/255,230/255); purple1 <- rgb(192/255,103/255,169/255)
   purple2 <- rgb(148/255,43/255,112/255);
   if (is.null(Color1)) {

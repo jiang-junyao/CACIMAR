@@ -10,9 +10,10 @@ Plot_MarkersHeatmap(
   Color1 = NULL,
   ModuleColor1 = NULL,
   Gene1 = NULL,
+  NumRowBlank = 0,
   show_colnames = F,
   legend1 = T,
-  Scale1 = "none"
+  Scale = "none"
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ Plot_MarkersHeatmap(
 \item{ModuleColor1}{colors for each moudle}
 
 \item{Gene1}{genes that you want to show in the pheatmap}
+
+\item{NumRowBlank}{the blank between each group}
 
 \item{show_colnames}{logic, indicating whether show column names}
 

@@ -6,22 +6,27 @@
 \usage{
 OrthG_TwoSpecies(
   OrthG,
-  Species1_Marker,
-  Species2_Marker,
-  Species_name,
+  Species1_Marker_table,
+  Species2_Marker_table,
+  Species_name1,
+  Species_name2,
   match_cell_name = NULL
 )
 }
 \arguments{
 \item{OrthG}{orthologs database}
 
-\item{Species1_Marker}{data.frame, rownames should be ENSEMBEL ID of first species,
+\item{Species1_Marker_table}{data.frame, rownames should be ENSEMBEL ID of first species,
 and should contains column "AllCluster".}
 
-\item{Species2_Marker}{data.frame, rownames should be ENSEMBEL ID of second species,
+\item{Species2_Marker_table}{data.frame, rownames should be ENSEMBEL ID of second species,
 and should contains column "AllCluster".}
 
-\item{Species_name}{character, indicating the names of two species}
+\item{Species_name1}{character, indicating the species names of Species1_Marker_table.
+(lowercase characters, eg 'mm')}
+
+\item{Species_name2}{character, indicating the species names of Species2_Marker_table
+(lowercase characters, eg 'mm')}
 
 \item{match_cell_name}{characters contained in both cell names
 to match similar cell types}

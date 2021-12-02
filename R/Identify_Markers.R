@@ -79,7 +79,7 @@ Identify_Markers1<-function(Seurat_object, PowerThr1=1/3){
   Marker2 <- Marker1[Marker1[,'avg_diff']>0 & Marker1[,'power']>PowerThr1,]
   uMarker2 <- unique(Marker2[,'gene'])
   MarkerRoc1 <- Cal_MarkersRoc(Seurat_object, uMarker2)
-  MarkerRoc2 <- Select_MarkersPower(MarkerRoc1)
+  MarkerRoc2 <- Select_MarkersPower2(MarkerRoc1)
   return(MarkerRoc2)
 }
 
@@ -102,6 +102,21 @@ Select_MarkersPower <- function(MarkerRoc01){
   return(Power02)
 }
 
+Select_MarkersPower2 <- function(MarkerRoc01){
+
+  MarkerRoc02 <- t(Revise_MarkersPower(MarkerRoc01))
+  colnames(MarkerRoc02) <- gsub('_power','',colnames(MarkerRoc02))
+  Power02 <- c()
+  for(i in 1:dim(MarkerRoc02)[1]){
+    MarkerRoc03 <- t(as.matrix(MarkerRoc02[i,seq(3,dim(MarkerRoc02)[2],3)]))
+    Power01 <- Sort_MarkersPower2(MarkerRoc03,0)
+    Power02 <- rbind(Power02,Power01)
+  }
+  rownames(Power02) <- rownames(MarkerRoc02)
+  colnames(Power02) <- c('Cluster','Power','Diff')
+
+  return(Power02)
+}
 
 
 Revise_MarkersPower <- function(MarkerRoc01){
@@ -117,7 +132,7 @@ Revise_MarkersPower <- function(MarkerRoc01){
 
 
 
-Sort_MarkersPower <- function(MarkerRoc01,Thr01=0){
+Sort_MarkersPower2 <- function(MarkerRoc01,Thr01=0){
 
   MarkerRoc02 <- sort.int(as.numeric(MarkerRoc01),index.return=T,decreasing=T)
   Name01 <- colnames(MarkerRoc01)

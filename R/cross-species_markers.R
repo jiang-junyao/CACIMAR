@@ -92,8 +92,9 @@ Get_OrthG <- function(OrthG1, MmRNA1, ZfRNA1, Spec1, MmPattern1='', ZfPattern1='
     } )
     rownames(OrthG21) <- colnames(OrthG1)[Ind1]
     OrthG3 <- cbind(OrthG2, t(OrthG21))
-    }else{ print(paste0('Not process ',tOrthG1[i])) }
-
+    }else{ print(paste0('Not process ',tOrthG1[i]))
+     stop('Can not match any  orthologs marker genes, please whether input
+           correct species names ') }
     if(i==1){ OrthG4 <- as.matrix(OrthG3);
     }else{ OrthG4 <- rbind(OrthG4, as.matrix(OrthG3)) }
   }
@@ -146,11 +147,14 @@ Refine_Used_OrthG<-function(ShMarker1,Species,smiliar_cell_name){
 #' Identify orthologs marker genes for two species
 #' @description Identify orthologs marker genes for two species based on orthologs database
 #' @param OrthG orthologs database
-#' @param Species1_Marker data.frame, rownames should be ENSEMBEL ID of first species,
+#' @param Species1_Marker_table data.frame, rownames should be ENSEMBEL ID of first species,
 #' and should contains column "AllCluster".
-#' @param Species2_Marker data.frame, rownames should be ENSEMBEL ID of second species,
+#' @param Species2_Marker_table data.frame, rownames should be ENSEMBEL ID of second species,
 #' and should contains column "AllCluster".
-#' @param Species_name character, indicating the names of two species
+#' @param Species_name1 character, indicating the species names of Species1_Marker_table.
+#' (lowercase characters, eg 'mm')
+#' @param Species_name2 character, indicating the species names of Species2_Marker_table
+#' (lowercase characters, eg 'mm')
 #' @param match_cell_name characters contained in both cell names
 #'  to match similar cell types
 #'
@@ -158,8 +162,22 @@ Refine_Used_OrthG<-function(ShMarker1,Species,smiliar_cell_name){
 #' @export
 #'
 #' @examples
-OrthG_TwoSpecies<-function(OrthG,Species1_Marker,Species2_Marker,Species_name,
+OrthG_TwoSpecies<-function(OrthG,Species1_Marker_table,Species2_Marker_table,
+                           Species_name1,Species_name2,
                            match_cell_name=NULL){
+  Spec1 <- colnames(OrthG)[2]
+  Spec2 <- colnames(OrthG)[4]
+  Spec1 <- gsub('_ID','',Spec1)
+  Spec2 <- gsub('_ID','',Spec2)
+  if (Spec1 == Species_name1 & Spec2 == Species_name2) {
+    Species_name <- c(Spec1,Spec2)
+    Species1_Marker <- Species1_Marker_table
+    Species2_Marker <- Species2_Marker_table
+  }else if(Spec2 == Species_name1 & Spec1 == Species_name2){
+    Species_name <- c(Spec2,Spec1)
+    Species2_Marker <- Species1_Marker_table
+    Species1_Marker <- Species2_Marker_table
+  }else{stop('please input correct Species name')}
   colnames(Species1_Marker) <- paste0(Species_name[1],colnames(Species1_Marker))
   colnames(Species2_Marker) <- paste0(Species_name[2],colnames(Species2_Marker))
   Species12 <- Species1_Marker

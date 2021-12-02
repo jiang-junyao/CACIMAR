@@ -76,6 +76,12 @@ gene (p.value &lt;0.05).
 Marker1 <- Identify_Markers(seurat_object,Spec1='Zf')
 ```
 
+plot Marker genes with Heaptmap
+
+    Plot_MarkersHeatmap(Marker1)
+
+![](D:\GIBH\platform\CCtMR\Readme%20figure\Marker_pheatmap.png)
+
 ### 3.Identify cross-species marker genes
 
 #### Identify cross-species marker genes in two species
@@ -99,9 +105,11 @@ head(Mm_marker_cell_type)###This table must contain 'CellType' column
 #> ENSMUSG00000031073  Fgf15       PrimaryPRCs
 Zf_marker_cell_type <- read.delim2("D:/GIBH/platform/test data/Zf_marker_cell_type.txt")
 Ch_marker_cell_type <- read.delim2("D:/GIBH/platform/test data/Ch_marker_cell_type.txt")
-OrthG_Mm_Zf <- read.delim('D:/GIBH/platform/test data/RNA_genes_mmVSzf.txt')
-OrthG_Zf_Ch <- read.delim('D:/GIBH/platform/test data/RNA_genes_chVSzf.txt')
-OrthG_TwoSpecies1 <- OrthG_TwoSpecies(OrthG_Mm_Zf,Mm_marker_cell_type,Zf_marker_cell_type,Species_name = c('mm','zf'))
+###select orthologs genes database
+OrthgMmZf <- OrthG_Mm_Zf
+OrthgZfCh <- OrthG_Zf_Ch
+###identify orthologs marker genes
+OrthG_TwoSpecies1 <- OrthG_TwoSpecies(OrthgMmZf,Mm_marker_cell_type,Zf_marker_cell_type,Species_name1 = 'mm',Species_name2 = 'zf')
 #> 
 #> mm_zf_0T1 mm_zf_1T0 mm_zf_1T1 mm_zf_1TN mm_zf_NT1 mm_zf_NTN 
 #>     14207     37432     10353      3238       273       128 
@@ -111,7 +119,7 @@ OrthG_TwoSpecies1 <- OrthG_TwoSpecies(OrthG_Mm_Zf,Mm_marker_cell_type,Zf_marker_
 #> [1] "mm_zf_1TN"
 #> [1] "mm_zf_NT1"
 #> [1] "mm_zf_NTN"
-OrthG_TwoSpecies2 <- OrthG_TwoSpecies(OrthG_Zf_Ch,Ch_marker_cell_type,Zf_marker_cell_type,Species_name = c('ch','zf'))
+OrthG_TwoSpecies2 <- OrthG_TwoSpecies(OrthgZfCh,Ch_marker_cell_type,Zf_marker_cell_type,Species_name1 = 'ch',Species_name2 = 'zf')
 #> 
 #> ch_zf_0T1 ch_zf_1T0 ch_zf_1T1 ch_zf_1TN ch_zf_NT1 ch_zf_NTN 
 #>     14171     11921      9056      2957       119       170 
@@ -149,14 +157,7 @@ mmMarker<-Overlap_Markers_Cond(mmMarkers3_F3F0,mmCelltype,Spec1='mm')
 zfMarker<-Overlap_Markers_Cond(zfMarkers3_F3F0,zfCelltype,Spec1='zf')
 ```
 
-### 4.plot MarkersHeaptmap
-
-``` r
-Marker1_plot<-Format_Markers_Frac(Marker1)
-plot_MarkersHeatmap(Marker1_plot)
-```
-
-### 5.Cross-species celltype heamtmap
+### 4.Cross-species celltype heamtmap
 
 ``` r
 expression<-read.table('D:\\GIBH\\platform\\CellType_Comp\\CellType_Comp\\Data/mmP60RmmNMDA_chP10chNMDA_zfAdzfNMDA_Power01_SharedMarkers_Frac.txt')
@@ -165,4 +166,4 @@ a<-Heatmap_Cor(expression,celltypes,cluster_cols=T, cluster_rows=F)
 Plot_tree(a)
 ```
 
-\#\#\#6. Cross-species regulatory networks
+\#\#\#5. Cross-species regulatory networks

@@ -8,7 +8,7 @@ OrthG_ThreeSpecies(
   OrthG_TwoSpecies1,
   OrthG_TwoSpecies2,
   Species_name,
-  match_cell_name
+  match_cell_name = NULL
 )
 }
 \arguments{

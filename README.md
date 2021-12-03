@@ -73,14 +73,14 @@ uses fisher test to identify significant cluster related to this marker
 gene (p.value &lt;0.05).
 
 ``` r
-Marker1 <- Identify_Markers(seurat_object,Spec1='Zf')
+Marker1 <- Identify_Markers(seurat_object)
 ```
 
 plot Marker genes with Heaptmap
 
     Plot_MarkersHeatmap(Marker1)
 
-![Marker](Readme%20figure\Marker_pheatmap.png)
+![Marker](Readme%20figure/Marker_pheatmap.png)
 
 ### 3.Identify cross-species marker genes
 
@@ -160,10 +160,16 @@ zfMarker<-Overlap_Markers_Cond(zfMarkers3_F3F0,zfCelltype,Spec1='zf')
 ### 4.Cross-species celltype heamtmap
 
 ``` r
-expression<-read.table('D:\\GIBH\\platform\\CellType_Comp\\CellType_Comp\\Data/mmP60RmmNMDA_chP10chNMDA_zfAdzfNMDA_Power01_SharedMarkers_Frac.txt')
+zfAdzfNMDA_pbmcSubC_CondSub_P0_Markers1 <- read.delim("D:/GIBH/platform/test data/cell type/zfAdzfNMDA_pbmcSubC_CondSub_P0_Markers1.txt")
+chP10chNMDA_UMI500_chFI48chNMDA72_sSubCM_P0_Markers1 <- read.delim("D:/GIBH/platform/test data/cell type/chP10chNMDA_UMI500_chFI48chNMDA72_sSubCM_P0_Markers1.txt")
+mmP60RmmNMDA_pbmcSubC_P0_Markers1 <- read.delim("D:/GIBH/platform/test data/cell type/mmP60RmmNMDA_pbmcSubC_P0_Markers1.txt")
+Marker_list <- list(zfAdzfNMDA_pbmcSubC_CondSub_P0_Markers1,chP10chNMDA_UMI500_chFI48chNMDA72_sSubCM_P0_Markers1,mmP60RmmNMDA_pbmcSubC_P0_Markers1)
+expression <- Identify_SharedMarkers(Marker_list,Species_names=c('zf','ch','mm'))
+cell_type_power <- expression[[2]]
 celltypes<-read.delim("D:/GIBH/platform/CellType_Comp/CellType_Comp/Data/mmP60RmmNMDA_chP10chNMDA_zfAdzfNMDA_Cell_Types.txt")
-a<-Heatmap_Cor(expression,celltypes,cluster_cols=T, cluster_rows=F)
+a<-Heatmap_Cor(cell_type_power,celltypes,cluster_cols=T, cluster_rows=F)
 Plot_tree(a)
 ```
 
-\#\#\#5. Cross-species regulatory networks
+![Marker](Readme%20figure/Cell_type.png) \#\#\#5. Cross-species
+regulatory networks

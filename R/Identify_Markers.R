@@ -11,11 +11,6 @@
 #' @param RocThr numeric, indicating the cutoff of Roc to identify marker genes
 #' @param DiffThr numeric, indicating the cutoff of difference in marker genes between
 #' clusters
-#' @param Spec1 character, When parameter GeneSymb1 == NULL, inner database will be used for
-#' ID changing, this parameter indicate the species of data
-#' @param GeneSymb1 Gene correspondence that is used for ID changing. first
-#' column should be ENSEMBLE ID, second column should be Symbol, third column
-#' should be NCBIID and fourth column should be officalsymbol.
 #' @param FracThr1 numeric, indicating the threshold of estimate of the odds
 #' ratio
 #'
@@ -23,25 +18,11 @@
 #' @export
 #'
 #' @examples
-Identify_Markers<-function(Seurat_object, RocThr=0.4, DiffThr=1/3, Spec1=NULL, GeneSymb1=NULL, FracThr=3 ){
-  if (is.null(GeneSymb1)) {
-    if (Spec1=='Mm') {
-      GeneSymb1 = MmscRNA_genes
-    }else if (Spec1=='Hs') {
-      GeneSymb1 = HsscRNA_genes
-    }else if (Spec1=='Zf') {
-      GeneSymb1 = ZfscRNA_genes
-    }else if (Spec1=='Ch') {
-      GeneSymb1 = ChscRNA_genes
-    }else if (is.null(Spec1)){
-      print('please input correct ')
-    }
-  }
+Identify_Markers<-function(Seurat_object, RocThr=0.4, DiffThr=1/3,FracThr=3 ){
   MarkerRoc<-Identify_Markers1(Seurat_object,RocThr)
   MarkerRoc<-as.data.frame(MarkerRoc)
-  Marker<-Identify_Markers2(Seurat_object,MarkerRoc,GeneSymb1=GeneSymb1,
-                            PowerThr1=DiffThr)
-  final_Markers<-Refine_Markers(Seurat_object,Spec1,GeneSymb1,Marker,FracThr)
+  Marker<-Identify_Markers2(Seurat_object,MarkerRoc,PowerThr1=DiffThr)
+  final_Markers<-Refine_Markers(Seurat_object,Marker,FracThr)
   return(final_Markers)
 }
 
@@ -161,69 +142,38 @@ Sort_MarkersPower2 <- function(MarkerRoc01,Thr01=0){
 }
 
 
-Identify_Markers2 <- function(pbmc, Marker, GeneSymb1=NULL, PowerThr1=1/3){
+Identify_Markers2 <- function(pbmc, Marker, PowerThr1=1/3){
 
   TotoalCluster <- length(unique(pbmc@active.ident))
   MarkerRoc1 <- Marker
   NumCluster <- apply(MarkerRoc1,1,function(X1){length(strsplit(as.character(X1[1]),',')[[1]])})
   MarkerRoc2 <- cbind(MarkerRoc1,NumCluster)
   MarkerRoc3 <- MarkerRoc2[MarkerRoc2$Diff>PowerThr1 & MarkerRoc2$NumCluster>1 & MarkerRoc2$NumCluster<=(ceiling(TotoalCluster/4)+1),]
-
-  Cluster1 <- strsplit(levels(as.factor(MarkerRoc3$Cluster)),',')
-  Cluster3 <- c()
-  for(i in 1:length(Cluster1)){
-    Cluster2 <- Cluster1[[i]]
-    Cluster3 <- c(Cluster3,Cluster2[1:(length(Cluster2)-1)])
-  }
-  uCluster3 <- unique(Cluster3)
-
-  Num1 <- c(); MarkerRoc5 <- c()
-  for(i in 1:length(uCluster3)){ print(uCluster3[i])
-    Cluster4 <- uCluster3[i]
-    MarkerRoc4 <- MarkerRoc3[grep(paste0(uCluster3[i],','),MarkerRoc3$Cluster),]
-    Num1 <- rbind(Num1,c(uCluster3[i],dim(MarkerRoc4)[1]))
-    if(dim(MarkerRoc4)[1]>0){
-      MarkerRoc5 <- rbind(MarkerRoc5,cbind(MarkerRoc4,Cluster4,rownames(MarkerRoc4)))
-    }
-  }
-  colnames(MarkerRoc5)[c(1,dim(MarkerRoc5)[2]-1,dim(MarkerRoc5)[2])] <- c('AllCluster','cluster','gene')
-  colnames(Num1) <- c('Cluster','NumMarkers')
-  Num1 <- Num1[order(Num1[,'Cluster']),]
-  print(Num1)
-
-  MarkerRoc51 <- apply(MarkerRoc5,1,function(x1){ x11 <- strsplit(as.character(x1[1]),',')[[1]]; x12 <- paste(x11[1:(length(x11)-1)],collapse=',')
-  x21 <- strsplit(as.character(x1[2]),',')[[1]]; x22 <- paste(x21[1:(length(x21)-1)],collapse=',')
-  return(c(x12,x22))
-  })
-  MarkerRoc52 <- cbind(t(MarkerRoc51),MarkerRoc5[,5:6])
-  colnames(MarkerRoc52)[1:2] <- colnames(MarkerRoc5)[1:2]
-
-  MarkerRoc53 <- cbind(MarkerRoc52, GeneSymb1[match(MarkerRoc52$gene,GeneSymb1[,1]),4])
-  colnames(MarkerRoc53)[ncol(MarkerRoc53)] <- 'Symbol'
-
-  return(MarkerRoc53)
+  Cluster <- apply(MarkerRoc3, 1, function(X1){strsplit(X1[1],',')[[1]][1]})
+  colnames(MarkerRoc3)[1]='AllCluster'
+  MarkerRoc3$Cluster <- Cluster
+  MarkerRoc3$gene <- rownames(MarkerRoc3)
+  MarkerRoc3 <- MarkerRoc3[,c(1,2,4,5)]
+  return(MarkerRoc3)
 }
 
 
 
 
 
-Refine_Markers<-function(Seurat_object, Spec1, GeneSymb1, Marker, FracThr1=3){
-  if(Spec1=='Zf'){ Cluster1 <- 'res.0.2' }else{ Cluster1 <- 'res.0.1' }
-  MarkerRoc3 <- Identify_Markers3(Seurat_object, Marker, Cluster1, GeneSymb1, FracThr1=FracThr1)
-  Ind1 <- grep('Symbol', colnames(MarkerRoc3))
-  if(length(Ind1)>1){ MarkerRoc3 <- MarkerRoc3[, -Ind1[2]] }
-  MarkerRoc4 <- MarkerRoc3[MarkerRoc3[,'Pvalue'] < 0.01, -grep('EnsemblID', colnames(MarkerRoc3))]
+Refine_Markers<-function(Seurat_object,Marker, FracThr1=3){
+  MarkerRoc3 <- Identify_Markers3(Seurat_object, Marker,FracThr1=FracThr1)
+  MarkerRoc4 <- MarkerRoc3[MarkerRoc3[,'Pvalue'] < 0.01,]
   print(c(nrow(MarkerRoc3), nrow(MarkerRoc4)))
   return(MarkerRoc4)
 }
 
 
 
-Identify_Markers3 <- function(pbmc, MarkerRoc2, Cluster1, Symb1, FracThr1=5){
+Identify_Markers3 <- function(pbmc, MarkerRoc2, FracThr1=5){
 
   pbmc@assays$RNA@data <- GetAssayData(pbmc)[rownames(MarkerRoc2), ]
-  Frac1 <- Get_scRNA_AggExp(pbmc, Symb1, Cluster1=Cluster1, ExpType1='fraction')
+  Frac1 <- Get_scRNA_AggExp(pbmc)
   colnames(Frac1) <- gsub('_0', '', colnames(Frac1))
   colnames(Frac1) <- gsub('FracC', 'Cluster', colnames(Frac1))
   MarkerRoc3 <- cbind(MarkerRoc2, Frac1)
@@ -258,20 +208,15 @@ Identify_Markers3 <- function(pbmc, MarkerRoc2, Cluster1, Symb1, FracThr1=5){
 
 
 
-Get_scRNA_AggExp <- function(pbmc, Symb1, Cluster1=c('all', 'res.0.1'), Group1=c('all', 'protocol'), ExpType1=c('expression', 'fraction')){
+Get_scRNA_AggExp <- function(pbmc){
 
-
-  if(Cluster1[1]=='all'){ pbmc@meta.data[,'all'] <- 0
-  }else if(!is.element(Cluster1, colnames(pbmc@meta.data))){
-    stop(paste('please input one of', paste(colnames(pbmc@meta.data)[grep('res',colnames(pbmc@meta.data))], collapse=',') ))
-  }
-  if(Group1[1]=='all'){ pbmc@meta.data[,'all'] <- 0
-  }else if(!is.element(Group1, colnames(pbmc@meta.data))){
-    stop(paste('please input one of', paste(colnames(pbmc@meta.data), collapse=',') ))
-  }
-
+  Cluster1 <- 'idents'
+  ExpType1 <- 'fraction'
+  Group1 <- 'all'
+  pbmc@meta.data[,'all'] <- 0
+  pbmc@meta.data$idents <- pbmc@active.ident
   Meta01 <- pbmc@meta.data
-  Cluster2 <- sort(unique(Meta01[, Cluster1[1]]))
+  Cluster2 <- as.character(sort(unique(Meta01[, Cluster1[1]])))
   Group2 <- sort(unique(Meta01[, Group1[1]]))
 
   Name01 <- c(); flag01 <- 0;
@@ -301,14 +246,5 @@ Get_scRNA_AggExp <- function(pbmc, Symb1, Cluster1=c('all', 'res.0.1'), Group1=c
         }else{ mObject04 <- cbind(mObject04, mObject03) }
       } } }
   mObject04 <- as.matrix(mObject04); colnames(mObject04) <- Name01
-  if(is.element('expression', ExpType1) & is.element('fraction', ExpType1)){
-    mObject04 <- mObject04[, c(seq(1,ncol(mObject04),2), seq(2,ncol(mObject04),2))]
-  }
-
-  if(grepl('^ENS', rownames(GetAssayData(pbmc))[1])){
-    GeneID1 <- Converse_GeneIDSymbol(rownames(mObject04), Symb1)
-    mObject05 <- cbind(GeneID1, mObject04)
-  }else{ mObject05 <- mObject04 }
-
-  return(mObject05)
+  return(mObject04)
 }

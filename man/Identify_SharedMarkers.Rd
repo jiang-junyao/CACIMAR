@@ -7,7 +7,12 @@
 Identify_SharedMarkers(Marker_list, Species_names, PowerTh1 = 0.1)
 }
 \arguments{
-\item{PowerTh1}{}
+\item{Marker_list}{each element should be marker genes table}
+
+\item{Species_names}{character, indicating the species of each marker genes
+table in Marker_list}
+
+\item{PowerTh1}{numeric, indicating the threshold to filter marker genes}
 }
 \value{
 

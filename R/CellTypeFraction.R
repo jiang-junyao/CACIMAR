@@ -1,8 +1,9 @@
 #' Calculate fraction of shared markers between species
 #'
-#' @param Marker_list
-#' @param Species_names
-#' @param PowerTh1
+#' @param Marker_list each element should be marker genes table
+#' @param Species_names character, indicating the species of each marker genes
+#' table in Marker_list
+#' @param PowerTh1 numeric, indicating the threshold to filter marker genes
 #'
 #' @return
 #' @export

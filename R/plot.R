@@ -60,7 +60,7 @@ Handle_CellType<-function(RNA1,CellT1){
   rownames(RNA1) <- apply(CellT2[match(rownames(RNA1), CellT2[, 1]), ],
                           1, function(x1){ x2 <- paste(c(x1[2],'.',x1[4])
                                                        ,collapse='') })
-  RNA1[RNA1==1] <- NA
+  RNA1[RNA1==1] <-NA
   return(RNA1)
 }
 

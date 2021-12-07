@@ -1,5 +1,6 @@
 #' Calculate fraction of shared markers between species
-#'
+#' @description This function calculate the power of each cluster pair based on
+#' the power of marker genes in each cluster.
 #' @param Marker_list each element should be marker genes table
 #' @param Species_names character, indicating the species of each marker genes
 #' table in Marker_list
@@ -19,7 +20,7 @@ Identify_SharedMarkers <- function(Marker_list, Species_names, PowerTh1=0.1){
     Exp02[, 'cluster'] <- paste0(Species_names[i], 'C', Exp02[, 'cluster'])
     print(table(Exp02[, 'cluster'])); AllCluster1 <- c(AllCluster1, unique(Exp02[, 'cluster']))
     Exp1[[i]] <- Exp02
-    ### calculate orhologs power of each cluster pair.
+    ### calculate orthologs power of each cluster pair.
     ### (ortholog gene power1+ortholog gene power2)/(all gene power1+all gene power2)
     ShMarker1 <- Cal_SharedMarkers(Exp1[[i]], Species_names[i])
     if(i==1){ ShMarker3 <- ShMarker1[[1]]
@@ -51,7 +52,7 @@ Identify_SharedMarkers <- function(Marker_list, Species_names, PowerTh1=0.1){
       ExpInd1[[j]] <- ExpInd01[!is.na(ExpInd01[, 2]), ]
       colnames(ExpInd1[[j]]) <- c('ID', 'RowNum')
     }
-
+    ### calculate power of each cluster pair that only contains orthlog genes
     mmExp1 <- Exp1[[cFile1[1,i]]]
     zfExp1 <- Exp1[[cFile1[2,i]]]
     mmExpInd1 <- ExpInd1[[1]]
@@ -68,7 +69,8 @@ Identify_SharedMarkers <- function(Marker_list, Species_names, PowerTh1=0.1){
     Frac12 <- Frac1[Frac1[,1]==AllCluster1[j] & Frac1[,2]==AllCluster1[i], 3]
     if(length(Frac11)==1){ Frac2 <- as.numeric(Frac11)
     }else if(length(Frac12)==1){ Frac2 <- as.numeric(Frac12)
-    }else{ print(paste('No',AllCluster1[i],AllCluster1[j])) }
+    }else{
+      print(paste('No',AllCluster1[i],AllCluster1[j])) }
     Frac21 <- c(Frac21, Frac2)
   }
   Frac3 <- rbind(Frac3, Frac21)

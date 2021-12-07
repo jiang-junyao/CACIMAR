@@ -159,6 +159,21 @@ zfMarker<-Overlap_Markers_Cond(zfMarkers3_F3F0,zfCelltype,Spec1='zf')
 
 ### 4.Cross-species celltype heamtmap
 
+In this part, CACIMAR first uses function Identify\_SharedMarkers to
+calculate the power of each cluster pair to identify cross-species cell
+types. Power of each cluster pair is calculated as:
+
+(*P*<sub>*s*1</sub> + *P*<sub>*s*2</sub>)/(*P*<sub>1</sub> + *P*<sub>2</sub>)
+
+where, *P*<sub>*s*1</sub> represents the sum of Power of genes shared by
+Cluster1 and Cluster2 in cluster1, *P*<sub>*s*2</sub> represents the sum
+of Power of genes shared by Cluster1 and Cluster2 in cluster2,
+*P*<sub>1</sub> represents the sum of Power of all genes in Cluster1,
+*P*<sub>2</sub> represents the sum of Power of all genes in Cluster2.
+
+Then, CACIMAR integrates with R package pheatmap to visualize the
+result.
+
 ``` r
 zfAdzfNMDA_pbmcSubC_CondSub_P0_Markers1 <- read.delim("D:/GIBH/platform/test data/cell type/zfAdzfNMDA_pbmcSubC_CondSub_P0_Markers1.txt")
 chP10chNMDA_UMI500_chFI48chNMDA72_sSubCM_P0_Markers1 <- read.delim("D:/GIBH/platform/test data/cell type/chP10chNMDA_UMI500_chFI48chNMDA72_sSubCM_P0_Markers1.txt")

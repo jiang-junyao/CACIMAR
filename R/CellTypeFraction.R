@@ -13,13 +13,14 @@ Identify_SharedMarkers <- function(Marker_list, Species_names, PowerTh1=0.1){
   Exp1 <- list(); ExpInd1 <- list(); AllCluster1 <- c()
   PowerTh12 <- gsub('\\.','',PowerTh1)
   for(i in 1:length(Marker_list)){
-    Exp01 <- Marker_list[[i]]
+    Exp01 <- Marker_list[[i]] ### filter marker gene based on PowerTh1
     print(nrow(Exp01))
     Exp02 <- Exp01[Exp01$avg_diff>0 & Exp01$power>PowerTh1, ]
     Exp02[, 'cluster'] <- paste0(Species_names[i], 'C', Exp02[, 'cluster'])
     print(table(Exp02[, 'cluster'])); AllCluster1 <- c(AllCluster1, unique(Exp02[, 'cluster']))
     Exp1[[i]] <- Exp02
-
+    ### calculate orhologs power of each cluster pair.
+    ### (ortholog gene power1+ortholog gene power2)/(all gene power1+all gene power2)
     ShMarker1 <- Cal_SharedMarkers(Exp1[[i]], Species_names[i])
     if(i==1){ ShMarker3 <- ShMarker1[[1]]
     Frac1 <- ShMarker1[[3]]
@@ -41,11 +42,11 @@ Identify_SharedMarkers <- function(Marker_list, Species_names, PowerTh1=0.1){
     }
     OrthG1 <- OrthG01[-grep('0', OrthG01$Type), ]
 
-    for(j in 1:2){
+    for(j in 1:2){ ### check whether marker are in database
       uExp1 <- unique(Exp1[[cFile1[j,i]]][, 'gene'])
       ExpInd01 <- t(apply(as.matrix(uExp1), 1, function(x1){
-        x2 <- grep(x1, OrthG1[,j*2])
-        if(length(x2)==1){ x3 <- c(x1, x2) }else{ x3 <- c(x1, NA) }
+        if(length(grep(x1, OrthG1[,2]))==1){ x3 <- c(x1, grep(x1, OrthG1[,2])) }
+        else if(length(grep(x1, OrthG1[,4]))==1){ x3 <- c(x1, grep(x1, OrthG1[,4])) }else{ x3 <- c(x1, NA) }
       }) )
       ExpInd1[[j]] <- ExpInd01[!is.na(ExpInd01[, 2]), ]
       colnames(ExpInd1[[j]]) <- c('ID', 'RowNum')

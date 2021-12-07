@@ -80,8 +80,8 @@ Identify_CellTypes2 <- function(MarkerRoc1) {
       Ind1 <- c(Ind1, Ind11, Ind12, Ind13)
     }
     MarkerRoc3 <- MarkerRoc2[unique(Ind1), ]
-    startidx <- grep('Cluster1_myAUC',colnames(MarkerRoc3))
-    MarkerRoc4 <- Cal_JointPower2(MarkerRoc3[, startidx:ncol(MarkerRoc3)])
+    startidx <- grep('NumCellType',colnames(MarkerRoc3))
+    MarkerRoc4 <- Cal_JointPower2(MarkerRoc3[, (startidx+1):ncol(MarkerRoc3)])
     MarkerRoc4 <- t(as.matrix(MarkerRoc4))
     colnames(MarkerRoc4) <- gsub("_power", "", colnames(MarkerRoc4))
     MarkerRoc5 <- rbind(MarkerRoc5, MarkerRoc4)

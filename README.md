@@ -171,5 +171,6 @@ a<-Heatmap_Cor(cell_type_power,celltypes,cluster_cols=T, cluster_rows=F)
 Plot_tree(a)
 ```
 
-![Marker](Readme%20figure/Cell_type.png) \#\#\#5. Cross-species
-regulatory networks
+![Marker](Readme%20figure/Cell_type.png)
+
+### 5.Cross-species regulatory networks

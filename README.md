@@ -9,6 +9,12 @@
 CACIMAR is an R package to identify cross-species marker genes, cell
 types and gene regulatory networks based on scRNA-seq data.
 
+## Citation
+
+[Hoang T, Wang J, Boyd P, et al. Gene regulatory networks controlling
+vertebrate retinal regeneration. Science 2020;
+370(6519):eabb8598](https://www.science.org/doi/10.1126/science.abb8598)
+
 ## Installation
 
 Install CACIMAR from github, run:

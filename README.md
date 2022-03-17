@@ -9,6 +9,8 @@
 CACIMAR is an R package to identify cross-species marker genes, cell
 types and gene regulatory networks based on scRNA-seq data.
 
+![](Readme%20figure/Workflow.png)
+
 ## Citation
 
 [Hoang T, Wang J, Boyd P, et al. Gene regulatory networks controlling

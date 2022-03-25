@@ -1,21 +1,24 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# CACIMAR
+# CACIMAR: cross-species analysis of cell identities, markers and regulations using single-cell sequencing profiles
 
 <!-- badges: start -->
 <!-- badges: end -->
 
-CACIMAR is an R package to identify cross-species marker genes, cell
-types and gene regulatory networks based on scRNA-seq data.
+-   **Identify cell types using known markers in each species**
+
+-   **Identify all cell-type specific markers in each species**
+
+-   **Identify species-specific or evolutionally conserved markers**
+
+-   **Identify cross-species cell types using evolutionally conserved
+    markers**
+
+-   **Comparative analysis of regulatory networks in evolutionally
+    conserved cell types**
 
 ![](Readme%20figure/Workflow.png)
-
-## Citation
-
-[Hoang T, Wang J, Boyd P, et al. Gene regulatory networks controlling
-vertebrate retinal regeneration. Science 2020;
-370(6519):eabb8598](https://www.science.org/doi/10.1126/science.abb8598)
 
 ## Installation
 
@@ -26,174 +29,13 @@ Install CACIMAR from github, run:
 devtools::install_github("jiang-junyao/CACIMAR")
 ```
 
-## Inputs data
+## Citation
 
-### (1) Seurat object
-
-Seurat object should have clustering information in active.ident slot
-and meta.data slot
-
-### (2) Marker genes table (used for identifying cell types)
-
-Rownames of Marker genes table should be the same format as the rownames
-format of seurat object, and should contain CellType column (Marker
-genes table can also contain other columns, which will not affect this
-function)
+[Hoang T, Wang J, Boyd P, et al. Gene regulatory networks controlling
+vertebrate retinal regeneration. Science 2020;
+370(6519):eabb8598](https://www.science.org/doi/10.1126/science.abb8598)
 
 ## Tutorial
 
-### 1.Identify Cell types
-
-Using known marker genes to annotate each cluster. This method is based
-on AUC (area under the receiver operating characteristic curve of gene
-expression), and is very sensitive to the marker genes input.
-
-``` r
-library(CACIMAR)
-Marker <- read.table('D:\\GIBH\\platform\\test data/Retinal_markersZf.txt',header = T)
-head(Marker)
-#>                     Symbol            CellType
-#> ENSDARG00000045904   nr2e3 Rods,Rodprogenitors
-#> ENSDARG00000019566 neurod1      RodProgenitors
-#> ENSDARG00000099572   hmgn2      RodProgenitors
-#> ENSDARG00000002193     rho                Rods
-#> ENSDARG00000100466     nrl                Rods
-#> ENSDARG00000011235    otx2                Rods
-```
-
-``` r
-### I identify cell type for 3 clusters here to reduce the running time
-seurat_object <- readRDS('D:\\GIBH\\platform\\test data/Zebrafishdata.rds')
-seurat_object <- subset(seurat_object,idents = c(1,2,3))
-zfcelltype <- Identify_CellType(seurat_object,Marker)
-```
-
-### 2.Identify markers
-
-In this part, CACIMAR first uses ROC analysis in ‘FindAllMarkers’
-function of
-[Seurat](https://satijalab.org/seurat/articles/get_started.html) to
-identify marker genes in each cluster. Then, based on marker genes
-identified above, CACIMAR calculates the power of marker gene in each
-and differences of marker gene between clusters, and marker genes with
-high differences between clusters will be retained. Finally, CACIMAR
-uses fisher test to identify significant cluster related to this marker
-gene (p.value &lt;0.05).
-
-``` r
-Marker1 <- Identify_Markers(seurat_object)
-```
-
-plot Marker genes with Heaptmap
-
-    Plot_MarkersHeatmap(Marker1)
-
-![Marker](Readme%20figure/Marker_pheatmap.png)
-
-### 3.Identify cross-species marker genes
-
-#### Identify cross-species marker genes in two species
-
-In this part, CACIMAR first uses **ortholog genes database of two
-species** to refine marker genes, marker genes in orthologs database
-will be retained. Then, CACIMAR selects marker genes that are in the
-same cell type of two species as cross-species marker genes of two
-species.
-
-``` r
-###Get_Used_OrthG
-Mm_marker_cell_type <- read.delim2("D:/GIBH/platform/test data/Mm_marker_cell_type.txt")
-head(Mm_marker_cell_type)###This table must contain 'CellType' column
-#>                    Symbol        AllCluster
-#> ENSMUSG00000070348  Ccnd1           RPCs,MG
-#> ENSMUSG00000006728   Cdk4              RPCs
-#> ENSMUSG00000027168   Pax6 RPCs,MG,HC,AC,RGC
-#> ENSMUSG00000021239   Vsx2 PrimaryPRCs,BC,MG
-#> ENSMUSG00000000247   Lhx2    PrimaryPRCs,MG
-#> ENSMUSG00000031073  Fgf15       PrimaryPRCs
-Zf_marker_cell_type <- read.delim2("D:/GIBH/platform/test data/Zf_marker_cell_type.txt")
-Ch_marker_cell_type <- read.delim2("D:/GIBH/platform/test data/Ch_marker_cell_type.txt")
-###select orthologs genes database
-OrthgMmZf <- OrthG_Mm_Zf
-OrthgZfCh <- OrthG_Zf_Ch
-###identify orthologs marker genes
-OrthG_TwoSpecies1 <- OrthG_TwoSpecies(OrthgMmZf,Mm_marker_cell_type,Zf_marker_cell_type,Species_name1 = 'mm',Species_name2 = 'zf')
-#> 
-#> mm_zf_0T1 mm_zf_1T0 mm_zf_1T1 mm_zf_1TN mm_zf_NT1 mm_zf_NTN 
-#>     14207     37432     10353      3238       273       128 
-#> [1] "mm_zf_0T1"
-#> [1] "mm_zf_1T0"
-#> [1] "mm_zf_1T1"
-#> [1] "mm_zf_1TN"
-#> [1] "mm_zf_NT1"
-#> [1] "mm_zf_NTN"
-OrthG_TwoSpecies2 <- OrthG_TwoSpecies(OrthgZfCh,Ch_marker_cell_type,Zf_marker_cell_type,Species_name1 = 'ch',Species_name2 = 'zf')
-#> 
-#> ch_zf_0T1 ch_zf_1T0 ch_zf_1T1 ch_zf_1TN ch_zf_NT1 ch_zf_NTN 
-#>     14171     11921      9056      2957       119       170 
-#> [1] "ch_zf_0T1"
-#> [1] "ch_zf_1T0"
-#> [1] "ch_zf_1T1"
-#> [1] "ch_zf_1TN"
-#> [1] "ch_zf_NT1"
-#> [1] "ch_zf_NTN"
-```
-
-#### Identify cross-species marker genes in three species
-
-Identify orthologs genes for three species based on the result of
-OrthG\_Twospecies
-
-``` r
-OrthG_ThreeSpecies<-OrthG_ThreeSpecies(OrthG_TwoSpecies1,OrthG_TwoSpecies2,c('mm','zf','zf','ch'))
-```
-
-Unkown codes
-
-``` r
-###usage???
-###Get_Wilcox_Markers_Cond ###???usage???
-wilcox<-read.table('D:\\GIBH\\platform\\test data/mmP60RmmNMDA_mmP60mmLD_wilcoxMG_MarkerGenes.txt')
-Cor<-read.table('D:\\GIBH\\platform\\test data/mmP60RmmNMDA_mmLD_pbmcSubC_MG_Bin50_R5_GeneCor.txt',header = T)
-wilcox_result<-get_Wilcox_Markers_Cond(wilcox,Cor)
-###Overlap_Markers_Cond
-mmMarkers3_F3F0 <- read.delim("D:/GIBH/platform/test data/mmP60RmmNMDA_mmP60mmLD_P03_Markers3_F3F0.txt")
-zfMarkers3_F3F0 <- read.delim("D:/GIBH/platform/test data/zfAdzfNMDA_zfAdzfLD_zfAdzfTR_P03_Markers3_F3F0.txt")
-mmCelltype<-read.table('D:/GIBH/platform/test data/mmP60RmmNMDA_mmP60mmLD_Cell_Types.txt',header = T)
-zfCelltype<-read.table('D:/GIBH/platform/test data/zfAdzfNMDA_zfAdzfLD_zfAdzfTR_Cell_Types.txt',header = T)
-mmMarker<-Overlap_Markers_Cond(mmMarkers3_F3F0,mmCelltype,Spec1='mm')
-zfMarker<-Overlap_Markers_Cond(zfMarkers3_F3F0,zfCelltype,Spec1='zf')
-```
-
-### 4.Cross-species celltype heamtmap
-
-In this part, CACIMAR first uses function Identify\_SharedMarkers to
-calculate the power of each cluster pair to identify cross-species cell
-types. Power of each cluster pair is calculated as:
-
-(*P*<sub>*s*1</sub> + *P*<sub>*s*2</sub>)/(*P*<sub>1</sub> + *P*<sub>2</sub>)
-
-where, *P*<sub>*s*1</sub> represents the sum of Power of genes shared by
-Cluster1 and Cluster2 in cluster1, *P*<sub>*s*2</sub> represents the sum
-of Power of genes shared by Cluster1 and Cluster2 in cluster2,
-*P*<sub>1</sub> represents the sum of Power of all genes in Cluster1,
-*P*<sub>2</sub> represents the sum of Power of all genes in Cluster2.
-
-Then, CACIMAR integrates with R package pheatmap to visualize the
-result.
-
-``` r
-zfAdzfNMDA_pbmcSubC_CondSub_P0_Markers1 <- read.delim("D:/GIBH/platform/test data/cell type/zfAdzfNMDA_pbmcSubC_CondSub_P0_Markers1.txt")
-chP10chNMDA_UMI500_chFI48chNMDA72_sSubCM_P0_Markers1 <- read.delim("D:/GIBH/platform/test data/cell type/chP10chNMDA_UMI500_chFI48chNMDA72_sSubCM_P0_Markers1.txt")
-mmP60RmmNMDA_pbmcSubC_P0_Markers1 <- read.delim("D:/GIBH/platform/test data/cell type/mmP60RmmNMDA_pbmcSubC_P0_Markers1.txt")
-Marker_list <- list(zfAdzfNMDA_pbmcSubC_CondSub_P0_Markers1,chP10chNMDA_UMI500_chFI48chNMDA72_sSubCM_P0_Markers1,mmP60RmmNMDA_pbmcSubC_P0_Markers1)
-expression <- Identify_SharedMarkers(Marker_list,Species_names=c('zf','ch','mm'))
-cell_type_power <- expression[[2]]
-celltypes<-read.delim("D:/GIBH/platform/CellType_Comp/CellType_Comp/Data/mmP60RmmNMDA_chP10chNMDA_zfAdzfNMDA_Cell_Types.txt")
-a<-Heatmap_Cor(cell_type_power,celltypes,cluster_cols=T, cluster_rows=F)
-Plot_tree(a)
-```
-
-![Marker](Readme%20figure/Cell_type.png)
-
-### 5.Cross-species regulatory networks
+[Cross-species marker genes and cell types analysis of
+retina](https://jiang-junyao.github.io/CACIMAR/CACIMAR_tutorial)

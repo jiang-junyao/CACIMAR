@@ -42,9 +42,11 @@ Install CACIMAR from github, run:
 devtools::install_github("jiang-junyao/CACIMAR")
 ```
 
-## Citation
-[Hoang T, Wang J, Boyd P, et al. Gene regulatory networks controlling vertebrate retinal regeneration. Science 2020; 370(6519):eabb8598](https://www.science.org/doi/10.1126/science.abb8598)
-
 ## Tutorial
 
 [Cross-species marker genes and cell types analysis of retina](https://jiang-junyao.github.io/CACIMAR/CACIMAR_tutorial)
+
+## Citation
+[Hoang T, Wang J, Boyd P, et al. Gene regulatory networks controlling vertebrate retinal regeneration. Science 2020; 370(6519):eabb8598](https://www.science.org/doi/10.1126/science.abb8598)
+
+

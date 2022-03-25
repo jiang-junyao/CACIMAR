@@ -241,14 +241,14 @@ Seurat_SubsetData <- function(pbmc1, SubG1, SubS1=NULL, ExSubS1=NULL){
 #' @export
 #'
 #' @examples
-Plot_MarkersHeatmap<-function(scRNA1, ModuleScale1=10,
+Plot_MarkersHeatmap<-function(scRNA1, ModuleScale1=15,
                               Color1=NULL, ModuleColor1=NULL, Gene1=NULL,
                               NumRowBlank=0,show_colnames=F, legend1=T,
                               Scale='none'){
   Scale1 <- Scale
   RevOrder1 <- -1
-  scRNA12 <- scRNA1[, c(grep('Symbol', colnames(scRNA1)), grep('Cluster\\d', colnames(scRNA1)))]
-  RowGroup1 <- as.numeric(apply(scRNA1, 1, function(x1){ x2 <- gsub('Cluster','', x1[1]) }))
+  scRNA12 <- scRNA1[, c(grep('Cluster\\d', colnames(scRNA1)))]
+  RowGroup1 <- as.numeric(apply(scRNA1, 1, function(x1){ x2 <- gsub('Cluster','', x1[4]) }))
   FigWH1 <- c(ncol(scRNA12)/5, 10); NumRowBlank1=NumRowBlank
   white1 <- rgb(230/255,230/255,230/255); purple1 <- rgb(192/255,103/255,169/255)
   purple2 <- rgb(148/255,43/255,112/255);
@@ -267,7 +267,7 @@ Plot_MarkersHeatmap<-function(scRNA1, ModuleScale1=10,
               rgb(0/255,114/255,189/255), rgb(74/255,76/255,191/255),
               rgb(103/255,97/255,156/255), rgb(42/255,122/255,155/255))
   }else{Col2=ModuleColor1}
-  scRNA2 <- scRNA12[, 2:ncol(scRNA12)]
+  scRNA2 <- scRNA12[, 1:ncol(scRNA12)]
   scRNA21<-apply(scRNA2, 2, as.numeric)
   rownames(scRNA21)<-rownames(scRNA2)
   scRNA3 <- Kmeans_heatmap(scRNA21, K1=1, RowGroup1=RowGroup1, Scale1=Scale1,

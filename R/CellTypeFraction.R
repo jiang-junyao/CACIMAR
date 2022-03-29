@@ -11,6 +11,9 @@
 #'
 #' @examples
 Identify_SharedMarkers <- function(Marker_list, Species_names, PowerTh1=0.1){
+  if (length(Marker_list) != length(Species_names)) {
+    stop("length of Marker_list should be equal to length of Species_names")
+  }
   Exp1 <- list(); ExpInd1 <- list(); AllCluster1 <- c()
   PowerTh12 <- gsub('\\.','',PowerTh1)
   for(i in 1:length(Marker_list)){

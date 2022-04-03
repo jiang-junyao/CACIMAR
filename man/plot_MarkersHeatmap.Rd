@@ -6,7 +6,7 @@
 \usage{
 Plot_MarkersHeatmap(
   scRNA1,
-  ModuleScale1 = 10,
+  ModuleScale1 = 15,
   Color1 = NULL,
   ModuleColor1 = NULL,
   Gene1 = NULL,

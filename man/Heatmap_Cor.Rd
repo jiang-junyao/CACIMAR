@@ -6,7 +6,6 @@
 \usage{
 Heatmap_Cor(
   RNA1,
-  CellType,
   RowType1 = "",
   ColType1 = "",
   cluster_cols = T,
@@ -16,9 +15,6 @@ Heatmap_Cor(
 }
 \arguments{
 \item{RNA1}{correlation of expression in each cell type}
-
-\item{CellType}{cell type. First column should be Species, second column should
-be Cluster, third column should be CellType, fourth column should be Group}
 
 \item{RowType1}{character, indicating the cell types that you want to show
 on the row in heatmap. RowType1='' means show all cell types}

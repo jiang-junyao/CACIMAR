@@ -1,7 +1,5 @@
 #' plot the heatmap of marker genes across different species
 #' @param RNA1 correlation of expression in each cell type
-#' @param CellType cell type. First column should be Species, second column should
-#' be Cluster, third column should be CellType, fourth column should be Group
 #' @param RowType1 character, indicating the cell types that you want to show
 #' on the row in heatmap. RowType1='' means show all cell types
 #' @param ColType1 character, indicating the cell types that you want to show
@@ -16,9 +14,12 @@
 #' @return return a list used in Plot_tree
 #'
 #' @examples
-Heatmap_Cor <- function(RNA1, CellType, RowType1='', ColType1='', cluster_cols=T
+Heatmap_Cor <- function(RNA1, RowType1='', ColType1='', cluster_cols=T
                         , cluster_rows=F, Color1=NULL){
-  RNA1 <- Handle_CellType(RNA1, CellType)
+  validInput(RowType1,'RowType1','character')
+  validInput(ColType1,'ColType1','character')
+  validInput(cluster_cols,'cluster_cols','logical')
+  validInput(cluster_rows,'cluster_rows','logical')
   Ind21 <- c(); Ind22 <- c();
   if(RowType1==''){ Ind21 <- 1:dim(RNA1)[1];
   }else{
@@ -51,7 +52,17 @@ Heatmap_Cor <- function(RNA1, CellType, RowType1='', ColType1='', cluster_cols=T
   return(Hier1)
 }
 
-Handle_CellType<-function(RNA1,CellT1){
+#' Title
+#'
+#' @param RNA1 correlation of expression in each cell type
+#' @param CellType cell type. First column should be Species, second column should
+#' be Cluster, third column should be CellType, fourth column should be Group
+#'
+#' @return
+#' @export
+#'
+#' @examples
+Rename_CellType<-function(RNA1,CellT1){
   CellT2 <- cbind(apply(CellT1, 1, function(x1){ x2 <- paste0(x1[1],x1[2]) })
                   , CellT1)
   colnames(RNA1) <- apply(CellT2[match(colnames(RNA1), CellT2[, 1]), ],

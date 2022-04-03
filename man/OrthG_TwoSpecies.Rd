@@ -14,19 +14,18 @@ OrthG_TwoSpecies(
 )
 }
 \arguments{
-\item{OrthG}{orthologs database}
+\item{OrthG}{ortholog genes database}
 
-\item{Species1_Marker_table}{data.frame, rownames should be ENSEMBEL ID of first species,
-and should contains column "AllCluster".}
+\item{Species1_Marker_table}{data.frame of species 1, first column should be gene name,
+second column should be Clusters corresponding to marker gene}
 
-\item{Species2_Marker_table}{data.frame, rownames should be ENSEMBEL ID of second species,
-and should contains column "AllCluster".}
+\item{Species2_Marker_table}{data.frame of species 2, first column should be gene name,
+second column should be Clusters corresponding to marker gene
+of marker genes.}
 
-\item{Species_name1}{character, indicating the species names of Species1_Marker_table.
-(lowercase characters, eg 'mm')}
+\item{Species_name1}{character, indicating the species names of Species1_Marker_table.}
 
-\item{Species_name2}{character, indicating the species names of Species2_Marker_table
-(lowercase characters, eg 'mm')}
+\item{Species_name2}{character, indicating the species names of Species2_Marker_table}
 
 \item{match_cell_name}{characters contained in both cell names
 to match similar cell types}

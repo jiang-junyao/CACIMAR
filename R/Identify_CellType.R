@@ -81,6 +81,8 @@ Identify_CellTypes2 <- function(MarkerRoc1) {
     }
     MarkerRoc3 <- MarkerRoc2[unique(Ind1), ]
     startidx <- grep('NumCellType',colnames(MarkerRoc3))
+    ### add the power of gene in the same cell types, if gene difference <0 ,
+    ### set power of that gene negative
     MarkerRoc4 <- Cal_JointPower2(MarkerRoc3[, (startidx+1):ncol(MarkerRoc3)])
     MarkerRoc4 <- t(as.matrix(MarkerRoc4))
     colnames(MarkerRoc4) <- gsub("_power", "", colnames(MarkerRoc4))

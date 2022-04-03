@@ -51,7 +51,12 @@ Overlap_Markers_Cond<-function(markers_expression, celltype, Spec1){
 
 Get_OrthG <- function(OrthG1, MmRNA1, ZfRNA1, Spec1, MmPattern1='', ZfPattern1=''){
   tOrthG1 <- table(OrthG1$Type); print(tOrthG1)
-  Ind1 <- c(grep(paste0(Spec1[1],'_ID'), colnames(OrthG1)), grep(paste0(Spec1[2],'_ID'), colnames(OrthG1)))
+  if (grepl('ENS',rownames(MmRNA1)[1])) {
+    Ind1 <- c(grep(paste0(Spec1[1],'_ID'), colnames(OrthG1)), grep(paste0(Spec1[2],'_ID'), colnames(OrthG1)))
+  }else{
+    Ind1 <- c(grep(paste0(Spec1[1],'_Symbol'), colnames(OrthG1)), grep(paste0(Spec1[2],'_Symbol'), colnames(OrthG1)))
+  }
+
 
   OrthG21 <- list()
   for(i in 1:length(tOrthG1)){ print(names(tOrthG1)[i])
@@ -146,15 +151,14 @@ Refine_Used_OrthG<-function(ShMarker1,Species,smiliar_cell_name){
 }
 #' Identify orthologs marker genes for two species
 #' @description Identify orthologs marker genes for two species based on orthologs database
-#' @param OrthG orthologs database
-#' @param Species1_Marker_table data.frame, rownames should be ENSEMBEL ID of first species,
-#' and should contains column "AllCluster".
-#' @param Species2_Marker_table data.frame, rownames should be ENSEMBEL ID of second species,
-#' and should contains column "AllCluster".
+#' @param OrthG ortholog genes database
+#' @param Species1_Marker_table data.frame of species 1, first column should be gene name,
+#' second column should be Clusters corresponding to marker gene
+#' @param Species2_Marker_table data.frame of species 2, first column should be gene name,
+#' second column should be Clusters corresponding to marker gene
+#' of marker genes.
 #' @param Species_name1 character, indicating the species names of Species1_Marker_table.
-#' (lowercase characters, eg 'mm')
 #' @param Species_name2 character, indicating the species names of Species2_Marker_table
-#' (lowercase characters, eg 'mm')
 #' @param match_cell_name characters contained in both cell names
 #'  to match similar cell types
 #'
@@ -165,6 +169,16 @@ Refine_Used_OrthG<-function(ShMarker1,Species,smiliar_cell_name){
 OrthG_TwoSpecies<-function(OrthG,Species1_Marker_table,Species2_Marker_table,
                            Species_name1,Species_name2,
                            match_cell_name=NULL){
+  validInput(OrthG,'OrthG','df')
+  validInput(Species_name1,'Species_name1','character')
+  validInput(Species_name2,'Species_name2','character')
+
+  Species1_Marker_table <- Species1_Marker_table[!duplicated(Species1_Marker_table[,1]),]
+  Species2_Marker_table <- Species2_Marker_table[!duplicated(Species2_Marker_table[,1]),]
+  colnames(Species1_Marker_table)[2] <- 'AllCluster'
+  colnames(Species2_Marker_table)[2] <- 'AllCluster'
+  Species_name1 <- tolower(Species_name1)
+  Species_name2 <- tolower(Species_name2)
   Spec1 <- colnames(OrthG)[2]
   Spec2 <- colnames(OrthG)[4]
   Spec1 <- gsub('_ID','',Spec1)
@@ -184,20 +198,25 @@ OrthG_TwoSpecies<-function(OrthG,Species1_Marker_table,Species2_Marker_table,
   Species22 <- Species2_Marker
   Spec1_gene <- data.frame(rep(0,nrow(Species12)),
                            rep(1,nrow(Species12)))
-  rownames(Spec1_gene) <- rownames(Species12)
+  rownames(Spec1_gene) <- Species12[,1]
   Spec2_gene <- data.frame(rep(0,nrow(Species22)),
                            rep(1,nrow(Species22)))
-  rownames(Spec2_gene) <- rownames(Species22)
+  rownames(Spec2_gene) <- Species22[,1]
   Exp2 <- Get_OrthG(OrthG, Spec1_gene, Spec2_gene, Species_name)
-  Type1 <- paste0('Used_',Species_name[1],'_ID')
-  Type2 <- paste0('Used_',Species_name[2],'_ID')
-  Species1 <- Species1_Marker[match(Exp2[, Type1],rownames(Species1_Marker)), ]
-  Species2 <- Species2_Marker[match(Exp2[, Type2],rownames(Species2_Marker)), ]
+  if (grepl('ENS',rownames(Spec1_gene)[1])) {
+    Type1 <- paste0('Used_',Species_name[1],'_ID')
+    Type2 <- paste0('Used_',Species_name[2],'_ID')
+  }else{
+    Type1 <- paste0('Used_',Species_name[1],'_Symbol')
+    Type2 <- paste0('Used_',Species_name[2],'_Symbol')
+  }
+  Species1 <- Species1_Marker[match(Exp2[, Type1],Species1_Marker[,1]), ]
+  Species2 <- Species2_Marker[match(Exp2[, Type2],Species2_Marker[,1]), ]
   Exp3 <- cbind(Exp2, Species1, Species2)
   Exp4 <- Exp3[!is.na(Exp3[, dim(Exp2)[2]+1]) & !is.na(Exp3[,dim(Exp2)[2]+dim(Species1)[2]+1]), ]
   Exp5 <- cbind(Exp4[,1:7], Species12[match(Exp4[,Type1],
-                                            rownames(Species12)), ],
-                Species22[match(Exp4[,Type2], rownames(Species22)), ])
+                                            Species12[,1]), ],
+                Species22[match(Exp4[,Type2], Species22[,1]), ])
   Exp6 <- Refine_Used_OrthG(Exp5,Species_name,match_cell_name)
 }
 
@@ -222,6 +241,11 @@ OrthG_TwoSpecies<-function(OrthG,Species1_Marker_table,Species2_Marker_table,
 #' @examples
 OrthG_ThreeSpecies <- function(OrthG_TwoSpecies1,OrthG_TwoSpecies2,
                                Species_name,match_cell_name=NULL){
+
+  validInput(Species_name,'Species_name','character')
+  validInput(OrthG_TwoSpecies1,'OrthG_TwoSpecies1','df')
+  validInput(OrthG_TwoSpecies2,'OrthG_TwoSpecies2','df')
+
   CellTypeIndex1 <- grepl('*AllCluster',colnames(OrthG_TwoSpecies1))
   CellTypeIndex2 <- grepl('*AllCluster',colnames(OrthG_TwoSpecies2))
   CellT11 <- OrthG_TwoSpecies1[,CellTypeIndex1][,1]
@@ -236,8 +260,11 @@ OrthG_ThreeSpecies <- function(OrthG_TwoSpecies1,OrthG_TwoSpecies2,
   SpecInd12 <- grep(paste0(Species_name[2],'*AllCluster'), colnames(OrthG_TwoSpecies1))
   SpecInd21 <- grep(paste0(Species_name[3],'*AllCluster'), colnames(OrthG_TwoSpecies2))
   SpecInd22 <- grep(paste0(Species_name[4],'*AllCluster'), colnames(OrthG_TwoSpecies2))
+  if (TRUE %in% grepl(paste0('Used_',Species_name[1],'_Symbol'),colnames(OrthG_TwoSpecies1))) {
+    UsedID1 <- paste0('Used_',Species_name,'_Symbol')
+  }else{UsedID1 <- paste0('Used_',Species_name,'_ID')}
 
-  UsedID1 <- paste0('Used_',Species_name,'_ID'); ShMarker4 <- c()
+  ShMarker4 <- c()
   IDFren <- as.data.frame(table(UsedID1))
   MaxFren <- as.character(IDFren[IDFren$Freq==2,1])
   MaxFrenIndex <- grep(MaxFren,UsedID1)

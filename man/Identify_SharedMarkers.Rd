@@ -18,5 +18,6 @@ table in Marker_list}
 
 }
 \description{
-Calculate fraction of shared markers between species
+This function calculate the power of each cluster pair based on
+the power of marker genes in each cluster.
 }

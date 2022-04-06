@@ -7,6 +7,7 @@
 #' @param cluster_cols boolean values determining if columns should be clustered
 #' or hclust object
 #' @param cluster_rows boolean values determining if rows should be clustered or
+#'
 #' hclust object
 #' @param Color1 vector of colors used in heatmap
 #' @export
@@ -24,7 +25,7 @@ Heatmap_Cor <- function(RNA1, RowType1='', ColType1='', cluster_cols=T
   if(RowType1==''){ Ind21 <- 1:dim(RNA1)[1];
   }else{
     for(i in 1:length(RowType1)){
-      Ind1 <- grep(RowType1[i], rownames(RNA2))
+      Ind1 <- grep(RowType1[i], rownames(RNA1))
       Ind21 <- c(Ind21, Ind1)
     }
   }
@@ -32,7 +33,7 @@ Heatmap_Cor <- function(RNA1, RowType1='', ColType1='', cluster_cols=T
   if(ColType1==''){ Ind22 <- 1:dim(RNA1)[2]
   }else{
     for(i in 1:length(ColType1)){
-      Ind1 <- grep(ColType1[i], colnames(RNA2))
+      Ind1 <- grep(ColType1[i], colnames(RNA1))
       Ind22 <- c(Ind22, Ind1)
     }
   }

@@ -7,7 +7,7 @@
 
         <meta name="author" content="Jiang junyao" />
     
-        <meta name="date" content="2022-04-03" />
+        <meta name="date" content="2022-04-06" />
     
     <title>CACIMAR tutorial</title>
 
@@ -153,7 +153,7 @@
       <p class="authors">
            <span class="glyphicon glyphicon-user"></span> Jiang junyao
       </p>
-         <p class="date"><span class="glyphicon glyphicon-calendar"></span> 2022-04-03</p>
+         <p class="date"><span class="glyphicon glyphicon-calendar"></span> 2022-04-06</p>
            
 
    
@@ -285,25 +285,13 @@ OrthG_TwoSpecies1 &lt;- OrthG_TwoSpecies(OrthgMmZf,Mm_marker_cell_type,Zf_marker
 <h3>Identify cross-species marker genes in three species</h3>
 <p>Identify orthologs genes for three species based on the result of OrthG_Twospecies</p>
 <pre class="r"><code>OrthG_ThreeSpecies&lt;-OrthG_ThreeSpecies(OrthG_TwoSpecies1,OrthG_TwoSpecies2,c(&#39;mm&#39;,&#39;zf&#39;,&#39;zf&#39;,&#39;ch&#39;))</code></pre>
-<p>Unkown codes</p>
-<pre class="r"><code>###Get_Wilcox_Markers_Cond
-wilcox&lt;-read.table(&#39;D:\\GIBH\\platform\\test data/mmP60RmmNMDA_mmP60mmLD_wilcoxMG_MarkerGenes.txt&#39;)
-Cor&lt;-read.table(&#39;D:\\GIBH\\platform\\test data/mmP60RmmNMDA_mmLD_pbmcSubC_MG_Bin50_R5_GeneCor.txt&#39;,header = T)
-wilcox_result&lt;-get_Wilcox_Markers_Cond(wilcox,Cor)
-###Overlap_Markers_Cond
-mmMarkers3_F3F0 &lt;- read.delim(&quot;D:/GIBH/platform/test data/mmP60RmmNMDA_mmP60mmLD_P03_Markers3_F3F0.txt&quot;)
-zfMarkers3_F3F0 &lt;- read.delim(&quot;D:/GIBH/platform/test data/zfAdzfNMDA_zfAdzfLD_zfAdzfTR_P03_Markers3_F3F0.txt&quot;)
-mmCelltype&lt;-read.table(&#39;D:/GIBH/platform/test data/mmP60RmmNMDA_mmP60mmLD_Cell_Types.txt&#39;,header = T)
-zfCelltype&lt;-read.table(&#39;D:/GIBH/platform/test data/zfAdzfNMDA_zfAdzfLD_zfAdzfTR_Cell_Types.txt&#39;,header = T)
-mmMarker&lt;-Overlap_Markers_Cond(mmMarkers3_F3F0,mmCelltype,Spec1=&#39;mm&#39;)
-zfMarker&lt;-Overlap_Markers_Cond(zfMarkers3_F3F0,zfCelltype,Spec1=&#39;zf&#39;)</code></pre>
 </div>
 </div>
 <div id="cross-species-celltype-heamtmap" class="section level1">
 <h1>4.Cross-species celltype heamtmap</h1>
 <p>In this part, CACIMAR first uses function Identify_SharedMarkers to calculate the power of each cluster pair to identify cross-species cell types. Power of each cluster pair is calculated as:</p>
 <p><span class="math display">\[ (P_{s1} + P_{s2}) /(P_{1}+P_{2}) \]</span></p>
-<p>where, <span class="math inline">\(P_{s1}\)</span> represents the sum of Power of genes shared by Cluster1 and Cluster2 in cluster1, <span class="math inline">\(P_{s2}\)</span> represents the sum of Power of genes shared by Cluster1 and Cluster2 in cluster2, <span class="math inline">\(P_{1}\)</span> represents the sum of Power of all genes in Cluster1, <span class="math inline">\(P_{2}\)</span> represents the sum of Power of all genes in Cluster2.</p>
+<p>where, <span class="math inline">\(P_{s1}\)</span> represents the Power of genes shared by Cluster1 and Cluster2 in cluster1, <span class="math inline">\(P_{s2}\)</span> represents the Power of genes shared by Cluster1 and Cluster2 in cluster2, <span class="math inline">\(P_{1}\)</span> represents the Power of all genes in Cluster1, <span class="math inline">\(P_{2}\)</span> represents Power of all genes in Cluster2.</p>
 <p>Then, CACIMAR integrates with R package pheatmap to visualize the result.</p>
 <pre class="r"><code>zfAdzfNMDA_pbmcSubC_CondSub_P0_Markers1 &lt;- read.delim(&quot;D:/GIBH/platform/test data/cell type/zfAdzfNMDA_pbmcSubC_CondSub_P0_Markers1.txt&quot;)
 chP10chNMDA_UMI500_chFI48chNMDA72_sSubCM_P0_Markers1 &lt;- read.delim(&quot;D:/GIBH/platform/test data/cell type/chP10chNMDA_UMI500_chFI48chNMDA72_sSubCM_P0_Markers1.txt&quot;)

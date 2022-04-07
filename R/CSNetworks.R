@@ -135,11 +135,11 @@ Identify_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,Species_n
 
       GeneRowmatch <- data.frame(Sp1GeneRow,Sp2GeneRow)
 
-      Sp1Regulation <- RnList[[1]][RnList[[1]][,1]%in%Sp1GeneRow &
-                                     RnList[[1]][,4]%in%Sp1GeneRow,]
+      Sp1Regulation <- NetworkGroup1[NetworkGroup1$TF%in%Sp1GeneRow &
+                                       NetworkGroup1$Target%in%Sp1GeneRow,]
 
-      Sp2Regulation <- RnList[[2]][RnList[[2]][,1]%in%Sp2GeneRow &
-                                     RnList[[2]][,4]%in%Sp2GeneRow,]
+      Sp2Regulation <- NetworkGroup2[NetworkGroup2$TF%in%Sp1GeneRow &
+                                       NetworkGroup2$Target%in%Sp1GeneRow,]
 
       if (nrow(Sp1Regulation) > 0 & nrow(Sp2Regulation) > 0) {
         OrthGRelationshipsNum <- 0
@@ -170,6 +170,8 @@ Identify_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,Species_n
   OrthG_df <- OrthG_df[,c(1:5,8:13,6,7)]
   ###calculate network conserved score
   OrthG_df$NCS <- (k1*OrthG_df[,6]) + (k2*OrthG_df[,9]) + (k3*OrthG_df[,11])
+  OrthG_df[,1] <- paste0(Species_name1,OrthG_df[,1])
+  OrthG_df[,2] <- paste0(Species_name2,OrthG_df[,2])
   NCS_df <- reshape2::dcast(OrthG_df[,c(1,2,14)],Group1~Group2,fill = 0)
   rownames(NCS_df) <- NCS_df[,1]
   NCS_df <- NCS_df[,-1]

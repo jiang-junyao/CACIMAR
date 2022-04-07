@@ -1,70 +1,86 @@
-#' Calculate fraction of shared markers between species
-#' @description This function calculate the power of each cluster pair based on
-#' the power of marker genes in each cluster.
-#' @param Marker_list each element should be marker genes table
-#' @param Species_names character, indicating the species of each marker genes
-#' table in Marker_list
-#' @param PowerTh1 numeric, indicating the threshold to filter marker genes
+#' Identify conserved cell types based on power of genes and orthologs database
+#'
+#' @param OrthG ortholog genes database
+#' @param Species1_Marker_table data.frame of species 1, should contain three column:
+#' 'gene', 'cluster' and 'power'
+#' @param Species2_Marker_table data.frame of species 2, should contain three column:
+#' 'gene', 'cluster' and 'power'
+#' @param Species_name1 character, indicating the species names of Species1_Marker_table
+#' @param Species_name2 character, indicating the species names of Species2_Marker_table
 #'
 #' @return
 #' @export
 #'
 #' @examples
-Identify_SharedMarkers <- function(Marker_list, Species_names, PowerTh1=0.1){
-  if (length(Marker_list) != length(Species_names)) {
-    stop("length of Marker_list should be equal to length of Species_names")
+Identify_ConservedCellTypes <- function(OrthG,Species1_Marker_table,Species2_Marker_table,
+                                        Species_name1,Species_name2){
+  ### inputs validation
+  if (!'power' %in% colnames(Species1_Marker_table)) {
+    stop('Species1_Marker_table should contain power column!')
   }
-  Exp1 <- list(); ExpInd1 <- list(); AllCluster1 <- c()
-  PowerTh12 <- gsub('\\.','',PowerTh1)
-  for(i in 1:length(Marker_list)){
-    Exp01 <- Marker_list[[i]] ### filter marker gene based on PowerTh1
-    print(nrow(Exp01))
-    Exp02 <- Exp01[Exp01$avg_diff>0 & Exp01$power>PowerTh1, ]
-    Exp02[, 'cluster'] <- paste0(Species_names[i], 'C', Exp02[, 'cluster'])
-    print(table(Exp02[, 'cluster'])); AllCluster1 <- c(AllCluster1, unique(Exp02[, 'cluster']))
-    Exp1[[i]] <- Exp02
-    ### calculate orthologs power of each cluster pair.
-    ### (ortholog gene power1+ortholog gene power2)/(all gene power1+all gene power2)
-    ShMarker1 <- Cal_SharedMarkers(Exp1[[i]], Species_names[i])
-    if(i==1){ ShMarker3 <- ShMarker1[[1]]
-    Frac1 <- ShMarker1[[3]]
-    }else{ ShMarker3 <- rbind(ShMarker3, ShMarker1[[1]])
-    Frac1 <- rbind(Frac1, ShMarker1[[3]])
-    } }
-
-  print('Calculate fraction of shared markers between species')
-  cFile1 <- combn(length(Marker_list), 2)
-  for(i in 1:ncol(cFile1)){ print(cFile1[,i])
-    Spec1 <- Species_names[cFile1[1,i]]
-    Spec2 <- Species_names[cFile1[2,i]]
-    if (Spec1 == 'ch' & Spec2 =='mm' | Spec2 == 'ch' & Spec1 =='mm') {
-      OrthG01 <- OrthG_Mm_Ch
-    }else if (Spec1 == 'zf' & Spec2 =='mm' | Spec2 == 'zf' & Spec1 =='mm') {
-      OrthG01 <- OrthG_Mm_Zf
-    }else if (Spec1 == 'ch' & Spec2 =='zf' | Spec2 == 'ch' & Spec1 =='zf') {
-      OrthG01 <- OrthG_Zf_Ch
-    }
-    OrthG1 <- OrthG01[-grep('0', OrthG01$Type), ]
-
-    for(j in 1:2){ ### check whether marker are in database
-      uExp1 <- unique(Exp1[[cFile1[j,i]]][, 'gene'])
-      ExpInd01 <- t(apply(as.matrix(uExp1), 1, function(x1){
-        if(length(grep(x1, OrthG1[,2]))==1){ x3 <- c(x1, grep(x1, OrthG1[,2])) }
-        else if(length(grep(x1, OrthG1[,4]))==1){ x3 <- c(x1, grep(x1, OrthG1[,4])) }else{ x3 <- c(x1, NA) }
-      }) )
-      ExpInd1[[j]] <- ExpInd01[!is.na(ExpInd01[, 2]), ]
-      colnames(ExpInd1[[j]]) <- c('ID', 'RowNum')
-    }
-    ### calculate power of each cluster pair that only contains orthlog genes
-    mmExp1 <- Exp1[[cFile1[1,i]]]
-    zfExp1 <- Exp1[[cFile1[2,i]]]
-    mmExpInd1 <- ExpInd1[[1]]
-    zfExpInd1 <- ExpInd1[[2]]
-    ShMarker2 <- Cal_SharedMarkers_Species(mmExp1, zfExp1, mmExpInd1, zfExpInd1, Species_names[cFile1[,i]])
-    ShMarker3 <- rbind(ShMarker3, ShMarker2[[1]])
-    Frac1 <- rbind(Frac1, ShMarker2[[3]])
+  if (!'power' %in% colnames(Species2_Marker_table)) {
+    stop('Species2_Marker_table should contain power column!')
   }
+  if (!'cluster' %in% colnames(Species1_Marker_table)) {
+    stop('Species1_Marker_table should contain cluster column!')
+  }
+  if (!'cluster' %in% colnames(Species2_Marker_table)) {
+    stop('Species2_Marker_table should contain cluster column!')
+  }
+  if (!'gene' %in% colnames(Species1_Marker_table)) {
+    stop('Species1_Marker_table should contain gene column!')
+  }
+  if (!'gene' %in% colnames(Species2_Marker_table)) {
+    stop('Species2_Marker_table should contain gene column!')
+  }
+  validInput(OrthG,'OrthG','df')
+  validInput(Species_name1,'Species_name1','character')
+  validInput(Species_name2,'Species_name2','character')
+  Species_name1 <- tolower(Species_name1)
+  Species_name2 <- tolower(Species_name2)
+  Spec1 <- colnames(OrthG)[2]
+  Spec2 <- colnames(OrthG)[4]
+  Spec1 <- gsub('_ID','',Spec1)
+  Spec2 <- gsub('_ID','',Spec2)
+  if (Spec1 == Species_name1 & Spec2 == Species_name2) {
+    Species_name <- c(Spec1,Spec2)
+    Species1_Marker <- Species1_Marker_table
+    Species2_Marker <- Species2_Marker_table
+  }else if(Spec2 == Species_name1 & Spec1 == Species_name2){
+    Species_name <- c(Spec2,Spec1)
+    Species2_Marker <- Species1_Marker_table
+    Species1_Marker <- Species2_Marker_table
+  }else{stop('please input correct Species name')}
 
+  ### fraction in same species
+  Species1_Marker_table$cluster <- paste0(Species_name1, Species1_Marker_table[, 'cluster'])
+  Species2_Marker_table$cluster <- paste0(Species_name2, Species2_Marker_table[, 'cluster'])
+  ShMarker1 <- Cal_SharedMarkers(Species1_Marker_table, Species_name1)
+  ShMarker2 <- Cal_SharedMarkers(Species2_Marker_table, Species_name2)
+  Frac1 <- rbind(ShMarker1[[3]], ShMarker2[[3]])
+  ShMarker3 <- rbind(ShMarker1[[1]],ShMarker2[[1]])
+  ### fraction between different species
+  Sp1Gene <- Species1_Marker_table$gene
+  ExpInd01 <- t(apply(as.matrix(Sp1Gene), 1, function(x1){
+    if(length(grep(x1, OrthG[,2]))==1){ x3 <- c(x1, grep(x1, OrthG[,2])) }
+    else if(length(grep(x1, OrthG[,4]))==1){ x3 <- c(x1, grep(x1, OrthG[,4])) }else{ x3 <- c(x1, NA) }
+  }) )
+  Sp1Ind2 <- ExpInd01[!is.na(ExpInd01[, 2]), ]
+  colnames(Sp1Ind2) <- c('ID', 'RowNum')
+  Sp2Gene <- Species2_Marker_table$gene
+  ExpInd02 <- t(apply(as.matrix(Sp2Gene), 1, function(x1){
+    if(length(grep(x1, OrthG[,2]))==1){ x3 <- c(x1, grep(x1, OrthG[,2])) }
+    else if(length(grep(x1, OrthG[,4]))==1){ x3 <- c(x1, grep(x1, OrthG[,4])) }else{ x3 <- c(x1, NA) }
+  }) )
+  Sp2Ind2 <- ExpInd02[!is.na(ExpInd02[, 2]), ]
+  colnames(Sp2Ind2) <- c('ID', 'RowNum')
+  ShMarker2 <- Cal_SharedMarkers_Species(Species1_Marker_table, Species2_Marker_table,
+                                         Sp1Ind2, Sp2Ind2,
+                                         c(Species_name1,Species_name2))
+  ShMarker3 <- rbind(ShMarker3, ShMarker2[[1]])
+  Frac1 <- rbind(Frac1, ShMarker2[[3]])
+
+  AllCluster1 <- unique(c(Species1_Marker_table$cluster,Species2_Marker_table$cluster))
   AllCluster12 <- sort(AllCluster1); Frac3 <- c()
   for(i in 1:length(AllCluster1)){ Frac21 <- c()
   for(j in 1:length(AllCluster1)){
@@ -80,13 +96,14 @@ Identify_SharedMarkers <- function(Marker_list, Species_names, PowerTh1=0.1){
   }
   rownames(Frac3) <- AllCluster1; colnames(Frac3) <- AllCluster1
 
-  ShMarker4 <- list(); ShMarker4[[1]] <- ShMarker3; ShMarker4[[2]] <- Frac3; ShMarker4[[3]] <- Frac1
-
+  ShMarker4 <- list(); ShMarker4[[1]] <- ShMarker3
+  ShMarker4[[2]] <- Frac3
+  ShMarker4[[3]] <- Frac1
   return(ShMarker4)
 }
 
+
 Cal_SharedMarkers <- function(mmExp1, Spec1='mm'){
-  print('Calculate fraction of shared markers across clusters within species')
 
   mmCluster1 <- sort(unique(mmExp1$cluster))
   ShMarker1 <- c(); Fraction3 <- c(); Fraction4 <- c()
@@ -120,6 +137,7 @@ Cal_SharedMarkers <- function(mmExp1, Spec1='mm'){
 
   return(ShMarker2)
 }
+
 
 Cal_SharedMarkers_Species <- function(mmExp1, zfExp1, mmExpInd1, zfExpInd1, Spec1=c('mm','zf')){
   zfCluster1 <- sort(unique(zfExp1$cluster))

@@ -192,7 +192,10 @@ Identify_Markers3 <- function(pbmc, MarkerRoc2, FracThr1=5){
     TNum31 <- round(TNum21*Frac21); TNum32 <- round(TNum22*Frac22)
 
     Num4 <- matrix(c(TNum31, TNum21-TNum31, TNum32, TNum22-TNum32), nrow=2)
-    Test1 <- fisher.test(Num4)
+    if (FALSE %in% (c(TNum31, TNum21-TNum31, TNum32, TNum22-TNum32)>5)) {
+      Test1 <- fisher.test(Num4)
+    }else{Test1 <- chisq.test(Num4)}
+
     if(Frac22!=0){
       if(as.numeric(Test1$estimate)/Frac22 < FracThr1){ return(Frac22)
       }else{ return(Test1$p.value) }

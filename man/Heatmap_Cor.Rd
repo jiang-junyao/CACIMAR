@@ -26,6 +26,7 @@ on the column in heatmap. RowType1='' means show all cell types}
 or hclust object}
 
 \item{cluster_rows}{boolean values determining if rows should be clustered or
+
 hclust object}
 
 \item{Color1}{vector of colors used in heatmap}

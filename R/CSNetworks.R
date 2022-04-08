@@ -51,7 +51,7 @@ Identify_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,Species_n
   for (i in 1:length(RnList)) {
     Species <- Species_name[i]
     Rn <- RnList[[i]]
-    RnTFGroup <- dplyr::select(Rn,c('TF','TFGroup'))
+    RnTFGroup <- dplyr::select(Rn,c('Source','SourceGroup'))
     colnames(RnTFGroup) <- paste0(Species,c('Gene','Group'))
     RnTargetGroup <- dplyr::select(Rn,c('Target','TargetGroup'))
     colnames(RnTargetGroup) <- paste0(Species,c('Gene','Group'))
@@ -112,16 +112,16 @@ Identify_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,Species_n
     Sp1GeneRow <- unlist(strsplit(OrthG_df$Sp1OrthGenes[i],';'))
     Sp2GeneRow <- unlist(strsplit(OrthG_df$Sp2OrthGenes[i],';'))
 
-    NetworkGroup1 <- RnList[[1]][RnList[[1]]$TFGroup==OrthG_df[i,1] &
+    NetworkGroup1 <- RnList[[1]][RnList[[1]]$SourceGroup==OrthG_df[i,1] &
                                    RnList[[1]]$TargetGroup==OrthG_df[i,1],]
 
-    NetworkGroup2 <- RnList[[2]][RnList[[2]]$TFGroup==OrthG_df[i,2] &
+    NetworkGroup2 <- RnList[[2]][RnList[[2]]$SourceGroup==OrthG_df[i,2] &
                                    RnList[[2]]$TargetGroup==OrthG_df[i,2],]
 
-    Sp1OrthGEdge <- NetworkGroup1[NetworkGroup1$TF%in%Sp1GeneRow &
+    Sp1OrthGEdge <- NetworkGroup1[NetworkGroup1$Source%in%Sp1GeneRow &
                                     NetworkGroup1$Target%in%Sp1GeneRow,]
 
-    Sp2OrthGEdge <- NetworkGroup2[NetworkGroup2$TF%in%Sp1GeneRow &
+    Sp2OrthGEdge <- NetworkGroup2[NetworkGroup2$Source%in%Sp1GeneRow &
                                     NetworkGroup2$Target%in%Sp1GeneRow,]
 
     OrthEdgeGNum <- nrow(Sp1OrthGEdge)+nrow(Sp2OrthGEdge)
@@ -135,18 +135,18 @@ Identify_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,Species_n
 
       GeneRowmatch <- data.frame(Sp1GeneRow,Sp2GeneRow)
 
-      Sp1Regulation <- NetworkGroup1[NetworkGroup1$TF%in%Sp1GeneRow &
+      Sp1Regulation <- NetworkGroup1[NetworkGroup1$Source%in%Sp1GeneRow &
                                        NetworkGroup1$Target%in%Sp1GeneRow,]
 
-      Sp2Regulation <- NetworkGroup2[NetworkGroup2$TF%in%Sp1GeneRow &
+      Sp2Regulation <- NetworkGroup2[NetworkGroup2$Source%in%Sp1GeneRow &
                                        NetworkGroup2$Target%in%Sp1GeneRow,]
 
       if (nrow(Sp1Regulation) > 0 & nrow(Sp2Regulation) > 0) {
         OrthGRelationshipsNum <- 0
         for (j in 1:nrow(Sp1Regulation)) {
-          Sp2RelatedTF <- GeneRowmatch[GeneRowmatch$Sp1GeneRow == Sp1Regulation$TF,2]
+          Sp2RelatedTF <- GeneRowmatch[GeneRowmatch$Sp1GeneRow == Sp1Regulation$Source,2]
           Sp2RelatedTarget <- GeneRowmatch[GeneRowmatch$Sp1GeneRow == Sp1Regulation$Target,2]
-          if (paste(Sp2RelatedTF,Sp2RelatedTarget)%in%paste(Sp2Regulation$TF,Sp2Regulation$Target)) {
+          if (paste(Sp2RelatedTF,Sp2RelatedTarget)%in%paste(Sp2Regulation$Source,Sp2Regulation$Target)) {
             OrthGRelationshipsNum <- OrthGRelationshipsNum+1
           }
         }
@@ -168,7 +168,11 @@ Identify_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,Species_n
   OrthG_df$TopologicalOrthGEdgeNum<-TopoOrthGEdgeSum
   OrthG_df$TopologicalOrthGEdgeFraction <- OrthGTopoEdgeFraction
   OrthG_df <- OrthG_df[,c(1:5,8:13,6,7)]
-  ###calculate network conserved score
+  ##calculate network conserved score
+  #k1 <- OrthG_df[,4] + OrthG_df[,5]
+  #k2 <- (OrthG_df[,4]*(OrthG_df[,4]-1)) + (OrthG_df[,5]*(OrthG_df[,5]-1))
+  #OrthG_df$NCS <- (k1*OrthG_df[,6]) + (k2*OrthG_df[,9]) + (k3*2*OrthG_df[,11])
+  k1 <- 1;k2=3;k3=6
   OrthG_df$NCS <- (k1*OrthG_df[,6]) + (k2*OrthG_df[,9]) + (k3*OrthG_df[,11])
   OrthG_df[,1] <- paste0(Species_name1,OrthG_df[,1])
   OrthG_df[,2] <- paste0(Species_name2,OrthG_df[,2])

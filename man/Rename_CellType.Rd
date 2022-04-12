@@ -4,7 +4,7 @@
 \alias{Rename_CellType}
 \title{Title}
 \usage{
-Rename_CellType(RNA1, CellT1)
+Rename_CellType(RNA1, CellType)
 }
 \arguments{
 \item{RNA1}{correlation of expression in each cell type}

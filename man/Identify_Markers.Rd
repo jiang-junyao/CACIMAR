@@ -14,7 +14,7 @@ Identify_Markers(Seurat_object, RocThr = 0.4, DiffThr = 1/3, FracThr = 3)
 \item{DiffThr}{numeric, indicating the cutoff of difference in marker genes between
 clusters}
 
-\item{FracThr1}{numeric, indicating the threshold of estimate of the odds
+\item{FracThr}{numeric, indicating the threshold of estimate of the odds
 ratio}
 }
 \value{

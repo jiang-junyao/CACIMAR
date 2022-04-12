@@ -11,8 +11,12 @@
 #' @param RocThr numeric, indicating the cutoff of Roc to identify marker genes
 #' @param DiffThr numeric, indicating the cutoff of difference in marker genes between
 #' clusters
-#' @param FracThr1 numeric, indicating the threshold of estimate of the odds
+#' @param FracThr numeric, indicating the threshold of estimate of the odds
 #' ratio
+#' @importFrom Seurat FindAllMarkers
+#' @importFrom Seurat GetAssayData
+#' @importFrom stats fisher.test
+#' @importFrom stats chisq.test
 #'
 #' @return
 #' @export
@@ -55,7 +59,7 @@ Format_Markers_Frac<-function(Marker_genes){
 
 
 Identify_Markers1<-function(Seurat_object, PowerThr1=1/3){
-  Marker0 <- FindAllMarkers(object = Seurat_object, test.use ='roc', return.thresh = PowerThr1)
+  Marker0 <- Seurat::FindAllMarkers(object = Seurat_object, test.use ='roc', return.thresh = PowerThr1)
   Marker1 <- as.data.frame(Marker0)
   Marker2 <- Marker1[Marker1[,'avg_diff']>0 & Marker1[,'power']>PowerThr1,]
   uMarker2 <- unique(Marker2[,'gene'])

@@ -32,6 +32,10 @@ Plot_MarkersHeatmap(
 \item{show_colnames}{logic, indicating whether show column names}
 
 \item{legend1}{logic, indicating whether show the legend}
+
+\item{Scale}{character indicating if the values should be centered and scaled
+in either the row direction or the column direction, or none. Corresponding
+values are "row", "column" and "none"}
 }
 \value{
 

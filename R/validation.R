@@ -102,17 +102,6 @@ validInput <- function(input = NULL, name = NULL, valid = NULL){
       cv2 <- is(input, "SimpleList")
       cv <- any(cv1, cv2)
 
-    }else if(vi == "bsgenome"){
-
-      cv1 <- is(input, "BSgenome")
-      cv2 <- tryCatch({
-        library(input)
-        eval(parse(text=input))
-      }, error = function(e){
-        FALSE
-      })
-      cv <- any(cv1, cv2)
-
     }else if(vi == "se" | vi == "summarizedexperiment"){
 
       cv <- is(input, "SummarizedExperiment")

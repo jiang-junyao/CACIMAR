@@ -26,15 +26,6 @@ Identify_CellType <- function(object, Marker_gene_table) {
 }
 
 
-#' Title
-#'
-#' @param object
-#' @param Marker1
-#'
-#' @return
-#' @export
-#'
-#' @examples
 Identify_CellTypes1 <- function(object, Marker1) {
   ## calculate the power of each marker on distinguishing cell types
   NumCellType <- apply(Marker1, 1, function(X1) {

@@ -1,5 +1,3 @@
-#' Inner function to make ID change
-#'
 
 Converse_GeneIDSymbol <- function(Gene1, GeneInf1=NULL){
 

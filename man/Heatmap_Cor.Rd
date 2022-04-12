@@ -32,7 +32,7 @@ hclust object}
 \item{Color1}{vector of colors used in heatmap}
 }
 \value{
-return a list used in Plot_tree
+pheatmap object
 }
 \description{
 plot the heatmap of marker genes across different species

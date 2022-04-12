@@ -1,26 +1,28 @@
 Package: CACIMAR
-Title: What the Package Does (One Line, Title Case)
+Title: cross-species analysis of cell identities, markers and regulations
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "Junyao",
            family = "Jiang",
            role = c("aut", "cre"),
            email = "jiangjunyao789@163.com")
-Description: What the package does (one paragraph).
+Description: CACIMAR is an R package to perform cross-species analysis based on scRNA-seq data. CACIMAR contains 5 main features. (1) identify Markers in each cluster. (2) Cell type annotaion (3) identify conserved markers. (4) identify conserved cell types. (5) identify conserved modules of regulatory networks.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Imports: 
-    ape,
     pheatmap,
-    ggtree,
     pbapply,
     psych,
     ROCR,
-    gridExtra
+    gridExtra,
+    reshape2,
+    dplyr,
+    grDevices,
+    stats,
+    methods
 Depends: 
     R (>= 4.0),
-    Seurat,
-    ggplot2
+    Seurat

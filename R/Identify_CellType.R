@@ -8,19 +8,25 @@
 #' the cell type according to UP. Generally, the cluster beongs to the cell
 #' type which have the highest united power or higher than the threshold of
 #' the united power (for example > 0.9 power).
-#' @param object seurat object
-#' @param Marker_gene_table data.frame, indicating marker gene and its corresponding cell type,
-#' rownames of Marker genes table should be the same format as the
-#' rownames format of seurat object, and should contain CellType column
+#' @param seurat_object seurat object
+#' @param Marker_gene_table data.frame, indicating marker gene and its
+#' corresponding cell type. Marker_gene_table should contain two columns: 'CellType'
+#' represent correseponding cell types of each marker and 'Marker' represent Markers
 #'
 #' @return Cell type with the highest power in each cluster
 #' @export
 #'
 #' @examples
-Identify_CellType <- function(object, Marker_gene_table) {
-  MarkerRoc1 <- Identify_CellTypes1(object, Marker_gene_table)
+Identify_CellType <- function(seurat_object, Marker_gene_table) {
+  validInput(seurat_object,'seurat_object','seuratobject')
+  if (!'CellType' %in% colnames(Marker_gene_table)) {
+    stop('Marker_gene_table should contain CellType column ')
+  }
+  if (!'Marker' %in% colnames(Marker_gene_table)) {
+    stop('Marker_gene_table should contain Marker column ')
+  }
+  MarkerRoc1 <- Identify_CellTypes1(seurat_object, Marker_gene_table)
   ClusterCellT1 <- Identify_CellTypes2(MarkerRoc1)
-  #write.table(MarkerRoc1, 'MarkerRoc.txt')
 
   return(ClusterCellT1)
 }
@@ -28,12 +34,13 @@ Identify_CellType <- function(object, Marker_gene_table) {
 
 Identify_CellTypes1 <- function(object, Marker1) {
   ## calculate the power of each marker on distinguishing cell types
+  CelltypeIdx <- grep('CellType',colnames(Marker1))
   NumCellType <- apply(Marker1, 1, function(X1) {
-    length(strsplit(as.character(X1[3]), ";")[[1]])
+    length(strsplit(as.character(X1[CelltypeIdx]),",")[[1]])
   })
   Marker2 <- cbind(Marker1, NumCellType)
 
-  MarkerRoc1 <- Cal_MarkersRoc(object, rownames(Marker1))
+  MarkerRoc1 <- Cal_MarkersRoc(object, Marker1$Marker)
   MarkerRoc2 <- cbind(Marker2[order(rownames(Marker2)), ], MarkerRoc1[order(rownames(MarkerRoc1)), ])
   MarkerRoc2 <- MarkerRoc2[order(MarkerRoc2$CellType), ]
 

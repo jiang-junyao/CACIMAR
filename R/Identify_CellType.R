@@ -41,7 +41,7 @@ Identify_CellTypes1 <- function(object, Marker1) {
   Marker2 <- cbind(Marker1, NumCellType)
 
   MarkerRoc1 <- Cal_MarkersRoc(object, Marker1$Marker)
-  MarkerRoc2 <- cbind(Marker2[order(rownames(Marker2)), ], MarkerRoc1[order(rownames(MarkerRoc1)), ])
+  MarkerRoc2 <- cbind(Marker2[order(Marker2$Marker), ], MarkerRoc1[order(rownames(MarkerRoc1)), ])
   MarkerRoc2 <- MarkerRoc2[order(MarkerRoc2$CellType), ]
 
   return(MarkerRoc2)

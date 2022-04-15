@@ -31,3 +31,7 @@ network, second df contains NCS between module pairs
 Use Score of Conserved network to identify conserved regulatory
 network modules based on homologous genes databased and topology of networks
 }
+\examples{
+load(system.file("extdata", "network_example.rda", package = "CACIMAR"))
+n1 <- Identify_ConservedNetworks(OrthG_Mm_Zf,mmNetwork,zfNetwork,'mm','zf')
+}

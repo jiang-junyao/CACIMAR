@@ -12,15 +12,37 @@
 #' network, second df contains NCS between module pairs
 #' @export
 #'
-#' @examples
+#' @examples load(system.file("extdata", "network_example.rda", package = "CACIMAR"))
+#' n1 <- Identify_ConservedNetworks(OrthG_Mm_Zf,mmNetwork,zfNetwork,'mm','zf')
 Identify_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,Species_name1,Species_name2){
   ### input check
   validInput(Species_name1,'Species_name1','character')
   validInput(Species_name2,'Species_name2','character')
-  validInput(k1,'k1','numeric')
-  validInput(k1,'k2','numeric')
-  validInput(k1,'k3','numeric')
 
+  if (!'Source' %in% colnames(Species1_GRN)) {
+    stop('Species1_GRN should contain Source column')
+  }
+  if (!'Target' %in% colnames(Species1_GRN)) {
+    stop('Species1_GRN should contain Target column')
+  }
+  if (!'SourceGroup' %in% colnames(Species1_GRN)) {
+    stop('Species1_GRN should contain SourceGroup column')
+  }
+  if (!'TargetGroup' %in% colnames(Species1_GRN)) {
+    stop('Species1_GRN should contain TargetGroup column')
+  }
+  if (!'Source' %in% colnames(Species2_GRN)) {
+    stop('Species2_GRN should contain Source column')
+  }
+  if (!'Target' %in% colnames(Species2_GRN)) {
+    stop('Species2_GRN should contain Target column')
+  }
+  if (!'SourceGroup' %in% colnames(Species2_GRN)) {
+    stop('Species2_GRN should contain SourceGroup column')
+  }
+  if (!'TargetGroup' %in% colnames(Species2_GRN)) {
+    stop('Species2_GRN should contain TargetGroup column')
+  }
   Species_name1 <- tolower(Species_name1)
   Species_name2 <- tolower(Species_name2)
   ### species check
@@ -32,7 +54,7 @@ Identify_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,Species_n
     Species_name <- c(Spec1,Spec2)
     RnList <- list(Species1_GRN,Species2_GRN)
   }else if(Spec2 == tolower(Species_name1) & Spec1 == tolower(Species_name2)){
-    Species_name <- c(Species2_GRN,Species1_GRN)
+    Species_name <- c(Spec1,Spec2)
     RnList <- list(Species2_GRN,Species1_GRN)
   }else{stop('please input correct Species name')}
 
@@ -53,16 +75,16 @@ Identify_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,Species_n
   }
 
   ### get orthology genes
-  Sp1Gene <- RnGeneList[[1]]
-  Sp2Gene <- RnGeneList[[2]]
+  Sp1Gene <- RnGeneList[[Species_name[1]]]
+  Sp2Gene <- RnGeneList[[Species_name[2]]]
   Sp1Group <- sort(Sp1Gene$Group[!duplicated(Sp1Gene$Group)])
   Sp2Group <- sort(Sp2Gene$Group[!duplicated(Sp2Gene$Group)])
   Spec1_gene <- data.frame(rep(0,nrow(Sp1Gene)),
                            rep(1,nrow(Sp1Gene)))
-  rownames(Spec1_gene) <- Sp1Gene$mmGene
+  rownames(Spec1_gene) <- Sp1Gene[,1]
   Spec2_gene <- data.frame(rep(0,nrow(Sp2Gene)),
                            rep(1,nrow(Sp2Gene)))
-  rownames(Spec2_gene) <- Sp2Gene$zfGene
+  rownames(Spec2_gene) <- Sp2Gene[,1]
   Exp2 <- Get_OrthG(OrthG, Spec1_gene, Spec2_gene, Species_name)
   Type1 <- paste0('Used_',Species_name[1],'_ID')
   Type2 <- paste0('Used_',Species_name[2],'_ID')

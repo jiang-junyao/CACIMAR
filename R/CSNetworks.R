@@ -1,27 +1,19 @@
 
 #' Identify conserved regulatory networks
+#' @description Use Score of Conserved network to identify conserved regulatory
+#' network modules based on homologous genes databased and topology of networks
 #' @param OrthG ortholog genes database
 #' @param Species1_GRN gene regulatory network of species 1
 #' @param Species2_GRN gene regulatory network of species 2
 #' @param Species_name1 character, indicating the species names of Species1_GRN
 #' @param Species_name2 character, indicating the species names of Species2_GRN
-#' @param k1 coefficient of shared genes fraction to determine the importance of
-#' the fraction of orthology genes between each module pair in
-#' identifying conserved regulatory networks
-#' @param k2 coefficient of orthology edge fraction to determine the importance of
-#' fraction of edge number between orthology genes between each module pair in
-#' identifying conserved regulatory networks
-#' @param k3 coefficient of topological orthology edge fraction to determine the
-#' importance of fraction of edge number between topologically matched orthology
-#' genes between each module pair in identifying conserved regulatory networks
 #'
 #' @return list contains two df. First df contains details of conserved regulatory
 #' network, second df contains NCS between module pairs
 #' @export
 #'
 #' @examples
-Identify_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,Species_name1,Species_name2,
-                                       k1 = 1, k2 = 2, k3 = 4){
+Identify_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,Species_name1,Species_name2){
   ### input check
   validInput(Species_name1,'Species_name1','character')
   validInput(Species_name2,'Species_name2','character')
@@ -168,7 +160,8 @@ Identify_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,Species_n
   OrthG_df$TopologicalOrthGEdgeNum<-TopoOrthGEdgeSum
   OrthG_df$TopologicalOrthGEdgeFraction <- OrthGTopoEdgeFraction
   OrthG_df <- OrthG_df[,c(1:5,8:13,6,7)]
-  ##calculate Score of Conserved Networks
+
+  ### calculate Score of Conserved Networks (SCN)
   Candidate_moudle <- OrthG_df[OrthG_df$OrthGEdgeNum > 0,]
   HNi <- mean(Candidate_moudle$OrthGeneNum)
   HNj <- mean(Candidate_moudle$OrthGeneNum)

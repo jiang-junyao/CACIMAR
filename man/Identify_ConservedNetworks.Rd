@@ -9,10 +9,7 @@ Identify_ConservedNetworks(
   Species1_GRN,
   Species2_GRN,
   Species_name1,
-  Species_name2,
-  k1 = 1,
-  k2 = 2,
-  k3 = 4
+  Species_name2
 )
 }
 \arguments{
@@ -25,23 +22,12 @@ Identify_ConservedNetworks(
 \item{Species_name1}{character, indicating the species names of Species1_GRN}
 
 \item{Species_name2}{character, indicating the species names of Species2_GRN}
-
-\item{k1}{coefficient of shared genes fraction to determine the importance of
-the fraction of orthology genes between each module pair in
-identifying conserved regulatory networks}
-
-\item{k2}{coefficient of orthology edge fraction to determine the importance of
-fraction of edge number between orthology genes between each module pair in
-identifying conserved regulatory networks}
-
-\item{k3}{coefficient of topological orthology edge fraction to determine the
-importance of fraction of edge number between topologically matched orthology
-genes between each module pair in identifying conserved regulatory networks}
 }
 \value{
 list contains two df. First df contains details of conserved regulatory
 network, second df contains NCS between module pairs
 }
 \description{
-Identify conserved regulatory networks
+Use Score of Conserved network to identify conserved regulatory
+network modules based on homologous genes databased and topology of networks
 }

@@ -31,7 +31,7 @@ of marker genes.}
 to match similar cell types}
 }
 \value{
-
+Data frame of conserved markers
 }
 \description{
 Identify orthologs marker genes for two species based on orthologs database

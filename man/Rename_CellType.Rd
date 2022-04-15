@@ -13,7 +13,7 @@ Rename_CellType(RNA1, CellType)
 be Cluster, third column should be CellType, fourth column should be Group}
 }
 \value{
-
+Renamed data frame
 }
 \description{
 Title

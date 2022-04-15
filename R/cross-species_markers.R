@@ -162,7 +162,7 @@ Refine_Used_OrthG<-function(ShMarker1,Species,smiliar_cell_name){
 #' @param match_cell_name characters contained in both cell names
 #'  to match similar cell types
 #'
-#' @return
+#' @return Data frame of conserved markers
 #' @export
 #'
 #' @examples
@@ -235,7 +235,7 @@ OrthG_TwoSpecies<-function(OrthG,Species1_Marker_table,Species2_Marker_table,
 #' @param match_cell_name characters contained in both cell names
 #'  to match similar cell types
 #'
-#' @return
+#' @return Data frame of conserved markers
 #' @export
 #'
 #' @examples

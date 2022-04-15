@@ -18,7 +18,7 @@
 #' @importFrom stats fisher.test
 #' @importFrom stats chisq.test
 #'
-#' @return
+#' @return Data frame of conserved markers
 #' @export
 #'
 #' @examples

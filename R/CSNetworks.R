@@ -168,12 +168,14 @@ Identify_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,Species_n
   OrthG_df$TopologicalOrthGEdgeNum<-TopoOrthGEdgeSum
   OrthG_df$TopologicalOrthGEdgeFraction <- OrthGTopoEdgeFraction
   OrthG_df <- OrthG_df[,c(1:5,8:13,6,7)]
-  ##calculate network conserved score
-  #k1 <- OrthG_df[,4] + OrthG_df[,5]
-  #k2 <- (OrthG_df[,4]*(OrthG_df[,4]-1)) + (OrthG_df[,5]*(OrthG_df[,5]-1))
-  #OrthG_df$NCS <- (k1*OrthG_df[,6]) + (k2*OrthG_df[,9]) + (k3*2*OrthG_df[,11])
-  k1 <- 1;k2=3;k3=6
-  OrthG_df$NCS <- (k1*OrthG_df[,6]) + (k2*OrthG_df[,9]) + (k3*OrthG_df[,11])
+  ##calculate Score of Conserved Networks
+  Candidate_moudle <- OrthG_df[OrthG_df$OrthGEdgeNum > 0,]
+  HNi <- mean(Candidate_moudle$OrthGeneNum)
+  HNj <- mean(Candidate_moudle$OrthGeneNum)
+  Ni <- mean(Candidate_moudle$Group1AllGenes)
+  Nj <- mean(Candidate_moudle$Group2AllGenes)
+  MIU <- ((Ni+Nj-1)/(HNi+HNj-1))
+  OrthG_df$NCS <- OrthG_df[,6] + (MIU*OrthG_df[,9]) + (MIU*2*OrthG_df[,11])
   OrthG_df[,1] <- paste0(Species_name1,OrthG_df[,1])
   OrthG_df[,2] <- paste0(Species_name2,OrthG_df[,2])
   NCS_df <- reshape2::dcast(OrthG_df[,c(1,2,14)],Group1~Group2,fill = 0)
@@ -182,4 +184,9 @@ Identify_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,Species_n
   OrthG_list <- list(OrthG_df,NCS_df)
   return(OrthG_list)
 }
+
+
+
+
+
 

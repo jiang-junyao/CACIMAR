@@ -27,7 +27,7 @@ and OrthG_TwoSpecies2}
 to match similar cell types}
 }
 \value{
-
+Data frame of conserved markers
 }
 \description{
 Identify orthologs genes for three species based on the result

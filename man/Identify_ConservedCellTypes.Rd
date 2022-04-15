@@ -26,7 +26,8 @@ Identify_ConservedCellTypes(
 \item{Species_name2}{character, indicating the species names of Species2_Marker_table}
 }
 \value{
-
+list contains two elements: first one is details of conserved cell types,
+second one is matrix of cell types conserved score
 }
 \description{
 Identify conserved cell types based on power of genes and orthologs database

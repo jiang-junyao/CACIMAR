@@ -27,3 +27,7 @@ the cell type according to UP. Generally, the cluster beongs to the cell
 type which have the highest united power or higher than the threshold of
 the united power (for example > 0.9 power).
 }
+\examples{
+\dontrun{ annotation <- Identify_CellType(seurat_object,Marker_gene_table)
+}
+}

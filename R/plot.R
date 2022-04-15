@@ -62,7 +62,7 @@ Heatmap_Cor <- function(RNA1, RowType1='', ColType1='', cluster_cols=T
 #' @param CellType cell type. First column should be Species, second column should
 #' be Cluster, third column should be CellType, fourth column should be Group
 #'
-#' @return
+#' @return Renamed data frame
 #' @export
 #'
 #' @examples
@@ -126,7 +126,7 @@ Seurat_SubsetData <- function(pbmc1, SubG1, SubS1=NULL, ExSubS1=NULL){
 #' @importFrom stats hclust
 #' @importFrom stats as.dist
 #' @importFrom stats cor
-#' @return
+#' @return heatmap
 #' @export
 #'
 #' @examples

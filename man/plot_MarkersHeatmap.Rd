@@ -38,7 +38,7 @@ in either the row direction or the column direction, or none. Corresponding
 values are "row", "column" and "none"}
 }
 \value{
-
+heatmap
 }
 \description{
 Plot the Marker genes in each cluster

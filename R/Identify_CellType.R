@@ -16,7 +16,8 @@
 #' @return Cell type with the highest power in each cluster
 #' @export
 #'
-#' @examples
+#' @examples \dontrun{ annotation <- Identify_CellType(seurat_object,Marker_gene_table)
+#' }
 Identify_CellType <- function(seurat_object, Marker_gene_table) {
   validInput(seurat_object,'seurat_object','seuratobject')
   if (!'CellType' %in% colnames(Marker_gene_table)) {

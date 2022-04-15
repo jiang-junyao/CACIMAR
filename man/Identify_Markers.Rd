@@ -18,7 +18,7 @@ clusters}
 ratio}
 }
 \value{
-
+Data frame of conserved markers
 }
 \description{
 This function first identify marker genes in each cluster

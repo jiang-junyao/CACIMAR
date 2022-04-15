@@ -8,7 +8,8 @@
 #' @param Species_name1 character, indicating the species names of Species1_Marker_table
 #' @param Species_name2 character, indicating the species names of Species2_Marker_table
 #'
-#' @return
+#' @return list contains two elements: first one is details of conserved cell types,
+#' second one is matrix of cell types conserved score
 #' @export
 #'
 #' @examples

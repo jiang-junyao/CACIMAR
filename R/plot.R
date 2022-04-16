@@ -120,6 +120,7 @@ Seurat_SubsetData <- function(pbmc1, SubG1, SubS1=NULL, ExSubS1=NULL){
 #' values are "row", "column" and "none"
 #' @importFrom pheatmap pheatmap
 #' @importFrom gridExtra grid.arrange
+#' @importFrom gridExtra arrangeGrob
 #' @importFrom grDevices rgb
 #' @importFrom grDevices colorRampPalette
 #' @importFrom stats kmeans

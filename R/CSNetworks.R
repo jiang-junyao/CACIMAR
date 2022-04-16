@@ -7,7 +7,7 @@
 #' @param Species2_GRN gene regulatory network of species 2
 #' @param Species_name1 character, indicating the species names of Species1_GRN
 #' @param Species_name2 character, indicating the species names of Species2_GRN
-#'
+#' @importFrom reshape2 dcast
 #' @return list contains two df. First df contains details of conserved regulatory
 #' network, second df contains NCS between module pairs
 #' @export
@@ -145,7 +145,7 @@ Identify_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,Species_n
     AllEdgeNumSum <- c(AllEdgeNumSum,AllEdgeNum)
     OrthGEdgeFraction <- c(OrthGEdgeFraction,(OrthEdgeGNum/AllEdgeNum))
     ### topological fraction
-    if (OrthG_df[,3]>1) {
+    if (OrthG_df[i,3]>1) {
 
       GeneRowmatch <- data.frame(Sp1GeneRow,Sp2GeneRow)
 

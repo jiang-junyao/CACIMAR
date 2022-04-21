@@ -29,3 +29,7 @@ Next, gene with the largest power in which cluster will be the marker
 gene in this cluster. Eventually, make fisher test for power of each cluster,
 cluster with p.value < 0.05 will be retained as the final cluster for marker gene
 }
+\examples{
+data("pbmc_small")
+all.markers <- Identify_Markers(pbmc_small)
+}

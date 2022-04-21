@@ -17,7 +17,9 @@
 #' @importFrom methods is
 #' @return pheatmap object
 #'
-#' @examples
+#' @examples load(system.file("extdata", "network_example.rda", package = "CACIMAR"))
+#' n1 <- Identify_ConservedNetworks(OrthG_Mm_Zf,mmNetwork,zfNetwork,'mm','zf')
+#' Heatmap_Cor(n1[[2]],cluster_cols=TRUE, cluster_rows=FALSE)
 Heatmap_Cor <- function(RNA1, RowType1='', ColType1='', cluster_cols=T
                         , cluster_rows=F, Color1=NULL){
   validInput(RowType1,'RowType1','character')
@@ -55,31 +57,6 @@ Heatmap_Cor <- function(RNA1, RowType1='', ColType1='', cluster_cols=T
 
   return(Hier1)
 }
-
-#' Title
-#'
-#' @param RNA1 correlation of expression in each cell type
-#' @param CellType cell type. First column should be Species, second column should
-#' be Cluster, third column should be CellType, fourth column should be Group
-#'
-#' @return Renamed data frame
-#' @export
-#'
-#' @examples
-Rename_CellType<-function(RNA1,CellType){
-  CellT2 <- cbind(apply(CellType, 1, function(x1){ x2 <- paste0(x1[1],x1[2]) })
-                  , CellType)
-  colnames(RNA1) <- apply(CellT2[match(colnames(RNA1), CellT2[, 1]), ],
-                          1, function(x1){ x2 <- paste(c(x1[2],'.',x1[4])
-                                                       ,collapse='') })
-  rownames(RNA1) <- apply(CellT2[match(rownames(RNA1), CellT2[, 1]), ],
-                          1, function(x1){ x2 <- paste(c(x1[2],'.',x1[4])
-                                                       ,collapse='') })
-  RNA1[RNA1==1] <-NA
-  return(RNA1)
-}
-
-
 
 
 
@@ -130,7 +107,9 @@ Seurat_SubsetData <- function(pbmc1, SubG1, SubS1=NULL, ExSubS1=NULL){
 #' @return heatmap
 #' @export
 #'
-#' @examples
+#' @examples data("pbmc_small")
+#' all.markers <- Identify_Markers(pbmc_small,,RocThr = 0)
+#' Plot_MarkersHeatmap(all.markers)
 Plot_MarkersHeatmap<-function(scRNA1, ModuleScale1=15,
                               Color1=NULL, ModuleColor1=NULL, Gene1=NULL,
                               NumRowBlank=0,show_colnames=F, legend1=T,

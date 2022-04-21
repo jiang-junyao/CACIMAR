@@ -32,3 +32,7 @@ second one is matrix of cell types conserved score
 \description{
 Identify conserved cell types based on power of genes and orthologs database
 }
+\examples{
+load(system.file("extdata", "CellTypeAllMarkers.rda", package = "CACIMAR"))
+expression <- Identify_ConservedCellTypes(OrthG_Mm_Zf,mm_Marker,zf_Marker,'mm','zf')
+}

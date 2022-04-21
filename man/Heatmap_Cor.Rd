@@ -37,3 +37,8 @@ pheatmap object
 \description{
 plot the heatmap of marker genes across different species
 }
+\examples{
+load(system.file("extdata", "network_example.rda", package = "CACIMAR"))
+n1 <- Identify_ConservedNetworks(OrthG_Mm_Zf,mmNetwork,zfNetwork,'mm','zf')
+Heatmap_Cor(n1[[2]],cluster_cols=TRUE, cluster_rows=FALSE)
+}

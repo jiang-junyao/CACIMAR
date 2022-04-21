@@ -33,3 +33,11 @@ Data frame of conserved markers
 Identify orthologs genes for three species based on the result
 of OrthG_Twospecies
 }
+\examples{
+load(system.file("extdata", "CellMarkers.rda", package = "CACIMAR"))
+OrthG_TwoSpecies1 <- Identify_ConservedMarkers(OrthG_Mm_Zf,Mm_marker_cell_type
+,Zf_marker_cell_type,Species_name1 = 'mm',Species_name2 = 'zf')
+OrthG_TwoSpecies2 <- Identify_ConservedMarkers(OrthG_Zf_Ch,Ch_marker_cell_type
+,Zf_marker_cell_type,Species_name1 = 'ch',Species_name2 = 'zf')
+OrthG_ThreeSpecies<-OrthG_ThreeSpecies(OrthG_TwoSpecies1,OrthG_TwoSpecies2,c('mm','zf','zf','ch'))
+}

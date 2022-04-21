@@ -43,3 +43,8 @@ heatmap
 \description{
 Plot the Marker genes in each cluster
 }
+\examples{
+data("pbmc_small")
+all.markers <- Identify_Markers(pbmc_small,,RocThr = 0)
+Plot_MarkersHeatmap(all.markers)
+}

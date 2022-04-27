@@ -8,11 +8,10 @@
 #' cluster with p.value < 0.05 will be retained as the final cluster for marker gene
 #'
 #' @param Seurat_object Seurat object, should contain cluster information
-#' @param RocThr numeric, indicating the cutoff of Roc to identify marker genes
-#' @param DiffThr numeric, indicating the cutoff of difference in marker genes between
-#' clusters
-#' @param FracThr numeric, indicating the threshold of estimate of the odds
-#' ratio
+#' @param PowerCutoff numeric, indicating the cutoff of gene power to refine marker genes
+#' @param DifferenceCutoff numeric, indicating the cutoff of difference in marker genes between
+#' clusters to refine marker genes
+#' @param PvalueCutoff numeric, indicating the p.value cutoff of chi-square test to refine marker genes
 #' @importFrom Seurat FindAllMarkers
 #' @importFrom Seurat GetAssayData
 #' @importFrom stats fisher.test
@@ -23,11 +22,12 @@
 #'
 #' @examples data("pbmc_small")
 #' all.markers <- Identify_Markers(pbmc_small)
-Identify_Markers<-function(Seurat_object, RocThr=0.4, DiffThr=1/3,FracThr=3 ){
-  MarkerRoc<-Identify_Markers1(Seurat_object,RocThr)
+Identify_Markers<-function(Seurat_object, PowerCutoff=0.4,
+                           DifferenceCutoff=0,PvalueCutoff=0.05 ){
+  MarkerRoc<-Identify_Markers1(Seurat_object,PowerCutoff,DifferenceCutoff)
   MarkerRoc<-as.data.frame(MarkerRoc)
-  Marker<-Identify_Markers2(Seurat_object,MarkerRoc,PowerThr1=DiffThr)
-  final_Markers<-Refine_Markers(Seurat_object,Marker,FracThr)
+  Marker<-Identify_Markers2(Seurat_object,MarkerRoc,PowerThr1=DifferenceCutoff)
+  final_Markers<-Refine_Markers(Seurat_object,Marker,p.value = PvalueCutoff)
   return(final_Markers)
 }
 
@@ -58,10 +58,10 @@ Format_Markers_Frac<-function(Marker_genes){
 }
 
 
-Identify_Markers1<-function(Seurat_object, PowerThr1=1/3){
+Identify_Markers1<-function(Seurat_object, PowerThr1=1/3,diffthr1){
   Marker0 <- Seurat::FindAllMarkers(object = Seurat_object, test.use ='roc', return.thresh = PowerThr1)
   Marker1 <- as.data.frame(Marker0)
-  Marker2 <- Marker1[Marker1[,'avg_diff']>0 & Marker1[,'power']>PowerThr1,]
+  Marker2 <- Marker1[Marker1[,'avg_diff'] > diffthr1 & Marker1[,'power']>PowerThr1,]
   uMarker2 <- unique(Marker2[,'gene'])
   MarkerRoc1 <- Cal_MarkersRoc(Seurat_object, uMarker2)
   MarkerRoc2 <- Select_MarkersPower2(MarkerRoc1)
@@ -165,16 +165,16 @@ Identify_Markers2 <- function(pbmc, Marker, PowerThr1=1/3){
 
 
 
-Refine_Markers<-function(Seurat_object,Marker, FracThr1=3){
-  MarkerRoc3 <- Identify_Markers3(Seurat_object, Marker,FracThr1=FracThr1)
-  MarkerRoc4 <- MarkerRoc3[MarkerRoc3[,'Pvalue'] < 0.01,]
+Refine_Markers<-function(Seurat_object,Marker,p.value = 0.05){
+  MarkerRoc3 <- Identify_Markers3(Seurat_object, Marker)
+  MarkerRoc4 <- MarkerRoc3[MarkerRoc3[,'Pvalue'] < 0.05,]
   print(c(nrow(MarkerRoc3), nrow(MarkerRoc4)))
   return(MarkerRoc4)
 }
 
 
 
-Identify_Markers3 <- function(pbmc, MarkerRoc2, FracThr1=5){
+Identify_Markers3 <- function(pbmc, MarkerRoc2){
 
   pbmc@assays$RNA@data <- GetAssayData(pbmc)[rownames(MarkerRoc2), ]
   Frac1 <- Get_scRNA_AggExp(pbmc)

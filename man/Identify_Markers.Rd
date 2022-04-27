@@ -4,18 +4,22 @@
 \alias{Identify_Markers}
 \title{Identify markers of each cluster}
 \usage{
-Identify_Markers(Seurat_object, RocThr = 0.4, DiffThr = 1/3, FracThr = 3)
+Identify_Markers(
+  Seurat_object,
+  PowerCutoff = 0.4,
+  DifferenceCutoff = 0,
+  PvalueCutoff = 0.05
+)
 }
 \arguments{
 \item{Seurat_object}{Seurat object, should contain cluster information}
 
-\item{RocThr}{numeric, indicating the cutoff of Roc to identify marker genes}
+\item{PowerCutoff}{numeric, indicating the cutoff of gene power to refine marker genes}
 
-\item{DiffThr}{numeric, indicating the cutoff of difference in marker genes between
-clusters}
+\item{DifferenceCutoff}{numeric, indicating the cutoff of difference in marker genes between
+clusters to refine marker genes}
 
-\item{FracThr}{numeric, indicating the threshold of estimate of the odds
-ratio}
+\item{PvalueCutoff}{numeric, indicating the p.value cutoff of chi-square test to refine marker genes}
 }
 \value{
 Data frame of conserved markers

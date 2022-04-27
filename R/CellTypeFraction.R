@@ -99,6 +99,7 @@ Identify_ConservedCellTypes <- function(OrthG,Species1_Marker_table,Species2_Mar
   rownames(Frac3) <- AllCluster1; colnames(Frac3) <- AllCluster1
 
   ShMarker4 <- list(); ShMarker4[[1]] <- ShMarker3
+  Frac3[Frac3==1] <- NA
   ShMarker4[[2]] <- Frac3
   ShMarker4[[3]] <- Frac1
   return(ShMarker4)

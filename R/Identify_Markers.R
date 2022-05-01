@@ -46,14 +46,16 @@ Format_Markers_Frac<-function(Marker_genes){
   Cluster1 <- t(apply(RNA1, 1, function(x1){
     x21 <- strsplit(x1[1],',')[[1]]; x22 <- strsplit(x1[2],',')[[1]]
     x31 <- paste(x21[1:(length(x21)-1)], collapse=',')
-    x32 <- paste(x22[1:(length(x22)-1)], collapse=',')
+    x32 <- x22[1]
     return(c(x21[1], x31, x32))
   }))
-  colnames(Cluster1) <- c('Cluster','AllCluster','Power')
+  colnames(Cluster1) <- c('cluster','AllCluster','power')
   RNA2 <- cbind(Cluster1, RNA1[,3:ncol(RNA1)])
-  RNA3 <- RNA2[order(RNA2[, 'Power'], decreasing=T), ]
+  RNA3 <- RNA2[order(RNA2[, 'power'], decreasing=T), ]
   RNA3 <- RNA3[order(RNA3[, 'AllCluster']), ]
-  RNA3 <- RNA3[order(RNA3[, 'Cluster']), ]; print(c(nrow(RNA2), nrow(RNA3)))
+  RNA3 <- RNA3[order(RNA3[, 'cluster']), ]; print(c(nrow(RNA2), nrow(RNA3)))
+  RNA3$gene <- rownames(RNA3)
+  RNA3 <- RNA3[,c(ncol(RNA3),(1:ncol(RNA3)-1))]
   return(RNA3)
 }
 

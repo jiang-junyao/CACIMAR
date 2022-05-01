@@ -67,6 +67,9 @@ Identify_ConservedMarkers <- function(OrthG,Species1_Marker_table,Species2_Marke
   Species2 <- Species2_Marker[match(Exp2[, Type2],Species2_Marker[,1]), ]
   Exp3 <- cbind(Exp2, Species1, Species2)
   Exp4 <- Exp3[!is.na(Exp3[, dim(Exp2)[2]+1]) & !is.na(Exp3[,dim(Exp2)[2]+dim(Species1)[2]+1]), ]
+  if (nrow(Exp4)==0) {
+    stop('No homologous genes appear!')
+  }
   Exp5 <- cbind(Exp4[,1:7], Species12[match(Exp4[,Type1],
                                             Species12[,1]), ],
                 Species22[match(Exp4[,Type2], Species22[,1]), ])

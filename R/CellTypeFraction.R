@@ -53,6 +53,8 @@ Identify_ConservedCellTypes <- function(OrthG,Species1_Marker_table,Species2_Mar
     Species2_Marker <- Species1_Marker_table
     Species1_Marker <- Species2_Marker_table
   }else{stop('please input correct Species name')}
+  Species1_Marker_table$power <- as.numeric(Species1_Marker_table$power)
+  Species2_Marker_table$power <- as.numeric(Species2_Marker_table$power)
 
   ### fraction in same species
   Species1_Marker_table$cluster <- paste0(Species_name1, Species1_Marker_table[, 'cluster'])
@@ -112,7 +114,7 @@ Cal_SharedMarkers <- function(mmExp1, Spec1='mm'){
   ShMarker1 <- c(); Fraction3 <- c(); Fraction4 <- c()
   for(i in 1:length(mmCluster1)){
     zfExp2 <- mmExp1[mmExp1$cluster==mmCluster1[i], ]
-    zfPower1 <- sum(zfExp2$power)
+    zfPower1 <- sum(as.numeric(zfExp2$power))
     Fraction2 <- c()
     for(j in 1:length(mmCluster1)){
       mmExp2 <- mmExp1[mmExp1$cluster==mmCluster1[j], ]
@@ -148,7 +150,7 @@ Cal_SharedMarkers_Species <- function(mmExp1, zfExp1, mmExpInd1, zfExpInd1, Spec
   ShMarker1 <- c(); Fraction3 <- c(); Fraction4 <- c()
   for(i in 1:length(zfCluster1)){
     zfExp2 <- zfExp1[zfExp1$cluster==zfCluster1[i], ]
-    zfPower1 <- sum(zfExp2$power)
+    zfPower1 <- sum(as.numeric(zfExp2$power))
     zfExp22 <- zfExpInd1[match(zfExp2[,'gene'], zfExpInd1[,'ID']), ]
 
     Fraction2 <- c()
@@ -156,6 +158,12 @@ Cal_SharedMarkers_Species <- function(mmExp1, zfExp1, mmExpInd1, zfExpInd1, Spec
       mmExp2 <- mmExp1[mmExp1$cluster==mmCluster1[j], ]
       mmPower1 <- sum(mmExp2$power)
       mmExp22 <- mmExpInd1[match(mmExp2[, 'gene'], mmExpInd1[,'ID']), ]
+      if (class(mmExp22) == 'character') {
+        mmExp22 <- matrix(mmExp22,ncol=2)
+      }
+      if (class(zfExp22) == 'character') {
+        zfExp22 <- matrix(zfExp22,ncol=2)
+      }
       Exp3 <- intersect(zfExp22[, 2], mmExp22[, 2])
       Exp32 <- Exp3[!is.na(Exp3)]
 

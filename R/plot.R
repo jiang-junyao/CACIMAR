@@ -113,7 +113,7 @@ CACIMAR_cols <- function(color_number){
 #' Plot Markers in each cell type
 #' @description This function integrate R package pheatmap to plot markers in each
 #' cell type
-#' @param ConservedMarker
+#' @param ConservedMarker Markers table
 #' @param start_col numeric, indicating the start column of marker power in each
 #' cell type
 #' @param module_colors vector, indicating colors of modules (annotation_colors)

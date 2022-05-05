@@ -158,10 +158,10 @@ Cal_SharedMarkers_Species <- function(mmExp1, zfExp1, mmExpInd1, zfExpInd1, Spec
       mmExp2 <- mmExp1[mmExp1$cluster==mmCluster1[j], ]
       mmPower1 <- sum(mmExp2$power)
       mmExp22 <- mmExpInd1[match(mmExp2[, 'gene'], mmExpInd1[,'ID']), ]
-      if (class(mmExp22) == 'character') {
+      if (is.character(mmExp22)) {
         mmExp22 <- matrix(mmExp22,ncol=2)
       }
-      if (class(zfExp22) == 'character') {
+      if (is.character(zfExp22)) {
         zfExp22 <- matrix(zfExp22,ncol=2)
       }
       Exp3 <- intersect(zfExp22[, 2], mmExp22[, 2])

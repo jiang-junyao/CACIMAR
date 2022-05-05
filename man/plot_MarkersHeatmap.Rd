@@ -22,6 +22,8 @@ Plot_MarkersHeatmap(
 )
 }
 \arguments{
+\item{ConservedMarker}{Markers table}
+
 \item{start_col}{numeric, indicating the start column of marker power in each
 cell type}
 

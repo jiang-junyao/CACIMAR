@@ -22,7 +22,8 @@ Imports:
     dplyr,
     grDevices,
     stats,
-    methods
+    methods,
+    viridisLite
 Depends: 
     R (>= 4.0),
     Seurat

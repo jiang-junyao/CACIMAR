@@ -21,7 +21,7 @@
 #' n1 <- Identify_ConservedNetworks(OrthG_Mm_Zf,mmNetwork,zfNetwork,'mm','zf')
 #' Heatmap_Cor(n1[[2]],cluster_cols=TRUE, cluster_rows=FALSE)
 Heatmap_Cor <- function(RNA1, RowType1='', ColType1='', cluster_cols=T
-                        , cluster_rows=F, Color1=NULL){
+                        , cluster_rows=F, Color1=NULL, ...){
   validInput(RowType1,'RowType1','character')
   validInput(ColType1,'ColType1','character')
   validInput(cluster_cols,'cluster_cols','logical')
@@ -53,7 +53,7 @@ Heatmap_Cor <- function(RNA1, RowType1='', ColType1='', cluster_cols=T
 
   Hier1 <- pheatmap::pheatmap(as.matrix(RNA2), cluster_cols =cluster_cols, cluster_rows =
                       cluster_rows, color = colorRampPalette(Color1)(50),
-                    border_color=rgb(200/255,200/255,200/255))
+                    border_color=rgb(200/255,200/255,200/255),...)
 
   return(Hier1)
 }

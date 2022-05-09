@@ -94,7 +94,7 @@ Identify_CellTypes2 <- function(MarkerRoc1) {
   }
   rownames(MarkerRoc5) <- cell_type_out
   exclusive_cell_type <- paste(setdiff(uCellType2,cell_type_out),collapse = ' ,')
-  if (!is.null(exclusive_cell_type)) {
+  if (length(exclusive_cell_type)>1) {
     warning(paste0('No genes express in',exclusive_cell_type))
   }
 

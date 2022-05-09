@@ -24,10 +24,17 @@
 #' all.markers <- Identify_Markers(pbmc_small)
 Identify_Markers<-function(Seurat_object, PowerCutoff=0.4,
                            DifferenceCutoff=0,PvalueCutoff=0.05 ){
+  validInput(Seurat_object,'seurat_object','seuratobject')
+  validInput(PowerCutoff,'PowerCutoff','numeric')
+  validInput(DifferenceCutoff,'DifferenceCutoff','numeric')
+  validInput(PvalueCutoff,'PvalueCutoff','numeric')
+
   MarkerRoc<-Identify_Markers1(Seurat_object,PowerCutoff,DifferenceCutoff)
   MarkerRoc<-as.data.frame(MarkerRoc)
   Marker<-Identify_Markers2(Seurat_object,MarkerRoc,PowerThr1=DifferenceCutoff)
   final_Markers<-Refine_Markers(Seurat_object,Marker,p.value = PvalueCutoff)
+  final_Markers <- final_Markers[,c(1:4,ncol(final_Markers),5:(ncol(final_Markers)-1))]
+  colnames(final_Markers)[2] <- 'Allpower'
   return(final_Markers)
 }
 
@@ -40,7 +47,7 @@ Identify_Markers<-function(Seurat_object, PowerCutoff=0.4,
 #'
 #' @examples data("pbmc_small")
 #' all.markers <- Identify_Markers(pbmc_small)
-#' all.markers <- Format_Markers_Frac(all.markers)
+#' all.markers2 <- Format_Markers_Frac(all.markers)
 Format_Markers_Frac<-function(Marker_genes){
   RNA1 <- Marker_genes
   Cluster1 <- t(apply(RNA1, 1, function(x1){
@@ -49,11 +56,11 @@ Format_Markers_Frac<-function(Marker_genes){
     x32 <- x22[1]
     return(c(x21[1], x31, x32))
   }))
-  colnames(Cluster1) <- c('cluster','AllCluster','power')
-  RNA2 <- cbind(Cluster1, RNA1[,3:ncol(RNA1)])
+  colnames(Cluster1) <- c('cluster','Allcluster','power')
+  RNA2 <- cbind(Cluster1, RNA1[,5:ncol(RNA1)])
   RNA3 <- RNA2[order(RNA2[, 'power'], decreasing=T), ]
-  RNA3 <- RNA3[order(RNA3[, 'AllCluster']), ]
-  RNA3 <- RNA3[order(RNA3[, 'cluster']), ]; print(c(nrow(RNA2), nrow(RNA3)))
+  RNA3 <- RNA3[order(RNA3[, 'Allcluster']), ]
+  RNA3 <- RNA3[order(RNA3[, 'cluster']), ]
   RNA3$gene <- rownames(RNA3)
   RNA3 <- RNA3[,c(ncol(RNA3),(1:ncol(RNA3)-1))]
   return(RNA3)

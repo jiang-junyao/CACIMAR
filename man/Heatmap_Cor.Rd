@@ -10,7 +10,8 @@ Heatmap_Cor(
   ColType1 = "",
   cluster_cols = T,
   cluster_rows = F,
-  Color1 = NULL
+  Color1 = NULL,
+  ...
 )
 }
 \arguments{
@@ -30,6 +31,8 @@ or hclust object}
 hclust object}
 
 \item{Color1}{vector of colors used in heatmap}
+
+\item{...}{parameter in pheatmap}
 }
 \value{
 pheatmap object

@@ -6,7 +6,7 @@
 \usage{
 Plot_MarkersHeatmap(
   ConservedMarker,
-  start_col = 7,
+  start_col = 2,
   module_colors = NA,
   heatmap_colors = NA,
   cluster_rows = F,
@@ -68,5 +68,5 @@ cell type
 data("pbmc_small")
 all.markers <- Identify_Markers(pbmc_small)
 all.markers <- Format_Markers_Frac(all.markers)
-Plot_MarkersHeatmap(all.markers)
+Plot_MarkersHeatmap(all.markers[,c(2,7,8,9)])
 }

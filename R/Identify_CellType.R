@@ -69,6 +69,7 @@ Identify_CellTypes2 <- function(MarkerRoc1) {
 
   ## Calculate the joint power for each cluster
   MarkerRoc5 <- c()
+  cell_type_out <- c()
   for (i in 1:length(uCellType2)) {
     uCellType3 <- uCellType2[i]
     Ind1 <- c()
@@ -82,13 +83,18 @@ Identify_CellTypes2 <- function(MarkerRoc1) {
     startidx <- grep('NumCellType',colnames(MarkerRoc3))
     ### add the power of gene in the same cell types, if gene difference <0 ,
     ### set power of that gene negative
-    MarkerRoc4 <- Cal_JointPower2(MarkerRoc3[, (startidx+1):ncol(MarkerRoc3)])
-    MarkerRoc4 <- t(as.matrix(MarkerRoc4))
-    colnames(MarkerRoc4) <- gsub("_power", "", colnames(MarkerRoc4))
-    MarkerRoc5 <- rbind(MarkerRoc5, MarkerRoc4)
+    if (nrow(MarkerRoc3)>0) {
+      MarkerRoc4 <- Cal_JointPower2(MarkerRoc3[, (startidx+1):ncol(MarkerRoc3)])
+      MarkerRoc4 <- t(as.matrix(MarkerRoc4))
+      colnames(MarkerRoc4) <- gsub("_power", "", colnames(MarkerRoc4))
+      MarkerRoc5 <- rbind(MarkerRoc5, MarkerRoc4)
+      cell_type_out <- c(cell_type_out,uCellType3)
+    }
+
   }
-  rownames(MarkerRoc5) <- uCellType2
-  #write.table(MarkerRoc5, 'MarkerRoc3.txt')
+  rownames(MarkerRoc5) <- cell_type_out
+  exclusive_cell_type <- paste(setdiff(uCellType2,cell_type_out),collapse = ' ,')
+  warning(paste0('No genes express in',exclusive_cell_type))
 
   ## Sort assigned cell types according to the joint power for each cluster
   MarkerRoc8 <- c()
@@ -103,5 +109,4 @@ Identify_CellTypes2 <- function(MarkerRoc1) {
 
   return(MarkerRoc8)
 }
-
 

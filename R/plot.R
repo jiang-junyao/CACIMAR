@@ -10,6 +10,7 @@
 #'
 #' hclust object
 #' @param Color1 vector of colors used in heatmap
+#' @param ... parameter in pheatmap
 #' @export
 #' @importFrom pheatmap pheatmap
 #' @importFrom grDevices rgb
@@ -142,14 +143,14 @@ CACIMAR_cols <- function(color_number){
 #' @examples data("pbmc_small")
 #' all.markers <- Identify_Markers(pbmc_small)
 #' all.markers <- Format_Markers_Frac(all.markers)
-#' Plot_MarkersHeatmap(all.markers)
-Plot_MarkersHeatmap <- function(ConservedMarker,start_col = 7,module_colors = NA,
+#' Plot_MarkersHeatmap(all.markers[,c(2,7,8,9)])
+Plot_MarkersHeatmap <- function(ConservedMarker,start_col = 2,module_colors = NA,
                                 heatmap_colors = NA, cluster_rows = F,cluster_cols = F,
                                 show_rownames = F, show_colnames = F,cellwidth = NA,
                                 cellheight = NA,legend = F,annotation_legend=F,
                                 annotation_names_row = F, ...){
   if (is.na(module_colors)) {
-    all_cell_type <- c(ConservedMarker$cluster)
+    all_cell_type <- c(ConservedMarker[,1])
     all_cell_type <- all_cell_type[!duplicated(all_cell_type)]
     module_colors <- CACIMAR::CACIMAR_cols(length(all_cell_type))
     names(module_colors) <- all_cell_type
@@ -159,15 +160,15 @@ Plot_MarkersHeatmap <- function(ConservedMarker,start_col = 7,module_colors = NA
   if (is.na(heatmap_colors)) {
     heatmap_colors <- viridisLite::viridis(100,option = 'D')
   }
-  annotation_row <- as.data.frame(ConservedMarker$cluster)
+  annotation_row <- as.data.frame(ConservedMarker[,start_col-1])
   rownames(annotation_row) <- rownames(ConservedMarker)
   colnames(annotation_row) <- 'Celltype'
   gap_row <- c()
-  for (i in levels(as.factor(ConservedMarker$cluster))) {
-    row1 <- grep(i,ConservedMarker$cluster)
+  for (i in levels(as.factor(ConservedMarker[,1]))) {
+    row1 <- grep(i,ConservedMarker[,1])
     gap_row <- c(gap_row,row1[length(row1)])
   }
-  p1=pheatmap::pheatmap(ConservedMarker[,start_col:(ncol(ConservedMarker)-1)],annotation_row =
+  p1=pheatmap::pheatmap(ConservedMarker[,start_col:ncol(ConservedMarker)],annotation_row =
                 annotation_row,cluster_rows = cluster_rows,
            show_rownames = show_rownames,cluster_cols = cluster_cols,
            gaps_row = gap_row,show_colnames = show_colnames, color = heatmap_colors,

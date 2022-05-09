@@ -26,6 +26,9 @@ Identify_CellType <- function(seurat_object, Marker_gene_table) {
   if (!'Marker' %in% colnames(Marker_gene_table)) {
     stop('Marker_gene_table should contain Marker column ')
   }
+  if (length(levels(seurat_object@active.ident))<2) {
+    stop('number of identities in seurat object should be more than 1')
+  }
   MarkerRoc1 <- Identify_CellTypes1(seurat_object, Marker_gene_table)
   ClusterCellT1 <- Identify_CellTypes2(MarkerRoc1)
 

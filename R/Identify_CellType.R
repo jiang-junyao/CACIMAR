@@ -62,8 +62,9 @@ Identify_CellTypes2 <- function(MarkerRoc1) {
   uCellType2 <- unique(CellType2)
 
   ## Revise the power according to the number of cell types
-  MarkerRoc2 <- cbind(MarkerRoc1[, 1:3], t(apply(MarkerRoc1, 1, function(x1) {
-    x2 <- as.numeric(x1[4:length(x1)])
+  col_indx = grep('Cluster',colnames(MarkerRoc1))[1]
+  MarkerRoc2 <- cbind(MarkerRoc1[, 1:(col_indx-1)], t(apply(MarkerRoc1, 1, function(x1) {
+    x2 <- as.numeric(x1[col_indx:length(x1)])
     x2[seq(4, length(x2), 3)] <- x2[seq(4, length(x2), 3)] / x2[1]
     return(x2)
   })))

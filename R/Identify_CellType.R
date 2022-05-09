@@ -94,7 +94,10 @@ Identify_CellTypes2 <- function(MarkerRoc1) {
   }
   rownames(MarkerRoc5) <- cell_type_out
   exclusive_cell_type <- paste(setdiff(uCellType2,cell_type_out),collapse = ' ,')
-  warning(paste0('No genes express in',exclusive_cell_type))
+  if (!is.null(exclusive_cell_type)) {
+    warning(paste0('No genes express in',exclusive_cell_type))
+  }
+
 
   ## Sort assigned cell types according to the joint power for each cluster
   MarkerRoc8 <- c()

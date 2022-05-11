@@ -30,7 +30,7 @@ knitr::opts_chunk$set(
 
 
 
-![](Readme figure/Workflow.png)
+![](Readme figure/Workflow.png){ width=75% height=75% }
 
 
 ## Installation

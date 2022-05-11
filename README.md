@@ -18,7 +18,7 @@
 -   **Comparative analysis of regulatory networks in evolutionally
     conserved cell types**
 
-![](Readme%20figure/Workflow.png)
+<img src="Readme%20figure/Workflow.png" style="width:75.0%;height:75.0%" />
 
 ## Installation
 

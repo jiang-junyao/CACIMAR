@@ -12,8 +12,8 @@
 #' network, second df contains NCS between module pairs
 #' @export
 #'
-#' @examples load(system.file("extdata", "network_example.rda", package = "CACIMAR"))
-#' n1 <- Identify_ConservedNetworks(OrthG_Mm_Zf,mmNetwork,zfNetwork,'mm','zf')
+#' @examples load(system.file("extdata", "gene_network.rda", package = "CACIMAR"))
+#' n1 <- Identify_ConservedNetworks(OrthG_Mm_Zf,mm_gene_network,zf_gene_network,'mm','zf')
 Identify_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,Species_name1,Species_name2){
   ### input check
   validInput(Species_name1,'Species_name1','character')

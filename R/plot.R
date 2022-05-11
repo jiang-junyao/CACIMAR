@@ -111,6 +111,7 @@ CACIMAR_cols <- function(color_number){
 }
 
 
+
 #' Plot Markers in each cell type
 #' @description This function integrate R package pheatmap to plot markers in each
 #' cell type
@@ -143,7 +144,7 @@ CACIMAR_cols <- function(color_number){
 #' @examples data("pbmc_small")
 #' all.markers <- Identify_Markers(pbmc_small)
 #' all.markers <- Format_Markers_Frac(all.markers)
-#' Plot_MarkersHeatmap(all.markers[,c(2,7,8,9)])
+#' Plot_MarkersHeatmap(all.markers[,c(2,6,7,8)])
 Plot_MarkersHeatmap <- function(ConservedMarker,start_col = 2,module_colors = NA,
                                 heatmap_colors = NA, cluster_rows = F,cluster_cols = F,
                                 show_rownames = F, show_colnames = F,cellwidth = NA,

@@ -68,5 +68,5 @@ cell type
 data("pbmc_small")
 all.markers <- Identify_Markers(pbmc_small)
 all.markers <- Format_Markers_Frac(all.markers)
-Plot_MarkersHeatmap(all.markers[,c(2,7,8,9)])
+Plot_MarkersHeatmap(all.markers[,c(2,6,7,8)])
 }

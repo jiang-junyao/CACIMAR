@@ -32,6 +32,6 @@ Use Score of Conserved network to identify conserved regulatory
 network modules based on homologous genes databased and topology of networks
 }
 \examples{
-load(system.file("extdata", "network_example.rda", package = "CACIMAR"))
-n1 <- Identify_ConservedNetworks(OrthG_Mm_Zf,mmNetwork,zfNetwork,'mm','zf')
+load(system.file("extdata", "gene_network.rda", package = "CACIMAR"))
+n1 <- Identify_ConservedNetworks(OrthG_Mm_Zf,mm_gene_network,zf_gene_network,'mm','zf')
 }

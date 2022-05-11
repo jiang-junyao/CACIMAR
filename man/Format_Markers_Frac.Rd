@@ -16,5 +16,5 @@ look better
 \examples{
 data("pbmc_small")
 all.markers <- Identify_Markers(pbmc_small)
-all.markers <- Format_Markers_Frac(all.markers)
+all.markers2 <- Format_Markers_Frac(all.markers)
 }

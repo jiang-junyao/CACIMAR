@@ -16,6 +16,7 @@ knitr::opts_chunk$set(
 # CACIMAR: cross-species analysis of cell identities, markers and regulations using single-cell sequencing profiles
 
 <!-- badges: start -->
+[![R-CMD-check](https://github.com/jiang-junyao/CACIMAR/workflows/R-CMD-check/badge.svg)](https://github.com/jiang-junyao/CACIMAR/actions)
 <!-- badges: end -->
 
 * **Identify cell types using known markers in each species**

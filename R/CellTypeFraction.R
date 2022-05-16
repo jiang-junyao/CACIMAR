@@ -13,7 +13,7 @@
 #' @export
 #'
 #' @examples load(system.file("extdata", "CellTypeAllMarkers.rda", package = "CACIMAR"))
-#' expression <- Identify_ConservedCellTypes(OrthG_Mm_Zf,mm_Marker,zf_Marker,'mm','zf')
+#' expression <- Identify_ConservedCellTypes(OrthG_Mm_Zf,mm_Marker[1:30,],zf_Marker[1:30,],'mm','zf')
 Identify_ConservedCellTypes <- function(OrthG,Species1_Marker_table,Species2_Marker_table,
                                         Species_name1,Species_name2){
   ### inputs validation

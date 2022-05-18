@@ -3,9 +3,6 @@
 
 # CACIMAR: cross-species analysis of cell identities, markers and regulations using single-cell sequencing profiles
 
-<!-- badges: start -->
-<!-- badges: end -->
-
 -   **Identify cell types using known markers in each species**
 
 -   **Identify all cell-type specific markers in each species**
@@ -22,7 +19,13 @@
 
 ## Installation
 
-Install CACIMAR from github, run:
+Install CACIMAR from CRAN, run:
+
+``` r
+install.packages('CACIMAR')
+```
+
+Install developing version of CACIMAR from github, run:
 
 ``` r
 # install.packages("devtools")

@@ -32,6 +32,12 @@ Install developing version of CACIMAR from github, run:
 devtools::install_github("jiang-junyao/CACIMAR")
 ```
 
+## News
+
+### Version1.1.0 (developing version)
+
+Add function to build homologous gene database
+
 ## Tutorial
 
 [Cross-species marker genes and cell types analysis of

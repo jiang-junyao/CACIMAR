@@ -34,5 +34,5 @@ Identify conserved cell types based on power of genes and orthologs database
 }
 \examples{
 load(system.file("extdata", "CellTypeAllMarkers.rda", package = "CACIMAR"))
-expression <- Identify_ConservedCellTypes(OrthG_Mm_Zf,mm_Marker,zf_Marker,'mm','zf')
+expression <- Identify_ConservedCellTypes(OrthG_Mm_Zf,mm_Marker[1:30,],zf_Marker[1:30,],'mm','zf')
 }

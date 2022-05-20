@@ -1,6 +1,6 @@
 Package: CACIMAR
 Title: cross-species analysis of cell identities, markers and regulations
-Version: 1.0.0
+Version: 1.1.0
 Authors@R: 
     person(given = "Junyao",
            family = "Jiang",

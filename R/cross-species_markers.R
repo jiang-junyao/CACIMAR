@@ -1,11 +1,10 @@
 #' Identify orthologs marker genes for two species
 #' @description Identify orthologs marker genes for two species based on orthologs database
 #' @param OrthG ortholog genes database
-#' @param Species1_Marker_table data.frame of species 1, first column should be gene name,
-#' second column should be Clusters corresponding to marker gene
-#' @param Species2_Marker_table data.frame of species 2, first column should be gene name,
-#' second column should be Clusters corresponding to marker gene
-#' of marker genes.
+#' @param Species1_Marker_table data.frame of species 1, should contain 'gene' and
+#' 'Allcluster' columns.
+#' @param Species2_Marker_table data.frame of species 2, should contain 'gene' and
+#' 'Allcluster' columns.
 #' @param Species_name1 character, indicating the species names of Species1_Marker_table.
 #' @param Species_name2 character, indicating the species names of Species2_Marker_table
 #' @param match_cell_name characters contained in both cell names
@@ -14,22 +13,31 @@
 #' @return Data frame of conserved markers
 #' @export
 #'
-#' @examples load(system.file("extdata", "CellMarkers.rda", package = "CACIMAR"))
-#' o1 <- Identify_ConservedMarkers(OrthG_Mm_Zf,Mm_marker_cell_type,
-#' Zf_marker_cell_type,Species_name1 = 'mm',Species_name2 = 'zf')
-#' o2 <- Identify_ConservedMarkers(OrthG_Zf_Ch,Ch_marker_cell_type,
-#' Zf_marker_cell_type,Species_name1 = 'ch',Species_name2 = 'zf')
+#' @examples load(system.file("extdata", "zf_mm_markers.rda", package = "CACIMAR"))
+#' ConservedMarker <- Identify_ConservedMarkers(OrthG_Mm_Zf,Mm_marker,Zf_marker,
+#' Species_name1 = 'mm',Species_name2 = 'zf')
 Identify_ConservedMarkers <- function(OrthG,Species1_Marker_table,Species2_Marker_table,
                            Species_name1,Species_name2,
                            match_cell_name=NULL){
   validInput(OrthG,'OrthG','df')
   validInput(Species_name1,'Species_name1','character')
   validInput(Species_name2,'Species_name2','character')
-
-  Species1_Marker_table <- Species1_Marker_table[!duplicated(Species1_Marker_table[,1]),]
-  Species2_Marker_table <- Species2_Marker_table[!duplicated(Species2_Marker_table[,1]),]
-  colnames(Species1_Marker_table)[2] <- 'cluster'
-  colnames(Species2_Marker_table)[2] <- 'cluster'
+  if (!'gene' %in% colnames(Species1_Marker_table)) {
+    stop('Species1_Marker_table should contain gene column')
+  }
+  if (!'gene' %in% colnames(Species2_Marker_table)) {
+    stop('Species2_Marker_table should contain gene column')
+  }
+  if (!'Allcluster' %in% colnames(Species1_Marker_table)) {
+    stop('Species1_Marker_table should contain Allcluster column')
+  }
+  if (!'Allcluster' %in% colnames(Species2_Marker_table)) {
+    stop('Species2_Marker_table should contain Allcluster column')
+  }
+  geneidx1 <- grep('gene',colnames(Species1_Marker_table))
+  geneidx2 <- grep('gene',colnames(Species2_Marker_table))
+  Species1_Marker_table <- Species1_Marker_table[!duplicated(Species1_Marker_table[,geneidx1]),]
+  Species2_Marker_table <- Species2_Marker_table[!duplicated(Species2_Marker_table[,geneidx2]),]
   Species_name1 <- tolower(Species_name1)
   Species_name2 <- tolower(Species_name2)
   Spec1 <- colnames(OrthG)[2]
@@ -51,10 +59,10 @@ Identify_ConservedMarkers <- function(OrthG,Species1_Marker_table,Species2_Marke
   Species22 <- Species2_Marker
   Spec1_gene <- data.frame(rep(0,nrow(Species12)),
                            rep(1,nrow(Species12)))
-  rownames(Spec1_gene) <- Species12[,1]
+  rownames(Spec1_gene) <- Species12[,geneidx1]
   Spec2_gene <- data.frame(rep(0,nrow(Species22)),
                            rep(1,nrow(Species22)))
-  rownames(Spec2_gene) <- Species22[,1]
+  rownames(Spec2_gene) <- Species22[,geneidx2]
   Exp2 <- Get_OrthG(OrthG, Spec1_gene, Spec2_gene, Species_name)
   if (grepl('ENS',rownames(Spec1_gene)[1])) {
     Type1 <- paste0('Used_',Species_name[1],'_ID')
@@ -74,7 +82,6 @@ Identify_ConservedMarkers <- function(OrthG,Species1_Marker_table,Species2_Marke
                                             Species12[,1]), ],
                 Species22[match(Exp4[,Type2], Species22[,1]), ])
   Exp6 <- Refine_Used_OrthG(Exp5,Species_name,match_cell_name)
-  Exp6 <- Exp6[Exp6$mmcluster==Exp6$zfcluster,]
   return(Exp6)
 }
 
@@ -140,7 +147,7 @@ Get_OrthG <- function(OrthG1, MmRNA1, ZfRNA1, Spec1, MmPattern1='', ZfPattern1='
 
 
 Refine_Used_OrthG<-function(ShMarker1,Species,smiliar_cell_name){
-  Type1 <- paste0(Species[1],'.*\\cluster'); Type2 <- paste0(Species[2], '.*\\cluster')
+  Type1 <- paste0(Species[1],'.*\\Allcluster'); Type2 <- paste0(Species[2], '.*\\Allcluster')
   Spec1Type1 <- grep(Type1, colnames(ShMarker1))
   Spec1Type2 <- grep(Type2, colnames(ShMarker1))
   if (is.null(smiliar_cell_name)) {
@@ -233,4 +240,15 @@ Refine_Markers_Species<-function(Marker1,Species){
   Marker3 <- Marker1[Marker2, ]
   print(c(nrow(Marker1), nrow(Marker3)))
   return(Marker3)
+}
+
+orderCellType <- function(df){
+  ct <- colnames(df)[-1]
+  idx <- c()
+  for (i in ct) {
+    idx1 <- grep(i,df[,1])
+    idx <- c(idx,idx1)
+  }
+  df1 <- df[idx,]
+  return(df1)
 }

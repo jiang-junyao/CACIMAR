@@ -2,7 +2,9 @@
 #' Build homologous gene database
 #' @description Build homologous gene database according to Vertebrate Homology
 #' data in MGI database. This function currently supports ten species: cattle,
-#' chicken, chimpanzee, dog, frog, human, macaque, mouse, rat, and zebrafish
+#' chicken, chimpanzee, dog, frog, human, macaque, mouse, rat, and zebrafish. After
+#' building the database, this function also integrates biomaRt to add ENSEMBEL ID
+#' for each gene in the database.
 #' @param MGI MGI database, download from http://www.informatics.jax.org/
 #' @param Species_name1 The name of the first species. input 'mm' for mouse, 'hs'
 #' for human, 'zf' for zebrafish, 'ch' for chicken, 'cf' for dog, 'pt' for chimpanzee,
@@ -10,10 +12,22 @@
 #' @param Species_name2 The name of the second species.  input 'mm' for mouse, 'hs'
 #' for human, 'zf' for zebrafish, 'ch' for chicken, 'cf' for dog, 'pt' for chimpanzee,
 #' 'xt' for frog, 'rn' for rat, 'bt' for cattle, and 'rh' for macaque.
+#' @param AddENS logical, indicating whether add ENSEMBL ID for each gene in homologous gene database
+#' @param host Parameter from biomaRt: Host to connect to. Only needs to be
+#' specified if different from www.ensembl.org
+#' @param
 #' @importFrom  stats na.omit
+#' @importFrom dplyr group_by
+#' @importFrom dplyr group_map
+#' @importFrom biomaRt useMart
+#' @importFrom biomaRt getBM
 #' @return homologous gene database of two species
 #' @export
-buildHomDatabase <- function(MGI,Species_name1,Species_name2){
+#'
+#' @example load(system.file("extdata", "MGIrda", package = "CACIMAR"))
+#' buildHomDatabase(MGI,'mm','pt',AddENS = F)
+buildHomDatabase <- function(MGI,Species_name1,Species_name2,
+                             AddENS = TRUE,host = 'https://uswest.ensembl.org'){
   ### set information for species 1
   if (Species_name1=='mm') {
     Sp1name <- 'mouse, laboratory'
@@ -145,33 +159,40 @@ buildHomDatabase <- function(MGI,Species_name1,Species_name2){
   final_orthg <- Sp1_orthg[,c(6,2,4)]
 
   ### add ens
-  mart1 <- biomaRt::useMart("ensembl",Mart_ID1)
-  gene_id1<-biomaRt::getBM(attributes=c("external_gene_name","ensembl_gene_id"),
-                           filters = "external_gene_name",values = final_orthg$V2,
-                           mart = mart1)
+  if (AddENS == TRUE) {
+    mart1 <- biomaRt::useMart("ensembl",Mart_ID1,host = host)
+    gene_id1<-biomaRt::getBM(attributes=c("external_gene_name","ensembl_gene_id"),
+                             filters = "external_gene_name",values = final_orthg$V2,
+                             mart = mart1)
 
-  gene_id1_group <- dplyr::group_by(gene_id1,external_gene_name)
-  gene_id1_group <- gene_id1_group[order(gene_id1_group$external_gene_name),]
-  gene_id1_group_ENS <- dplyr::group_map(gene_id1_group,~get_genes2(.x))
-  gene_id1_group_symbol <- gene_id1[!duplicated(gene_id1$external_gene_name),1]
-  Sp1_ID <- data.frame(gene_id1_group_symbol,unlist(gene_id1_group_ENS))
-  final_orthg$Speces1Ens <- Sp1_ID[match(final_orthg$V2,Sp1_ID$gene_id1_group_symbol),2]
+    gene_id1_group <- dplyr::group_by(gene_id1,external_gene_name)
+    gene_id1_group <- gene_id1_group[order(gene_id1_group$external_gene_name),]
+    gene_id1_group_ENS <- dplyr::group_map(gene_id1_group,~get_genes2(.x))
+    gene_id1_group_symbol <- gene_id1[!duplicated(gene_id1$external_gene_name),1]
+    Sp1_ID <- data.frame(gene_id1_group_symbol,unlist(gene_id1_group_ENS))
+    final_orthg$Speces1Ens <- Sp1_ID[match(final_orthg$V2,Sp1_ID$gene_id1_group_symbol),2]
 
 
-  mart2 <- biomaRt::useMart("ensembl",Mart_ID2)
-  gene_id2<-biomaRt::getBM(attributes=c("external_gene_name","ensembl_gene_id"),
-                           filters = "external_gene_name",values = final_orthg$Species2Symbol,
-                           mart = mart2)
-  gene_id2_group <- dplyr::group_by(gene_id2,external_gene_name)
-  gene_id2_group <- gene_id2_group[order(gene_id2_group$external_gene_name),]
-  gene_id2_group_ENS <- dplyr::group_map(gene_id2_group,~get_genes2(.x))
-  gene_id2_group_symbol <- gene_id2[!duplicated(gene_id2$external_gene_name),1]
-  Sp2_ID <- data.frame(gene_id2_group_symbol,unlist(gene_id2_group_ENS))
-  final_orthg$Speces2Ens <- Sp2_ID[match(final_orthg$Species2Symbol,Sp2_ID$gene_id2_group_symbol),2]
-  final_orthg <- final_orthg[,c(1,4,2,5,3)]
-  colnames(final_orthg)[2:5] <- c(paste0(use_name1,'_ID'),paste0(use_name1,'_Symbol')
-                                  ,paste0(use_name2,'_ID'),paste0(use_name2,'_Symbol'))
-  return(final_orthg)
+    mart2 <- biomaRt::useMart("ensembl",Mart_ID2,host = host)
+    gene_id2<-biomaRt::getBM(attributes=c("external_gene_name","ensembl_gene_id"),
+                             filters = "external_gene_name",values = final_orthg$Species2Symbol,
+                             mart = mart2)
+    gene_id2_group <- dplyr::group_by(gene_id2,external_gene_name)
+    gene_id2_group <- gene_id2_group[order(gene_id2_group$external_gene_name),]
+    gene_id2_group_ENS <- dplyr::group_map(gene_id2_group,~get_genes2(.x))
+    gene_id2_group_symbol <- gene_id2[!duplicated(gene_id2$external_gene_name),1]
+    Sp2_ID <- data.frame(gene_id2_group_symbol,unlist(gene_id2_group_ENS))
+    final_orthg$Speces2Ens <- Sp2_ID[match(final_orthg$Species2Symbol,Sp2_ID$gene_id2_group_symbol),2]
+    final_orthg <- final_orthg[,c(1,4,2,5,3)]
+    colnames(final_orthg)[2:5] <- c(paste0(use_name1,'_ID'),paste0(use_name1,'_Symbol')
+                                    ,paste0(use_name2,'_ID'),paste0(use_name2,'_Symbol'))
+    return(final_orthg)
+  }else{
+    colnames(final_orthg) <- c('Type',paste0(use_name1,'_Symbol'),
+                               paste0(use_name2,'_Symbol'))
+    return(final_orthg)
+    }
+
 }
 
 

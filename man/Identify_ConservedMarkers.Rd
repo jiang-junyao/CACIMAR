@@ -16,12 +16,11 @@ Identify_ConservedMarkers(
 \arguments{
 \item{OrthG}{ortholog genes database}
 
-\item{Species1_Marker_table}{data.frame of species 1, first column should be gene name,
-second column should be Clusters corresponding to marker gene}
+\item{Species1_Marker_table}{data.frame of species 1, should contain 'gene' and
+'Allcluster' columns.}
 
-\item{Species2_Marker_table}{data.frame of species 2, first column should be gene name,
-second column should be Clusters corresponding to marker gene
-of marker genes.}
+\item{Species2_Marker_table}{data.frame of species 2, should contain 'gene' and
+'Allcluster' columns.}
 
 \item{Species_name1}{character, indicating the species names of Species1_Marker_table.}
 
@@ -37,9 +36,7 @@ Data frame of conserved markers
 Identify orthologs marker genes for two species based on orthologs database
 }
 \examples{
-load(system.file("extdata", "CellMarkers.rda", package = "CACIMAR"))
-o1 <- Identify_ConservedMarkers(OrthG_Mm_Zf,Mm_marker_cell_type,
-Zf_marker_cell_type,Species_name1 = 'mm',Species_name2 = 'zf')
-o2 <- Identify_ConservedMarkers(OrthG_Zf_Ch,Ch_marker_cell_type,
-Zf_marker_cell_type,Species_name1 = 'ch',Species_name2 = 'zf')
+load(system.file("extdata", "zf_mm_markers.rda", package = "CACIMAR"))
+ConservedMarker <- Identify_ConservedMarkers(OrthG_Mm_Zf,Mm_marker,Zf_marker,
+Species_name1 = 'mm',Species_name2 = 'zf')
 }

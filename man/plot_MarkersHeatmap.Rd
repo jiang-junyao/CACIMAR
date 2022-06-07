@@ -13,8 +13,8 @@ Plot_MarkersHeatmap(
   cluster_cols = F,
   show_rownames = F,
   show_colnames = F,
-  cellwidth = NA,
-  cellheight = NA,
+  cellwidth = 6,
+  cellheight = 2,
   legend = F,
   annotation_legend = F,
   annotation_names_row = F,
@@ -47,7 +47,7 @@ values depend on the size of plotting window}
 \item{cellheight}{individual cell height in points. If left as NA, then the
 values depend on the size of plotting window}
 
-\item{legend}{logical to determine if legend should be drawn or not}
+\item{legend}{logicalal to determine if legend should be drawn or not}
 
 \item{annotation_legend}{boolean value showing if the legend for annotation
 tracks should be drawn}

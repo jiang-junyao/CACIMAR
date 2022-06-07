@@ -16,8 +16,10 @@
 #' @return Cell type with the highest power in each cluster
 #' @export
 #'
-#' @examples \dontrun{ annotation <- Identify_CellType(seurat_object,Marker_gene_table)
-#' }
+#' @examples KnownMarker=data.frame(c('AIF1','BID','CCL5','CD79A','CD79B','MS4A6A'),c('a','a','a','b','b','b'))
+#' data("pbmc_small")
+#' colnames(KnownMarker)=c('Marker','CellType')
+#' CT <- Identify_CellType(pbmc_small,KnownMarker)
 Identify_CellType <- function(seurat_object, Marker_gene_table) {
   validInput(seurat_object,'seurat_object','seuratobject')
   if (!'CellType' %in% colnames(Marker_gene_table)) {

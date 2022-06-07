@@ -28,6 +28,8 @@ type which have the highest united power or higher than the threshold of
 the united power (for example > 0.9 power).
 }
 \examples{
-\dontrun{ annotation <- Identify_CellType(seurat_object,Marker_gene_table)
-}
+KnownMarker=data.frame(c('AIF1','BID','CCL5','CD79A','CD79B','MS4A6A'),c('a','a','a','b','b','b'))
+data("pbmc_small")
+colnames(KnownMarker)=c('Marker','CellType')
+CT <- Identify_CellType(pbmc_small,KnownMarker)
 }

@@ -60,6 +60,59 @@ Heatmap_Cor <- function(RNA1, RowType1='', ColType1='', cluster_cols=T
 }
 
 
+#' Format Conserved markers to plot heatmap
+#'
+#' @param ConservedMarker Result from 'Identify_ConservedMarkers'
+#'
+#' @return list contains two data.frame
+#' @export
+#'
+#' @examples load(system.file("extdata", "zf_mm_markers.rda", package = "CACIMAR"))
+#' ConservedMarker <- Identify_ConservedMarkers(OrthG_Mm_Zf,Mm_marker,Zf_marker,
+#' Species_name1 = 'mm',Species_name2 = 'zf')
+#' MarkersPlot <- FormatConservedMarkers(ConservedMarker)
+FormatConservedMarkers <- function(ConservedMarker){
+  validInput(ConservedMarker,'ConservedMarker','df')
+  Species_name <- colnames(ConservedMarker)[grep('Used',colnames(ConservedMarker))]
+  Species_name1 <- strsplit(Species_name[1],'_')[[1]][2]
+  Species_name2 <- strsplit(Species_name[2],'_')[[1]][2]
+  Orth_cluster <- data.frame(ConservedMarker[,grep(paste0( Species_name1,'Allcluster'),colnames(ConservedMarker))],
+                             ConservedMarker[,grep(paste0( Species_name2,'Allcluster'),colnames(ConservedMarker))])
+  final_cluster1 <- c()
+  for (i in 1:nrow(Orth_cluster)) {
+    cluster1 <- unlist(strsplit(Orth_cluster[i,1],',')[[1]])
+    cluster2 <- unlist(strsplit(Orth_cluster[i,2],',')[[1]])
+    final_cluster2 <- intersect(cluster1,cluster2)[1]
+    final_cluster1 <- c(final_cluster1,final_cluster2)
+  }
+  Orth_cluster_gene <- data.frame(final_cluster1,ConservedMarker$mmgene,ConservedMarker$zfgene)
+
+  Sp1 <- ConservedMarker[,grep(Species_name1,colnames(ConservedMarker))]
+  rownames(Sp1) <- Sp1[,grep(paste0(Species_name1,'gene'),colnames(Sp1))]
+  Sp2 <- ConservedMarker[,grep(Species_name2,colnames(ConservedMarker))]
+  rownames(Sp2) <- Sp2[,grep(paste0(Species_name2,'gene'),colnames(Sp2))]
+
+  Species1_Poweridx <- (grep(paste0(Species_name1,'Pvalue'),colnames(Sp1))+1):ncol(Sp1)
+  Species2_Poweridx <- (grep(paste0(Species_name2,'Pvalue'),colnames(Sp2))+1):ncol(Sp2)
+  Species1_clusteridx <- grep(paste0(Species_name1,'cluster'),colnames(Sp1))
+  Species2_clusteridx <- grep(paste0(Species_name2,'cluster'),colnames(Sp2))
+
+  Species1ClusterPower <- Sp1[,c(Species1_clusteridx,Species1_Poweridx)]
+  Species2ClusterPower <- Sp2[,c(Species2_clusteridx,Species2_Poweridx)]
+
+  Species1ClusterPower[,1] <- Orth_cluster_gene[,1]
+  Species2ClusterPower[,1] <- Orth_cluster_gene[,1]
+  Species1ClusterPower[,1] <- paste0(Species_name1,Species1ClusterPower[,1])
+  Species2ClusterPower[,1] <- paste0(Species_name2,Species2ClusterPower[,1])
+  Species1ClusterPower <- orderCellType(Species1ClusterPower)
+  Species2ClusterPower <- orderCellType(Species2ClusterPower)
+  Species1ClusterPower[,1] <- gsub(Species_name1,'',Species1ClusterPower[,1])
+  Species2ClusterPower[,1] <- gsub(Species_name2,'',Species2ClusterPower[,1])
+  OrthGList <- list(Species1ClusterPower,Species2ClusterPower)
+  names(OrthGList) <- c(paste0(Species_name1,'ClusterPower'),paste0(Species_name2,'ClusterPower'))
+  return(OrthGList)
+}
+
 
 Seurat_SubsetData <- function(pbmc1, SubG1, SubS1=NULL, ExSubS1=NULL){
 
@@ -91,6 +144,7 @@ Seurat_SubsetData <- function(pbmc1, SubG1, SubS1=NULL, ExSubS1=NULL){
 #' @examples CACIMAR_cols(10)
 #' CACIMAR_cols(20)
 CACIMAR_cols <- function(color_number){
+  validInput(color_number,'color_number','numeric')
   cols <- c("OrangeRed","SlateBlue3","DarkOrange","GreenYellow","Purple",
             "DarkSlateGray","Gold","DarkGreen","DeepPink2","Red4","#4682B4",
             "#FFDAB9","#708090","#836FFF","#CDC673","#CD9B1D","#FF6EB4","#CDB5CD"
@@ -130,7 +184,7 @@ CACIMAR_cols <- function(color_number){
 #' values depend on the size of plotting window
 #' @param cellheight individual cell height in points. If left as NA, then the
 #' values depend on the size of plotting window
-#' @param legend logical to determine if legend should be drawn or not
+#' @param legend logicalal to determine if legend should be drawn or not
 #' @param annotation_legend boolean value showing if the legend for annotation
 #' tracks should be drawn
 #' @param annotation_names_row boolean value showing if the names for row
@@ -147,9 +201,22 @@ CACIMAR_cols <- function(color_number){
 #' Plot_MarkersHeatmap(all.markers[,c(2,6,7,8)])
 Plot_MarkersHeatmap <- function(ConservedMarker,start_col = 2,module_colors = NA,
                                 heatmap_colors = NA, cluster_rows = F,cluster_cols = F,
-                                show_rownames = F, show_colnames = F,cellwidth = NA,
-                                cellheight = NA,legend = F,annotation_legend=F,
+                                show_rownames = F, show_colnames = F,cellwidth = 6,
+                                cellheight = 2,legend = F,annotation_legend=F,
                                 annotation_names_row = F, ...){
+  validInput(ConservedMarker,'ConservedMarker','df')
+  validInput(start_col,'start_col','numeric')
+  validInput(cellwidth,'cellwidth','numeric')
+  validInput(cellheight,'cellheight','numeric')
+  validInput(cluster_rows,'cluster_rows','logical')
+  validInput(cluster_cols,'cluster_cols','logical')
+  validInput(show_rownames,'show_rownames','logical')
+  validInput(show_colnames,'show_colnames','logical')
+  validInput(legend,'legend','logical')
+  validInput(annotation_legend,'annotation_legend','logical')
+  validInput(annotation_names_row,'annotation_names_row','logical')
+
+
   if (is.na(module_colors)) {
     all_cell_type <- c(ConservedMarker[,1])
     all_cell_type <- all_cell_type[!duplicated(all_cell_type)]

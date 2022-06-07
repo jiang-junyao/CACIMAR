@@ -23,7 +23,8 @@ Imports:
     grDevices,
     stats,
     methods,
-    viridisLite
+    viridisLite,
+    biomaRt
 Depends: 
     R (>= 4.0),
     Seurat

@@ -21,6 +21,7 @@
 #' @importFrom dplyr group_map
 #' @importFrom biomaRt useMart
 #' @importFrom biomaRt getBM
+#' @importFrom purrr map_chr
 #' @return homologous gene database of two species
 #' @export
 #'
@@ -161,28 +162,19 @@ buildHomDatabase <- function(MGI,Species_name1,Species_name2,
   ### add ens
   if (AddENS == TRUE) {
     mart1 <- biomaRt::useMart("ensembl",Mart_ID1,host = host)
-    gene_id1<-biomaRt::getBM(attributes=c("external_gene_name","ensembl_gene_id"),
-                             filters = "external_gene_name",values = final_orthg$V2,
+    gene_id1 <- biomaRt::getBM(attributes=c("external_gene_name","ensembl_gene_id"),
+                             filters = "external_gene_name",values = unlist(strsplit(final_orthg$V2,';')),
                              mart = mart1)
-
-    gene_id1_group <- dplyr::group_by(gene_id1,external_gene_name)
-    gene_id1_group <- gene_id1_group[order(gene_id1_group$external_gene_name),]
-    gene_id1_group_ENS <- dplyr::group_map(gene_id1_group,~get_genes2(.x))
-    gene_id1_group_symbol <- gene_id1[!duplicated(gene_id1$external_gene_name),1]
-    Sp1_ID <- data.frame(gene_id1_group_symbol,unlist(gene_id1_group_ENS))
-    final_orthg$Speces1Ens <- Sp1_ID[match(final_orthg$V2,Sp1_ID$gene_id1_group_symbol),2]
+    ENS_ID1 <- purrr::map_chr(final_orthg$V2,~match_gene1(.x,gene_id1))
+    final_orthg$Species1ENS <- ENS_ID1
 
 
     mart2 <- biomaRt::useMart("ensembl",Mart_ID2,host = host)
     gene_id2<-biomaRt::getBM(attributes=c("external_gene_name","ensembl_gene_id"),
-                             filters = "external_gene_name",values = final_orthg$Species2Symbol,
+                             filters = "external_gene_name",values = unlist(strsplit(final_orthg$Species2Symbol,';')),
                              mart = mart2)
-    gene_id2_group <- dplyr::group_by(gene_id2,external_gene_name)
-    gene_id2_group <- gene_id2_group[order(gene_id2_group$external_gene_name),]
-    gene_id2_group_ENS <- dplyr::group_map(gene_id2_group,~get_genes2(.x))
-    gene_id2_group_symbol <- gene_id2[!duplicated(gene_id2$external_gene_name),1]
-    Sp2_ID <- data.frame(gene_id2_group_symbol,unlist(gene_id2_group_ENS))
-    final_orthg$Speces2Ens <- Sp2_ID[match(final_orthg$Species2Symbol,Sp2_ID$gene_id2_group_symbol),2]
+    ENS_ID2 <- purrr::map_chr(final_orthg$Species2Symbol,~match_gene2(.x,gene_id2))
+    final_orthg$Species2ENS <- ENS_ID2
     final_orthg <- final_orthg[,c(1,4,2,5,3)]
     colnames(final_orthg)[2:5] <- c(paste0(use_name1,'_ID'),paste0(use_name1,'_Symbol')
                                     ,paste0(use_name2,'_ID'),paste0(use_name2,'_Symbol'))
@@ -192,7 +184,6 @@ buildHomDatabase <- function(MGI,Species_name1,Species_name2,
                                paste0(use_name2,'_Symbol'))
     return(final_orthg)
     }
-
 }
 
 
@@ -207,7 +198,26 @@ get_genes <- function(data1){
   df=c(gene,type)
   return(df)
 }
-get_genes2 <- function(data1){
-  gene<-paste(as.character(data1$ensembl_gene_id),collapse = ';')
-  return(gene)
+
+match_gene1 <- function(x,gene_id1){
+  x1 <- strsplit(x,';')[[1]]
+  x2 <- c()
+  for (i in x1) {
+    if (i %in% gene_id1$external_gene_name) {
+      x2 <- c(x2,gene_id1[gene_id1$external_gene_name==i,2])
+    }else{x2 <- c(x2,NA)}
+  }
+  x3 <- paste(x2,collapse = ';')
+  return(x3)
+}
+match_gene2 <- function(x,gene_id2){
+  x1 <- strsplit(x,';')[[1]]
+  x2 <- c()
+  for (i in x1) {
+    if (i %in% gene_id2$external_gene_name) {
+      x2 <- c(x2,gene_id2[gene_id2$external_gene_name==i,2])
+    }else{x2 <- c(x2,NA)}
+  }
+  x3 <- paste(x2,collapse = ';')
+  return(x3)
 }

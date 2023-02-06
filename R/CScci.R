@@ -62,16 +62,20 @@ Identify_ConservedCCI <- function(OrthG,
   Species2_CCI = Species2_CCI[Species2_CCI[,3] %in% sp2_ct_use,]
   Species2_CCI = Species2_CCI[Species2_CCI[,4] %in% sp2_ct_use,]
   ### initial CCI filtering
-  Species1_CCI = Species1_CCI[Species1_CCI[,1] %in% OrthG[,db_idx[1]],]
-  Species1_CCI = Species1_CCI[Species1_CCI[,2] %in% OrthG[,db_idx[1]],]
-  Species2_CCI = Species2_CCI[Species2_CCI[,1] %in% OrthG[,db_idx[2]],]
-  Species2_CCI = Species2_CCI[Species2_CCI[,2] %in% OrthG[,db_idx[2]],]
+  Species1_CCI = Species1_CCI[Species1_CCI[,1] %in%
+                                unlist(strsplit(OrthG[,db_idx[1]],';')),]
+  Species1_CCI = Species1_CCI[Species1_CCI[,2] %in%
+                                unlist(strsplit(OrthG[,db_idx[1]],';')),]
+  Species2_CCI = Species2_CCI[Species2_CCI[,1] %in%
+                                unlist(strsplit(OrthG[,db_idx[2]],';')),]
+  Species2_CCI = Species2_CCI[Species2_CCI[,2] %in%
+                                unlist(strsplit(OrthG[,db_idx[2]],';')),]
   ### identify conserved ligand
   orthg_cci = c()
   for (i in 1:nrow(Species1_CCI)) {
     cci1 = c(Species1_CCI[i,1],Species1_CCI[i,2])
     for (j in 1:nrow(Species2_CCI)) {
-      cci2 = c(Species1_CCI[i,1],Species1_CCI[i,2])
+      cci2 = c(Species2_CCI[j,1],Species2_CCI[j,2])
       orthg_check = filter_orthg(cci1,cci2,OrthG,db_idx)
       if (orthg_check) {
         orthg_cci = c(orthg_cci,paste0(i,j))
@@ -96,16 +100,19 @@ filter_orthg <- function(cci1,cci2,OrthG,db_idx){
   db = OrthG[idx,]
   orthg_genes1 = db[db[,db_idx[1]] %in% cci1[1],db_idx[2]]
   orthg_genes2 = db[db[,db_idx[1]] %in% cci1[2],db_idx[2]]
-  if ((cci2[1] %in% orthg_genes1) & (cci2[2] %in% orthg_genes2)) {
-    return(TRUE)
+  if (cci2[1] %in% orthg_genes1) {
+    source = TRUE
+  }
+  if (cci2[2] %in% orthg_genes2) {
+    target = TRUE
   }
   ### identify 1TN
   idx = grep('*1TN',OrthG$Type)
   db = OrthG[idx,]
   orthg_genes1 = db[db[,db_idx[1]] %in% cci1[1],db_idx[2]]
-  orthg_genes1 = unlist(strsplit(orthg_genes,','))
-  orthg_genes1 = db[db[,db_idx[1]] %in% cci1[2],db_idx[2]]
-  orthg_genes1 = unlist(strsplit(orthg_genes,','))
+  orthg_genes1 = unlist(strsplit(orthg_genes1,','))
+  orthg_genes2 = db[db[,db_idx[1]] %in% cci1[2],db_idx[2]]
+  orthg_genes2 = unlist(strsplit(orthg_genes2,','))
   if (cci2[1] %in% orthg_genes1) {
     source = TRUE
   }
@@ -145,7 +152,7 @@ filter_orthg <- function(cci1,cci2,OrthG,db_idx){
 
 
 check_orthg_NT1 <- function(db,gene1,gene2,db_idx){
-  querry = unlist(strsplit(db[db_idx[1]],','))
+  querry = unlist(strsplit(db[db_idx[1]],';'))
   if (gene1 %in% querry) {
     if (gene2 == db[db_idx[2]]) {
       return(1)
@@ -154,8 +161,8 @@ check_orthg_NT1 <- function(db,gene1,gene2,db_idx){
 }
 
 check_orthg_NTN <- function(db,gene1,gene2,db_idx){
-  querry = unlist(strsplit(db[db_idx[1]],','))
-  target = unlist(strsplit(db[db_idx[2]],','))
+  querry = unlist(strsplit(db[db_idx[1]],';'))
+  target = unlist(strsplit(db[db_idx[2]],';'))
   if (gene1 %in% querry) {
     if (gene2 %in% target) {
       return(1)

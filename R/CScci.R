@@ -16,7 +16,8 @@
 #' @return
 #' @export
 #'
-#' @examples
+#' @examples load(system.file("extdata", "cci_test.rda", package = "CACIMAR"))
+#' Identify_ConservedCCI(OrthG_Hs_Mm,hs_cci_test,mm_cci_test,celltype,'hs','mm')
 Identify_ConservedCCI <- function(OrthG,
                                   Species1_CCI,
                                   Species2_CCI,

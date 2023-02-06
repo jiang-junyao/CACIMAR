@@ -89,6 +89,8 @@ Identify_ConservedCCI <- function(OrthG,
 
 
 filter_orthg <- function(cci1,cci2,OrthG,db_idx){
+  source = FALSE
+  target = FALSE
   ### identify 1T1
   idx = grep('*1T1',OrthG$Type)
   db = OrthG[idx,]
@@ -104,8 +106,11 @@ filter_orthg <- function(cci1,cci2,OrthG,db_idx){
   orthg_genes1 = unlist(strsplit(orthg_genes,','))
   orthg_genes1 = db[db[,db_idx[1]] %in% cci1[2],db_idx[2]]
   orthg_genes1 = unlist(strsplit(orthg_genes,','))
-  if ((cci2[1] %in% orthg_genes1) & (cci2[2] %in% orthg_genes2)) {
-    return(TRUE)
+  if (cci2[1] %in% orthg_genes1) {
+    source = TRUE
+  }
+  if (cci2[2] %in% orthg_genes2) {
+    target = TRUE
   }
   ### identify NT1
   idx = grep('*NT1',OrthG$Type)
@@ -114,8 +119,11 @@ filter_orthg <- function(cci1,cci2,OrthG,db_idx){
                               gene1=cci1[1],gene2=cci2[1],db_idx=db_idx))
   check_target = unlist(apply(db, 1, check_orthg_NT1,
                               gene1=cci1[2],gene2=cci2[2],db_idx=db_idx))
-  if ((1 %in% check_source) & (1 %in% check_target)) {
-    return(TRUE)
+  if (1 %in% check_source) {
+    source = TRUE
+  }
+  if (1 %in% check_target) {
+    target = TRUE
   }
   ### identify NTN
   idx = grep('*NTN',OrthG$Type)
@@ -124,10 +132,15 @@ filter_orthg <- function(cci1,cci2,OrthG,db_idx){
                               gene1=cci1[1],gene2=cci2[1],db_idx=db_idx))
   check_target = unlist(apply(db, 1, check_orthg_NTN,
                               gene1=cci1[2],gene2=cci2[2],db_idx=db_idx))
-  if ((1 %in% check_source) & (1 %in% check_target)) {
-    return(TRUE)
+  if (1 %in% check_source) {
+    source = TRUE
   }
-  return(FALSE)
+  if (1 %in% check_target) {
+    target = TRUE
+  }
+  if (source & target) {
+    return(TRUE)
+  }else{return(FALSE)}
 }
 
 

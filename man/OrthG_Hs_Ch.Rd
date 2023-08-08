@@ -5,7 +5,7 @@
 \alias{OrthG_Hs_Ch}
 \title{Orthologs genes database for homo sapiens and zebrafish}
 \format{
-An object of class \code{data.frame} with 12219 rows and 5 columns.
+An object of class \code{data.frame} with 16754 rows and 5 columns.
 }
 \usage{
 OrthG_Hs_Ch

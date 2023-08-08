@@ -176,8 +176,8 @@ Identify_ConservedCCI <- function(OrthG,
     sp1_final_list[[i]]=sp1_cci_use[sp1_cci_use_cluster %in% intersect_cluster,]
     sp2_final_list[[i]]=sp2_cci_use[sp2_cci_use_cluster %in% intersect_cluster,]
   }
-  sp1_final_df = do.call(bind_rows,sp1_final_list)
-  sp2_final_df = do.call(bind_rows,sp2_final_list)
+  sp1_final_df = do.call(dplyr::bind_rows,sp1_final_list)
+  sp2_final_df = do.call(dplyr::bind_rows,sp2_final_list)
   final_list = list(sp1_final_df,sp2_final_df)
   names(final_list) = c('sp1_orthg_ccc_df','sp2_orthg_ccc_df')
   return(final_list)

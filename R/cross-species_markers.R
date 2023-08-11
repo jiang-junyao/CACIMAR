@@ -9,6 +9,7 @@
 #' @param Species_name2 character, indicating the species names of Species2_Marker_table
 #' @param match_cell_name characters contained in both cell names
 #'  to match similar cell types
+#' @param filter_marker logical, indicating whether filter markers
 #'
 #' @return Data frame of conserved markers
 #' @export
@@ -18,7 +19,7 @@
 #' Species_name1 = 'mm',Species_name2 = 'zf')
 Identify_ConservedMarkers <- function(OrthG,Species1_Marker_table,Species2_Marker_table,
                            Species_name1,Species_name2,
-                           match_cell_name=NULL){
+                           match_cell_name=NULL,filter_marker =TRUE){
   validInput(OrthG,'OrthG','df')
   validInput(Species_name1,'Species_name1','character')
   validInput(Species_name2,'Species_name2','character')
@@ -78,11 +79,16 @@ Identify_ConservedMarkers <- function(OrthG,Species1_Marker_table,Species2_Marke
   if (nrow(Exp4)==0) {
     stop('No homologous genes appear!')
   }
-  Exp5 <- cbind(Exp4[,1:7], Species12[match(Exp4[,Type1],
+  if (filter_marker) {
+      Exp5 <- cbind(Exp4[,1:7], Species12[match(Exp4[,Type1],
                                             Species12[,1]), ],
                 Species22[match(Exp4[,Type2], Species22[,1]), ])
-  Exp6 <- Refine_Used_OrthG(Exp5,Species_name,match_cell_name)
-  return(Exp6)
+      Exp6 <- Refine_Used_OrthG(Exp5,Species_name,match_cell_name)
+      return(Exp6)
+  }else{
+    return(Exp4)
+  }
+
 }
 
 

@@ -10,7 +10,8 @@ Identify_ConservedMarkers(
   Species2_Marker_table,
   Species_name1,
   Species_name2,
-  match_cell_name = NULL
+  match_cell_name = NULL,
+  filter_marker = TRUE
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ Identify_ConservedMarkers(
 
 \item{match_cell_name}{characters contained in both cell names
 to match similar cell types}
+
+\item{filter_marker}{logical, indicating whether filter markers}
 }
 \value{
 Data frame of conserved markers

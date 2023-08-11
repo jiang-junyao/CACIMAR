@@ -9,6 +9,7 @@
 #' @param Species_name2 character, indicating the species names of Species2_Marker_table
 #' @param match_cell_name characters contained in both cell names
 #'  to match similar cell types
+#' @param filter_marker logical, indicating whether filter markers
 #'
 #' @return Data frame of conserved markers
 #' @export

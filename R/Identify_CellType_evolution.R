@@ -1,24 +1,32 @@
-# Run like this
-# Identify_CellType_evolution(Zf_seurat, Mm_seurat, ConservedMarker, species1_name = "Zf", species2_name = "Mm", Used_species1_ID = "Used_zf_ID", Used_species2_ID = "Used_mm_ID", dist.method = "euclidean", hclust.method = "average", layout.tree = 'rectangular', geom_nodepoint = 0, col.value = c("#990000", "#660099"))
-
-library(Seurat)
-library(CACIMAR)
-library(ggplot2)
-library(ape)
-library(ggtree)
-## Identify_CellType_evolution
+#' Title Identify celltype evolution between two species
+#' @description This function uses conserved markers between two species to find the correlation of celltypes between species.
+#'
+#' @param species1_seurat a species1 seurat object. The seurat object input should have been normalized, and active.ident should be the celltype.
+#' @param species2_seurat a species2 seurat object. The seurat object input should have been normalized, and active.ident should be the celltype.
+#' @param ConservedMarker A marker table with homologous genes of the species you input. The homologous genes should all be in your seurat object, respectively. Or you can used the result of Identify_ConservedMarkers function. 
+#' @param species1_name character, indicating the species names of species1.
+#' @param species2_name character, indicating the species names of species2.
+#' @param Used_species1_ID character, the columan name in ConservedMarker table for species1 seurat object. This must be in the column names of ConservedMarker.
+#' @param Used_species2_ID character, the columan name in ConservedMarker table for species2 seurat object. This must be in the column name of ConservedMarker.
+#' @param dist.method The method used for caculating distance. It can be any one used in dist funtion of R package stats.
+#' @param hclust.method The method used for hierarchical cluster analysis. This can be one of "ward.D", "ward.D2", "single", "complete", "average" (= UPGMA), "mcquitty" (= WPGMA), "median" (= WPGMC) or "centroid" (= UPGMC).
+#' @param layout.tree  The layout style of the tree. It can be one of 'rectangular', 'dendrogram', 'slanted', 'ellipse', 'roundrect', 'fan', 'circular', 'inward_circular', 'radial', 'equal_angle', 'daylight' or 'ape'.
+#' @param geom_nodepoint numeric, if it is greater than 0, it will show the nodepoint in the tree.
+#' @param col.value a vector for the colors used for the tippoints and tiplabels. The colors should be a length of the number of species, here that is tow.
+#'
+#' @return a list, it contains the tree result, and a plot of the tree.
+#' @export
+#'
+#' @examples Identify_CellType_evolution(Zf_seurat, Mm_seurat, ConservedMarker, species1_name = "Zf", species2_name = "Mm", Used_species1_ID = "Used_zf_ID", Used_species2_ID = "Used_mm_ID", dist.method = "euclidean", hclust.method = "average", layout.tree = 'rectangular', geom_nodepoint = 0, col.value = c("#990000", "#660099"))
 Identify_CellType_evolution <- function(species1_seurat, species2_seurat, ConservedMarker, species1_name = "Mm", species2_name = "Zf", Used_species1_ID, Used_species2_ID, dist.method = "euclidean", hclust.method = "average", layout.tree = "rectangular", geom_nodepoint = 0, col.value = c("#990000", "#660099")){
   print("Get mean expression")
   # process to get mean expression
   my_bind_mat <- process_mean_data(species1_seurat, species2_seurat, ConservedMarker, species1_name, species2_name, Used_species1_ID, Used_species2_ID)
   # Do the hclust analysis and plot
-  p <- Plot_celltype_tree(my_bind_mat, dist.method, hclust.method, layout.tree, geom_nodepoint, col.value)
-  print(p)
-  return(p)
+  return.list <- Plot_celltype_tree(my_bind_mat, dist.method, hclust.method, layout.tree, geom_nodepoint, col.value)
+  return(return.list)
 }
 
-# The seurat object input should have been normalized 
-# active.ident should be the celltype
 process_mean_data <- function(species1_seurat, species2_seurat, ConservedMarker, species1_name, species2_name, Used_species1_ID, Used_species2_ID) {
   # Subset data for species 1
   species1_marker_seurat <- species1_seurat[ConservedMarker[[Used_species1_ID]], ]
@@ -51,10 +59,11 @@ process_mean_data <- function(species1_seurat, species2_seurat, ConservedMarker,
   return(combined_mat)
 }
 
-Plot_celltype_tree <- function(expression_matrix, dist.method = c("euclidean", "maximum", "manhattan", "canberra", "binary", "minkowski"), hclust.method = c("average", "single", "complete"), layout.tree = c('rectangular', 'dendrogram', 'slanted', 'ellipse', 'roundrect', 'fan', 'circular', 'inward_circular', 'radial', 'equal_angle', 'daylight', 'ape'), geom_nodepoint = 0, col.value){
+Plot_celltype_tree <- function(expression_matrix, dist.method = c("euclidean"), hclust.method = c("average"), layout.tree = c('rectangular'), geom_nodepoint = 0, col.value){
   tree <- Celltypes_hclust_tree(expression_matrix, dist.method, hclust.method)
   tree.plot <- Make_tree_plot(tree, layout.tree, geom_nodepoint, col.value)
-  return(tree.plot)
+  return.list <- list("tree" = tree, "plot" = tree.plot)
+  return(return.list)
 }
 
 Celltypes_hclust_tree <- function(expression_matrix, dist.method, hclust.method){
@@ -80,11 +89,11 @@ Make_tree_plot <- function(tree, layout.tree, geom_nodepoint, col.value){
     geom_tiplab(aes(col=species), offset=0.1)+
     geom_tippoint(aes(col=species)) + 
     geom_nodepoint(color="black", alpha=1/4, size=geom_nodepoint) + 
-    theme_tree2() + 
+    theme_tree2() +
     xlim(NA, max(data$x)*1.3) +
     scale_fill_manual(values = col.value) +
-    scale_color_manual(values = col.value) + 
-    guides(shape = guide_legend(override.aes = list(shape = c(16, 16))))
+    scale_color_manual(values = col.value)
   
   return(tregraph)
 }
+

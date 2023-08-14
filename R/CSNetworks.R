@@ -14,7 +14,8 @@
 #'
 #' @examples load(system.file("extdata", "gene_network.rda", package = "CACIMAR"))
 #' n1 <- Identify_ConservedNetworks(OrthG_Mm_Zf,mm_gene_network,zf_gene_network,'mm','zf')
-Identify_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,Species_name1,Species_name2){
+Identify_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,
+                                       Species_name1,Species_name2){
   ### input check
   validInput(Species_name1,'Species_name1','character')
   validInput(Species_name2,'Species_name2','character')
@@ -57,7 +58,7 @@ Identify_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,Species_n
     Species_name <- c(Spec1,Spec2)
     RnList <- list(Species2_GRN,Species1_GRN)
   }else{stop('please input correct Species name')}
-
+  print('check pass')
 
 
   ### Extract genes in each group
@@ -77,8 +78,11 @@ Identify_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,Species_n
   ### get orthology genes
   Sp1Gene <- RnGeneList[[Species_name[1]]]
   Sp2Gene <- RnGeneList[[Species_name[2]]]
-  Sp1Group <- sort(Sp1Gene$Group[!duplicated(Sp1Gene$Group)])
-  Sp2Group <- sort(Sp2Gene$Group[!duplicated(Sp2Gene$Group)])
+  Sp1Gene_back <- Sp1Gene
+  Sp2Gene_back <- Sp2Gene
+  Sp1Gene <- Sp1Gene[!duplicated(Sp1Gene[,1]),]
+  Sp2Gene <- Sp2Gene[!duplicated(Sp2Gene[,1]),]
+
   Spec1_gene <- data.frame(rep(0,nrow(Sp1Gene)),
                            rep(1,nrow(Sp1Gene)))
   rownames(Spec1_gene) <- Sp1Gene[,1]
@@ -88,15 +92,15 @@ Identify_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,Species_n
   Exp2 <- Get_OrthG(OrthG, Spec1_gene, Spec2_gene, Species_name)
   Type1 <- paste0('Used_',Species_name[1],'_ID')
   Type2 <- paste0('Used_',Species_name[2],'_ID')
-  Species1 <- Sp1Gene[match(Exp2[, Type1],Sp1Gene$mmGene), ]
-  Species2 <- Sp2Gene[match(Exp2[, Type2],Sp2Gene$zfGene), ]
+  Species1 <- Sp1Gene[match(Exp2[, Type1],Sp1Gene_back$mmGene), ]
+  Species2 <- Sp2Gene[match(Exp2[, Type2],Sp2Gene_back$zfGene), ]
   Exp3 <- cbind(Exp2, Species1, Species2)
   Exp4 <- Exp3[!is.na(Exp3[, dim(Exp2)[2]+1]) &
                  !is.na(Exp3[,dim(Exp2)[2]+dim(Species1)[2]+1]), ]
 
   ### calculate orthology fraction
-  Sp1Freq <- as.data.frame(table(Sp1Gene$mmGroup))
-  Sp2Freq <- as.data.frame(table(Sp2Gene$zfGroup))
+  Sp1Freq <- as.data.frame(table(Sp1Gene_back$mmGroup))
+  Sp2Freq <- as.data.frame(table(Sp2Gene_back$zfGroup))
   OrthG_df <- as.data.frame(table(Exp4$mmGroup,Exp4$zfGroup))
   OrthG_df <- OrthG_df[OrthG_df$Freq>0,]
   Sp1GeneNum <- Sp1Freq[match(OrthG_df$Var1,Sp1Freq$Var1),2]

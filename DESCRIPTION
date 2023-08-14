@@ -24,10 +24,13 @@ Imports:
     stats,
     methods,
     viridisLite,
-    biomaRt
+    biomaRt,
+    ape
 Depends: 
     R (>= 4.0),
-    Seurat
+    Seurat,
+    tidyverse,
+    ggtree
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3

@@ -3,7 +3,7 @@
 #'
 #' @param species1_seurat a species1 seurat object. The seurat object input should have been normalized, and active.ident should be the celltype.
 #' @param species2_seurat a species2 seurat object. The seurat object input should have been normalized, and active.ident should be the celltype.
-#' @param ConservedMarker A marker table with homologous genes of the species you input. The homologous genes should all be in your seurat object, respectively. Or you can used the result of Identify_ConservedMarkers function. 
+#' @param ConservedMarker A marker table with homologous genes of the species you input. The homologous genes should all be in your seurat object, respectively. Or you can used the result of Identify_ConservedMarkers function.
 #' @param species1_name character, indicating the species names of species1.
 #' @param species2_name character, indicating the species names of species2.
 #' @param Used_species1_ID character, the columan name in ConservedMarker table for species1 seurat object. This must be in the column names of ConservedMarker.
@@ -13,7 +13,11 @@
 #' @param layout.tree  The layout style of the tree. It can be one of 'rectangular', 'dendrogram', 'slanted', 'ellipse', 'roundrect', 'fan', 'circular', 'inward_circular', 'radial', 'equal_angle', 'daylight' or 'ape'.
 #' @param geom_nodepoint numeric, if it is greater than 0, it will show the nodepoint in the tree.
 #' @param col.value a vector for the colors used for the tippoints and tiplabels. The colors should be a length of the number of species, here that is tow.
-#'
+#' @importFrom ggtree ggtree
+#' @importFrom ggtree fortify
+#' @importFrom ape as.phylo
+#' @importFrom stats dist
+#' @importFrom stats hclust
 #' @return a list, it contains the tree result, and a plot of the tree.
 #' @export
 #'
@@ -31,11 +35,11 @@ process_mean_data <- function(species1_seurat, species2_seurat, ConservedMarker,
   # Subset data for species 1
   species1_marker_seurat <- species1_seurat[ConservedMarker[[Used_species1_ID]], ]
   species1_marker_data <- GetAssayData(species1_marker_seurat, assay = "RNA", slot = "data")
-  
+
   # Subset data for species 2
   species2_marker_seurat <- species2_seurat[ConservedMarker[[Used_species2_ID]], ]
   species2_marker_data <- GetAssayData(species2_marker_seurat, assay = "RNA", slot = "data")
-  
+
   # Calculate mean expression for species 1
   species1_mean_mat <- aggregate(as.data.frame(t(as.matrix(species1_marker_data))), by = list(species1_marker_seurat@active.ident), FUN = "mean") # cell x gene
   species1_group_names <- species1_mean_mat$Group.1
@@ -43,7 +47,7 @@ process_mean_data <- function(species1_seurat, species2_seurat, ConservedMarker,
   rownames(species1_mean_mat) <- species1_group_names
   species1_mean_mat <- species1_mean_mat[, -1]
   rownames(species1_mean_mat) <- paste(species1_name, rownames(species1_mean_mat), sep = "_")
-  
+
   # Calculate mean expression for species 2
   species2_mean_mat <- aggregate(as.data.frame(t(as.matrix(species2_marker_data))), by = list(species2_marker_seurat@active.ident), FUN = "mean") # cell x gene
   species2_group_names <- species2_mean_mat$Group.1
@@ -51,11 +55,11 @@ process_mean_data <- function(species1_seurat, species2_seurat, ConservedMarker,
   rownames(species2_mean_mat) <- species2_group_names
   species2_mean_mat <- species2_mean_mat[, -1]
   rownames(species2_mean_mat) <- paste(species2_name, rownames(species2_mean_mat), sep = "_")
-  
-  # Merge data for both species 
+
+  # Merge data for both species
   colnames(species2_mean_mat) <- colnames(species1_mean_mat)
   combined_mat <- rbind(species1_mean_mat, species2_mean_mat)
-  
+
   return(combined_mat)
 }
 
@@ -73,8 +77,8 @@ Celltypes_hclust_tree <- function(expression_matrix, dist.method, hclust.method)
   # add species column to the tree
   first_parts <- vector("character", length(tree$tip.label))
   for (i in 1:length(tree$tip.label)) {
-    split_parts <- strsplit(tree$tip.label[i], "_")  
-    first_parts[i] <- split_parts[[1]][1] 
+    split_parts <- strsplit(tree$tip.label[i], "_")
+    first_parts[i] <- split_parts[[1]][1]
   }
   first_parts <- factor(first_parts, levels = unique(first_parts))
   tree$species <- first_parts
@@ -83,17 +87,17 @@ Celltypes_hclust_tree <- function(expression_matrix, dist.method, hclust.method)
 
 Make_tree_plot <- function(tree, layout.tree, geom_nodepoint, col.value){
   tree.p <- ggtree::ggtree(tree, layout=layout.tree, size=0.8, col="black")
-  data=fortify(tree)
+  data <- ggtree::fortify(tree)
   tree.df <- data.frame("tip.label"= tree$tip.label, "species" = tree$species)
   tregraph <- tree.p%<+%tree.df+
     geom_tiplab(aes(col=species), offset=0.1)+
-    geom_tippoint(aes(col=species)) + 
-    geom_nodepoint(color="black", alpha=1/4, size=geom_nodepoint) + 
+    geom_tippoint(aes(col=species)) +
+    geom_nodepoint(color="black", alpha=1/4, size=geom_nodepoint) +
     theme_tree2() +
     xlim(NA, max(data$x)*1.3) +
     scale_fill_manual(values = col.value) +
     scale_color_manual(values = col.value)
-  
+
   return(tregraph)
 }
 

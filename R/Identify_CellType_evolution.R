@@ -22,23 +22,23 @@
 #' @export
 #'
 #' @examples Identify_CellType_evolution(Zf_seurat, Mm_seurat, ConservedMarker, species1_name = "Zf", species2_name = "Mm", Used_species1_ID = "Used_zf_ID", Used_species2_ID = "Used_mm_ID", dist.method = "euclidean", hclust.method = "average", layout.tree = 'rectangular', geom_nodepoint = 0, col.value = c("#990000", "#660099"))
-Identify_CellType_evolution <- function(species1_seurat, species2_seurat, ConservedMarker, species1_name = "Mm", species2_name = "Zf", Used_species1_ID, Used_species2_ID, dist.method = "euclidean", hclust.method = "average", layout.tree = "rectangular", geom_nodepoint = 0, col.value = c("#990000", "#660099")){
+Identify_CellType_evolution <- function(species1_seurat, species2_seurat, ConservedMarker, species1_name = "Mm", species2_name = "Zf", Used_species1_ID, Used_species2_ID, assay, dist.method = "euclidean", hclust.method = "average", layout.tree = "rectangular", geom_nodepoint = 0, col.value = c("#990000", "#FF6600")){
   print("Get mean expression")
   # process to get mean expression
-  my_bind_mat <- process_mean_data(species1_seurat, species2_seurat, ConservedMarker, species1_name, species2_name, Used_species1_ID, Used_species2_ID)
+  my_bind_mat <- process_mean_data(species1_seurat, species2_seurat, ConservedMarker, species1_name, species2_name, Used_species1_ID, Used_species2_ID, assay)
   # Do the hclust analysis and plot
   return.list <- Plot_celltype_tree(my_bind_mat, dist.method, hclust.method, layout.tree, geom_nodepoint, col.value)
   return(return.list)
 }
 
-process_mean_data <- function(species1_seurat, species2_seurat, ConservedMarker, species1_name, species2_name, Used_species1_ID, Used_species2_ID) {
+process_mean_data <- function(species1_seurat, species2_seurat, ConservedMarker, species1_name, species2_name, Used_species1_ID, Used_species2_ID, assay) {
   # Subset data for species 1
   species1_marker_seurat <- species1_seurat[ConservedMarker[[Used_species1_ID]], ]
-  species1_marker_data <- GetAssayData(species1_marker_seurat, assay = "RNA", slot = "data")
+  species1_marker_data <- GetAssayData(species1_marker_seurat, assay = assay, slot = "data")
 
   # Subset data for species 2
   species2_marker_seurat <- species2_seurat[ConservedMarker[[Used_species2_ID]], ]
-  species2_marker_data <- GetAssayData(species2_marker_seurat, assay = "RNA", slot = "data")
+  species2_marker_data <- GetAssayData(species2_marker_seurat, assay = assay, slot = "data")
 
   # Calculate mean expression for species 1
   species1_mean_mat <- aggregate(as.data.frame(t(as.matrix(species1_marker_data))), by = list(species1_marker_seurat@active.ident), FUN = "mean") # cell x gene

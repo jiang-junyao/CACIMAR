@@ -25,7 +25,8 @@ Imports:
     methods,
     viridisLite,
     biomaRt,
-    ape
+    ape,
+    ggplot2
 Depends: 
     R (>= 4.0),
     Seurat,

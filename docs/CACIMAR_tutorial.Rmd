@@ -196,20 +196,18 @@ Heatmap_Cor(SNT,cluster_cols=F, cluster_rows=F,Color1 = c(rgb(102/255,46/255,115
 ![cross-species cell types](CACIMAR_tutorial_files/figure-html/Cell_type.png)
 
 ```r
-### identify celltype evolution based on conserved markers through hierarchical clustering
-### filter_marker will used all the homologene marker of the two species
-ConservedMarker <- Identify_ConservedMarkers(OrthG_Mm_Zf,Mm_marker,Zf_marker,
-                                             Species_name1 = 'mm',Species_name2 = 'zf', filter_marker = FALSE)
+### Plot cell types hierarchical clustering tree of different species based on the conserved markers
 
-# seurat object should have been normalized.
-library(ape)
-library(ggtree)
-CellType_evolution.result <- Identify_CellType_evolution(Zf_seurat, Mm_seurat, ConservedMarker, species1_name = "Zf", species2_name = "Mm", Used_species1_ID = "Used_zf_ID", Used_species2_ID = "Used_mm_ID", dist.method = "euclidean", hclust.method = "average", layout.tree = 'rectangular', geom_nodepoint = 0, col.value = c("#990000", "#660099"))
+### (1) get the conserved score matrix of cell types containing different species
+dist_matrix <- expression[[2]]
+species.vector <- substr(rownames(dist_matrix), 1, 2)
 
-CellType_evolution.result$plot
+### (2) plot Dendrogram
+Species_CellType_Tree <- Plot_Species_CellType_Tree(dist_matrix = dist_matrix, species.vector = species.vector, hcluster.method = "average", geom_nodepoint = 0, layout.tree = "rectangular", offset = 0.02, tiplab.size = 5, tippoint.shape = 22, tippoint.shape.size = 4)
+
+Species_CellType_Tree$Plot
 ```
-
-![celltypes Tree](CACIMAR_tutorial_files/figure-html/CellType_evolution.result.png)
+![Dendrogram of Cell types](CACIMAR_tutorial_files/figure-html/Plot_Species_CellType_Tree.png)
 
 
 # 5. Identify evolution-conserved regulatory networks

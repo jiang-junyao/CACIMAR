@@ -78,8 +78,6 @@ Identify_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,
   ### get orthology genes
   Sp1Gene <- RnGeneList[[Species_name[1]]]
   Sp2Gene <- RnGeneList[[Species_name[2]]]
-  Sp1Gene_back <- Sp1Gene
-  Sp2Gene_back <- Sp2Gene
   Sp1Gene <- Sp1Gene[!duplicated(Sp1Gene[,1]),]
   Sp2Gene <- Sp2Gene[!duplicated(Sp2Gene[,1]),]
 
@@ -92,8 +90,8 @@ Identify_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,
   Exp2 <- Get_OrthG(OrthG, Spec1_gene, Spec2_gene, Species_name)
   Type1 <- paste0('Used_',Species_name[1],'_ID')
   Type2 <- paste0('Used_',Species_name[2],'_ID')
-  Species1 <- Sp1Gene[match(Exp2[, Type1],Sp1Gene_back$mmGene), ]
-  Species2 <- Sp2Gene[match(Exp2[, Type2],Sp2Gene_back$zfGene), ]
+  Species1 <- Sp1Gene[match(Exp2[, Type1],Sp1Gene$mmGene), ]
+  Species2 <- Sp2Gene[match(Exp2[, Type2],Sp2Gene$zfGene), ]
   Exp3 <- cbind(Exp2, Species1, Species2)
   Exp4 <- Exp3[!is.na(Exp3[, dim(Exp2)[2]+1]) &
                  !is.na(Exp3[,dim(Exp2)[2]+dim(Species1)[2]+1]), ]
@@ -205,6 +203,37 @@ Identify_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,
 }
 
 
+identify_ct_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,
+                                          Species_name1,Species_name2,
+                                          network_regulation_num = 1000){
+  df_final <- list()
+  for (i in unique(Species1_GRN$SourceGroup)) {
+    for (j in unique(Species2_GRN$SourceGroup)) {
+
+      spe1_network_use <- Species1_GRN[Species1_GRN$SourceGroup==i,]
+      spe2_network_use <- Species2_GRN[Species2_GRN$SourceGroup==j,]
+
+      if (nrow(spe1_network_use) > network_regulation_num) {
+        spe1_network_use <- spe1_network_use[1:network_regulation_num,]
+      }
+      if (nrow(spe2_network_use) > network_regulation_num) {
+        spe2_network_use <- spe2_network_use[1:network_regulation_num,]
+      }
+
+      n1 <- Identify_ConservedNetworks(OrthG_Mm_Zf,
+                                       spe1_network_use,
+                                       spe2_network_use,
+                                       'mm','zf')
+      df_final[[paste0(i,'-',j)]] <- n1[[1]]
+    }
+  }
+  df_final <- do.call(bind_rows,df_final)
+  NCS_df <- reshape2::dcast(df_final[,c(1,2,14)],Group1~Group2,fill = 0)
+  rownames(NCS_df) <- NCS_df[,1]
+  NCS_df <- NCS_df[,-1]
+  OrthG_list <- list(df_final,NCS_df)
+  return(OrthG_list)
+}
 
 
 

@@ -310,20 +310,60 @@ zf.ccc.score <- read.delim("F:/platform/cci/zf_conserved_ccc_score.txt")
 df=read.delim('F:\\platform\\cci/mm_conserved_ccc_score.txt')
 print(df)
 ```
+
 Then, we visualize the result
-```{r warning=FALSE}
+```r
 ### visualize mm conserved ccc
 library(reshape2)
 mm.ccc.plot=dcast(mm.ccc.score[,3:5],sp1source~sp1target,sum,value.var = 'prob')
 rownames(mm.ccc.plot)=mm.ccc.plot[,1]
-mm.ccc.plot=mm.ccc.plot[,2:ncol(mm.ccc.plot)]
-Heatmap_Cor(mm.ccc.plot,cluster_cols=F, cluster_rows=F,Color1 = c(rgb(102/255,46/255,115/255),rgb(31/255,153/255,139/255),rgb(251/255,232/255,48/255)))
+```
+
+```r
+# long table of mm
+mm_long_df <- melt(mm.ccc.plot, id.vars = "sp1source", variable.name = "celltype2", value.name = "probility")
+colnames(mm_long_df)[1] <- "celltype1"
+mm_long_df$scale.probility <- scale(mm_long_df$probility, center = F)
+mm_long_df$score <- mm_long_df$scale.probility * 10
+mm_long_df <- mm_long_df[!mm_long_df$score == 0, ]
+mm_long_df <- na.omit(mm_long_df)
+mm_long_df$celltype1 <- droplevels(mm_long_df$celltype1)
+
+# colors
+mm_colors <- c(rgb(247/255,147/255,30/255), rgb(248/255,115/255,106/255), rgb(157/255,115/255,194/255), rgb(183/255,76/255,171/255), rgb(230/255,134/255,201/255), rgb(140/255,198/255,63/255), rgb(255/255,191/255,15/255), 
+            rgb(103/255,199/255,193/255), rgb(3/255,161/255,198/255), rgb(129/255,70/255,58/255), rgb(0/255,114/255,189/255))
+names(mm_colors) <- levels(mm_long_df$celltype1)
+
+# Celltype Communication Plot for mm
+Plot_Celltype.Communication(mm_long_df, sendercolumn = "celltype1", receivercolumn = "celltype2", widthcolumn = "score", useLabels = T, colors = mm_colors, nodeSize = 10, vertex.label.color = "black", vertex.label.cex = 1.2) 
+```
+![Mm celltypes communication](CACIMAR_tutorial_files/figure-html/Mm_CCC-plot_graph_network.png)
+
+```r
 ### visualize zf conserved ccc
 zf.ccc.plot=dcast(zf.ccc.score[,3:5],sp2source~sp2target,sum,value.var = 'prob')
 rownames(zf.ccc.plot)=zf.ccc.plot[,1]
-zf.ccc.plot=zf.ccc.plot[,2:ncol(zf.ccc.plot)]
-Heatmap_Cor(zf.ccc.plot,cluster_cols=F, cluster_rows=F,Color1 = c(rgb(102/255,46/255,115/255),rgb(31/255,153/255,139/255),rgb(251/255,232/255,48/255)))
 ```
+
+```r
+# long table of Zf
+zf_long_df <- melt(zf.ccc.plot, id.vars = "sp2source", variable.name = "celltype2", value.name = "probility")
+colnames(zf_long_df)[1] <- "celltype1"
+zf_long_df$scale.probility <- scale(zf_long_df$probility, center = F)
+zf_long_df$score <- zf_long_df$scale.probility * 10
+zf_long_df <- zf_long_df[!zf_long_df$score == 0, ]
+mm_long_df <- na.omit(mm_long_df)
+zf_long_df$celltype1 <- droplevels(zf_long_df$celltype1)
+
+# colors
+zf_colors <- c(rgb(247/255,147/255,30/255), rgb(248/255,115/255,106/255), rgb(157/255,115/255,194/255), rgb(183/255,76/255,171/255), rgb(230/255,134/255,201/255), rgb(140/255,198/255,63/255), rgb(255/255,191/255,15/255),
+            rgb(103/255,199/255,193/255), rgb(3/255,161/255,198/255), rgb(129/255,70/255,58/255), rgb(0/255,114/255,189/255))
+names(zf_colors) <- levels(zf_long_df$celltype1)
+
+# Celltype Communication Plot for Zf
+Plot_Celltype.Communication(zf_long_df, sendercolumn = "celltype1", receivercolumn = "celltype2", widthcolumn = "score", useLabels = T, colors = zf_colors, nodeSize = 10, vertex.label.color = "black", vertex.label.cex = 1.2)
+```
+![Zf celltypes communication](CACIMAR_tutorial_files/figure-html/Zf_CCC-plot_graph_network.png)
 
 
 

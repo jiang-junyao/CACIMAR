@@ -95,10 +95,18 @@ Identify_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,
   Exp3 <- cbind(Exp2, Species1, Species2)
   Exp4 <- Exp3[!is.na(Exp3[, dim(Exp2)[2]+1]) &
                  !is.na(Exp3[,dim(Exp2)[2]+dim(Species1)[2]+1]), ]
+  if (nrow(Exp4)==0) {
+    NCS_df <- matrix(0,nrow = length(unique(Sp1Gene$SourceGroup)),
+           ncol = length(unique(Sp2Gene$SourceGroup)))
+    rownames(NCS_df) <- unique(Sp1Gene$SourceGroup)
+    colnames(NCS_df) <- unique(Sp2Gene$SourceGroup)
+    OrthG_list <- list(NA,NCS_df)
+    return(OrthG_list)
+  }
 
   ### calculate orthology fraction
-  Sp1Freq <- as.data.frame(table(Sp1Gene_back$mmGroup))
-  Sp2Freq <- as.data.frame(table(Sp2Gene_back$zfGroup))
+  Sp1Freq <- as.data.frame(table(Sp1Gene$mmGroup))
+  Sp2Freq <- as.data.frame(table(Sp2Gene$zfGroup))
   OrthG_df <- as.data.frame(table(Exp4$mmGroup,Exp4$zfGroup))
   OrthG_df <- OrthG_df[OrthG_df$Freq>0,]
   Sp1GeneNum <- Sp1Freq[match(OrthG_df$Var1,Sp1Freq$Var1),2]
@@ -137,8 +145,8 @@ Identify_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,
     Sp1OrthGEdge <- NetworkGroup1[NetworkGroup1$Source%in%Sp1GeneRow &
                                     NetworkGroup1$Target%in%Sp1GeneRow,]
 
-    Sp2OrthGEdge <- NetworkGroup2[NetworkGroup2$Source%in%Sp1GeneRow &
-                                    NetworkGroup2$Target%in%Sp1GeneRow,]
+    Sp2OrthGEdge <- NetworkGroup2[NetworkGroup2$Source%in%Sp2GeneRow &
+                                    NetworkGroup2$Target%in%Sp2GeneRow,]
 
     OrthEdgeGNum <- nrow(Sp1OrthGEdge)+nrow(Sp2OrthGEdge)
     AllEdgeNum <- nrow(NetworkGroup1)+nrow(NetworkGroup2)
@@ -154,15 +162,16 @@ Identify_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,
       Sp1Regulation <- NetworkGroup1[NetworkGroup1$Source%in%Sp1GeneRow &
                                        NetworkGroup1$Target%in%Sp1GeneRow,]
 
-      Sp2Regulation <- NetworkGroup2[NetworkGroup2$Source%in%Sp1GeneRow &
-                                       NetworkGroup2$Target%in%Sp1GeneRow,]
+      Sp2Regulation <- NetworkGroup2[NetworkGroup2$Source%in%Sp2GeneRow &
+                                       NetworkGroup2$Target%in%Sp2GeneRow,]
 
       if (nrow(Sp1Regulation) > 0 & nrow(Sp2Regulation) > 0) {
         OrthGRelationshipsNum <- 0
         for (j in 1:nrow(Sp1Regulation)) {
-          Sp2RelatedTF <- GeneRowmatch[GeneRowmatch$Sp1GeneRow == Sp1Regulation$Source,2]
-          Sp2RelatedTarget <- GeneRowmatch[GeneRowmatch$Sp1GeneRow == Sp1Regulation$Target,2]
+          Sp2RelatedTF <- GeneRowmatch[GeneRowmatch$Sp1GeneRow == Sp1Regulation$Source[j],2]
+          Sp2RelatedTarget <- GeneRowmatch[GeneRowmatch$Sp1GeneRow == Sp1Regulation$Target[j],2]
           if (paste(Sp2RelatedTF,Sp2RelatedTarget)%in%paste(Sp2Regulation$Source,Sp2Regulation$Target)) {
+            print(paste(Sp2RelatedTF,Sp2RelatedTarget))
             OrthGRelationshipsNum <- OrthGRelationshipsNum+1
           }
         }
@@ -219,14 +228,22 @@ identify_ct_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,
       if (nrow(spe2_network_use) > network_regulation_num) {
         spe2_network_use <- spe2_network_use[1:network_regulation_num,]
       }
-
+      print(i)
+      print(j)
+      rownames(spe1_network_use) <- 1:nrow(spe1_network_use)
+      rownames(spe2_network_use) <- 1:nrow(spe2_network_use)
       n1 <- Identify_ConservedNetworks(OrthG_Mm_Zf,
                                        spe1_network_use,
                                        spe2_network_use,
                                        'mm','zf')
+      if (n1 == 'No conserved relationships') {
+
+      }
       df_final[[paste0(i,'-',j)]] <- n1[[1]]
     }
   }
+
+  df_final <- df_final[!is.na(df_final)]
   df_final <- do.call(bind_rows,df_final)
   NCS_df <- reshape2::dcast(df_final[,c(1,2,14)],Group1~Group2,fill = 0)
   rownames(NCS_df) <- NCS_df[,1]

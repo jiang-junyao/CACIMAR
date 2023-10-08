@@ -201,7 +201,8 @@ Identify_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,
   Ni <- mean(Candidate_moudle$Group1AllGenes)
   Nj <- mean(Candidate_moudle$Group2AllGenes)
   MIU <- ((Ni+Nj-1)/(HNi+HNj-1))
-  OrthG_df$NCS <- OrthG_df[,6] + (MIU*OrthG_df[,9]) + (MIU*2*OrthG_df[,11])
+  #OrthG_df$NCS <- OrthG_df[,6] + (MIU*OrthG_df[,9]) + (MIU*2*OrthG_df[,11])
+  OrthG_df$NCS <- OrthG_df[,6]+ (MIU*OrthG_df[,9])
   OrthG_df[,1] <- paste0(Species_name1,OrthG_df[,1])
   OrthG_df[,2] <- paste0(Species_name2,OrthG_df[,2])
   NCS_df <- reshape2::dcast(OrthG_df[,c(1,2,14)],Group1~Group2,fill = 0)
@@ -236,6 +237,13 @@ identify_ct_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,
                                        spe1_network_use,
                                        spe2_network_use,
                                        'mm','zf')
+      if (!is.na(n1[[1]])) {
+        homo_summary <- n1[[1]]
+        print(n1)
+        n1[[1]]$pvalue <- chisq.test(data.frame(c(homo_summary[,3],homo_summary[,5]-homo_summary[,3]),
+                              c(homo_summary[,3],homo_summary[,4]-homo_summary[,3])))$p.value
+      }
+
       if (n1 == 'No conserved relationships') {
 
       }
@@ -245,10 +253,15 @@ identify_ct_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,
 
   df_final <- df_final[!is.na(df_final)]
   df_final <- do.call(bind_rows,df_final)
+  ###NCS
   NCS_df <- reshape2::dcast(df_final[,c(1,2,14)],Group1~Group2,fill = 0)
   rownames(NCS_df) <- NCS_df[,1]
   NCS_df <- NCS_df[,-1]
-  OrthG_list <- list(df_final,NCS_df)
+  ###pvalue
+  pv_df <- reshape2::dcast(df_final[,c(1,2,15)],Group1~Group2,fill = 0)
+  rownames(pv_df) <- pv_df[,1]
+  pv_df <- pv_df[,-1]
+  OrthG_list <- list(df_final,NCS_df,pv_df)
   return(OrthG_list)
 }
 

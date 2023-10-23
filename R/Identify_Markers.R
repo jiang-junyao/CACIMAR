@@ -176,7 +176,7 @@ Identify_Markers2 <- function(pbmc, Marker, PowerThr1=1/3){
 
 Refine_Markers<-function(Seurat_object,Marker,p.value = 0.05){
   MarkerRoc3 <- Identify_Markers3(Seurat_object, Marker)
-  MarkerRoc4 <- MarkerRoc3[MarkerRoc3[,'Pvalue'] < 0.05,]
+  MarkerRoc4 <- MarkerRoc3[MarkerRoc3[,'Pvalue'] < p.value,]
   print(c(nrow(MarkerRoc3), nrow(MarkerRoc4)))
   return(MarkerRoc4)
 }

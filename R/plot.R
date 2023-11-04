@@ -217,10 +217,17 @@ Plot_MarkersHeatmap <- function(ConservedMarker,start_col = 2,module_colors = NA
   validInput(annotation_names_row,'annotation_names_row','logical')
 
 
-  if (is.na(module_colors)) {
+  if (is.na(module_colors[1])) {
     all_cell_type <- c(ConservedMarker[,1])
     all_cell_type <- all_cell_type[!duplicated(all_cell_type)]
     module_colors <- CACIMAR::CACIMAR_cols(length(all_cell_type))
+    names(module_colors) <- all_cell_type
+    module_colors <- list(module_colors)
+    names(module_colors) <- 'Celltype'
+  }else{
+    all_cell_type <- c(ConservedMarker[,1])
+    all_cell_type <- all_cell_type[!duplicated(all_cell_type)]
+    module_colors <- module_colors[1:length(all_cell_type)]
     names(module_colors) <- all_cell_type
     module_colors <- list(module_colors)
     names(module_colors) <- 'Celltype'
@@ -233,7 +240,7 @@ Plot_MarkersHeatmap <- function(ConservedMarker,start_col = 2,module_colors = NA
   colnames(annotation_row) <- 'Celltype'
   gap_row <- c()
   for (i in levels(as.factor(ConservedMarker[,1]))) {
-    row1 <- grep(i,ConservedMarker[,1])
+    row1 <- which(ConservedMarker[,1]==i)
     gap_row <- c(gap_row,row1[length(row1)])
   }
   p1=pheatmap::pheatmap(ConservedMarker[,start_col:ncol(ConservedMarker)],annotation_row =

@@ -58,7 +58,6 @@ Identify_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,
     Species_name <- c(Spec1,Spec2)
     RnList <- list(Species2_GRN,Species1_GRN)
   }else{stop('please input correct Species name')}
-  print('check pass')
 
 
   ### Extract genes in each group
@@ -171,7 +170,6 @@ Identify_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,
           Sp2RelatedTF <- GeneRowmatch[GeneRowmatch$Sp1GeneRow == Sp1Regulation$Source[j],2]
           Sp2RelatedTarget <- GeneRowmatch[GeneRowmatch$Sp1GeneRow == Sp1Regulation$Target[j],2]
           if (paste(Sp2RelatedTF,Sp2RelatedTarget)%in%paste(Sp2Regulation$Source,Sp2Regulation$Target)) {
-            print(paste(Sp2RelatedTF,Sp2RelatedTarget))
             OrthGRelationshipsNum <- OrthGRelationshipsNum+1
           }
         }
@@ -213,24 +211,26 @@ Identify_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,
 }
 
 
+#' Identify conserved cell type specific regulatory networks
+#'
+#' @param OrthG ortholog genes database
+#' @param Species1_GRN gene regulatory network of species 1
+#' @param Species2_GRN gene regulatory network of species 2
+#' @param Species_name1 character, indicating the species names of Species1_GRN
+#' @param Species_name2 character, indicating the species names of Species2_GRN
+#'
+#' @return
+#' @export
+#'
+#' @examples
 identify_ct_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,
-                                          Species_name1,Species_name2,
-                                          network_regulation_num = 1000){
+                                          Species_name1,Species_name2){
   df_final <- list()
   for (i in unique(Species1_GRN$SourceGroup)) {
     for (j in unique(Species2_GRN$SourceGroup)) {
 
       spe1_network_use <- Species1_GRN[Species1_GRN$SourceGroup==i,]
       spe2_network_use <- Species2_GRN[Species2_GRN$SourceGroup==j,]
-
-      if (nrow(spe1_network_use) > network_regulation_num) {
-        spe1_network_use <- spe1_network_use[1:network_regulation_num,]
-      }
-      if (nrow(spe2_network_use) > network_regulation_num) {
-        spe2_network_use <- spe2_network_use[1:network_regulation_num,]
-      }
-      print(i)
-      print(j)
       rownames(spe1_network_use) <- 1:nrow(spe1_network_use)
       rownames(spe2_network_use) <- 1:nrow(spe2_network_use)
       n1 <- Identify_ConservedNetworks(OrthG_Mm_Zf,
@@ -239,7 +239,6 @@ identify_ct_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,
                                        'mm','zf')
       if (!is.na(n1[[1]])) {
         homo_summary <- n1[[1]]
-        print(n1)
         n1[[1]]$pvalue <- chisq.test(data.frame(c(homo_summary[,3],homo_summary[,5]-homo_summary[,3]),
                               c(homo_summary[,3],homo_summary[,4]-homo_summary[,3])))$p.value
       }
@@ -268,3 +267,70 @@ identify_ct_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,
 
 
 
+#' Identify conserved node and edge in the networks
+#' Based on the Conservation analysis result from Identify_ConservedNetworks,
+#' this function further identify the conserved node and edge in the network(graph)
+#' @param Species1_GRN gene regulatory network of species 1
+#' @param Species2_GRN gene regulatory network of species 2
+#' @param ConservedNetworkTable result from Identify_ConservedNetworks
+#' @param Species1_group character,indicating interested GRN group in species 1
+#' @param Species2_group character,indicating interested GRN group in species 2
+#'
+#' @return
+#' @export
+#'
+#' @examples
+identify_network_relationships <- function(Species1_GRN,Species2_GRN,
+                                           ConservedNetworkTable,
+                                           Species1_group = '',
+                                           Species2_group = ''){
+  mm_con_gene = ConservedNetworkTable[ConservedNetworkTable$Group1==Species1_group &
+                                        ConservedNetworkTable$Group2==Species2_group,12]
+  zf_con_gene = ConservedNetworkTable[ConservedNetworkTable$Group1==Species1_group &
+                                        ConservedNetworkTable$Group2==Species2_group,13]
+  mm_con_gene = unlist(strsplit(mm_con_gene,';'))
+  zf_con_gene = unlist(strsplit(zf_con_gene,';'))
+  mm_source = c()
+  mm_target = c()
+  for (i in 1:nrow(Species1_GRN)) {
+    if (Species1_GRN$Source[i] %in% mm_con_gene) {
+      mm_source = c(mm_source,'conserved')
+    }else{
+      mm_source = c(mm_source,'unconserved')
+    }
+    if (Species1_GRN$Target[i] %in% mm_con_gene) {
+      mm_target = c(mm_target,'conserved')
+    }else{
+      mm_target = c(mm_target,'unconserved')
+    }
+  }
+
+  zf_source = c()
+  zf_target = c()
+  for (i in 1:nrow(Species2_GRN)) {
+    if (Species2_GRN$Source[i] %in% zf_con_gene) {
+      zf_source = c(zf_source,'conserved')
+    }else{
+      zf_source = c(zf_source,'unconserved')
+    }
+    if (Species2_GRN$Target[i] %in% zf_con_gene) {
+      zf_target = c(zf_target,'conserved')
+    }else{
+      zf_target = c(zf_target,'unconserved')
+    }
+  }
+  Species1_GRN$spec1_source_type = mm_source
+  Species1_GRN$spec1_target_type = mm_target
+  Species2_GRN$spec2_source_type = zf_source
+  Species2_GRN$spec2_target_type = zf_target
+
+  Species1_GRN$index = paste0(Species1_GRN$spec1_source_type,
+                              Species1_GRN$spec1_target_type)
+  Species1_GRN$edge_type = ifelse(Species1_GRN$index=='conservedconserved'
+                                  ,'conserved','unconserved')
+  Species2_GRN$index = paste0(Species2_GRN$spec2_source_type,
+                              Species2_GRN$spec2_target_type)
+  Species2_GRN$edge_type = ifelse(Species2_GRN$index=='conservedconserved'
+                                  ,'conserved','unconserved')
+  return(list(Species1_GRN,Species2_GRN))
+}

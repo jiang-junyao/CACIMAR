@@ -93,7 +93,7 @@ Identify_ConservedMarkers <- function(OrthG,Species1_Marker_table,Species2_Marke
 
 
 Get_OrthG <- function(OrthG1, MmRNA1, ZfRNA1, Spec1, MmPattern1='', ZfPattern1=''){
-  tOrthG1 <- table(OrthG1$Type); print(tOrthG1)
+  tOrthG1 <- table(OrthG1$Type)
   if (grepl('ENS',rownames(MmRNA1)[1])) {
     Ind1 <- c(grep(paste0(Spec1[1],'_ID'), colnames(OrthG1)), grep(paste0(Spec1[2],'_ID'), colnames(OrthG1)))
   }else{
@@ -102,7 +102,7 @@ Get_OrthG <- function(OrthG1, MmRNA1, ZfRNA1, Spec1, MmPattern1='', ZfPattern1='
 
 
   OrthG21 <- list()
-  for(i in 1:length(tOrthG1)){ print(names(tOrthG1)[i])
+  for(i in 1:length(tOrthG1)){
     if(names(tOrthG1)[i]==paste(c(Spec1,'0T1'),collapse='_')){ OrthG2 <- OrthG1[OrthG1$Type==names(tOrthG1)[i], ]
     OrthG3 <- cbind(OrthG2, OrthG2[,Ind1])
     }else if(names(tOrthG1)[i]==paste(c(Spec1,'1T0'),collapse='_')){ OrthG2 <- OrthG1[OrthG1$Type==names(tOrthG1)[i], ]

@@ -24,45 +24,13 @@ Install CACIMAR from github, run:
 # install.packages("devtools")
 devtools::install_github("jiang-junyao/CACIMAR")
 ```
+# Initiation
 
-# 1.Identify Cell types
-Using known marker genes to annotate each cluster. This method is based on AUC (area under the receiver operating characteristic curve of gene expression), and is very sensitive to the marker genes input.
-
-## Inputs data of this part
-
-### (1) Seurat object
-Seurat object should have clusters information in 'active.ident' slot. Test data used here can be download from [Google drive](https://drive.google.com/drive/folders/15bqQmEH4cDFRiEHYZTEp4gYWK4FJAhBL?usp=sharing)
-
-### (2) Known markers
-Knwon markers for each cell type, should contain 'Marker' and 'CellType' columns.
-
-## Example
-Known markers used here should contain two columns: 'Marker' represents marker genes, 'CellType' represents correseponding cell types of each marker.
-```{r warning=F,message=F}
+```{r warning=FALSE,message=FALSE}
 library(CACIMAR)
-### load known markers
-load(system.file("extdata", "knwon_marker.rda", package = "CACIMAR"))
-head(Zf_Known_marker)
+library(reshape2)
 ```
-If one Marker correspond to multiple cell types, cell types should be seperated by ',' (comma) character.
-```{r}
-Zf_Known_marker[1,]
-```
-```r
-### I identify cell type for 3 clusters here to reduce the running time
-Zf_seurat <- readRDS('D:\\GIBH\\platform\\test data/Zf_seurat.rds')
-Zfcelltype <- Identify_CellType(Zf_seurat,Zf_Known_marker)
-Mm_seurat <- readRDS('D:\\GIBH\\platform\\test data/Mm_seurat.rds')
-Mm_celltype <- Identify_CellType(Mm_seurat,Mm_Known_marker)
-```
-However, Zf_seurat and Mm_seurat contain about 40 thousand of cells which leads to super long running time. So i recommend subset the seurat object to just use cluster 1,2,3 to try this function.
-```r
-Zf_subset <- subset(seurat_object,idents = c(1,2,3))
-Zfcelltype_subset <- Identify_CellType(Zf_subset,Zf_Known_marker)
-
-```
-
-# 2.Identify markers
+# 1.Identify markers
 In this part, CACIMAR first uses ROC based method in 'FindAllMarkers' function of [Seurat](https://satijalab.org/seurat/articles/get_started.html) to identify markersin each cluster. Then, based on marker genes identified above, CACIMAR calculates the power of markers in each cluster and differences of markers between clusters, and markers with high differences between clusters will be retained. Finally, CACIMAR uses chi-square test/fisher test to identify significant cluster related to this marker gene (p.value <0.05).
 
 ## Inputs data of this part
@@ -74,6 +42,8 @@ Seurat object should have clusters information in 'active.ident' slot. Test data
 
 ```r
 ### identify markers
+Zf_seurat <- readRDS('Zf_seurat.rds')
+Mm_seurat <- readRDS('Mm_seurat.rds')
 Zf_marker <- Identify_Markers(Zf_seurat,PowerCutoff=0.4,DifferenceCutoff=0.1,PvalueCutoff=0.05)
 Mm_marker <- Identify_Markers(Mm_seurat,PowerCutoff=0.4,DifferenceCutoff=0.1,PvalueCutoff=0.05)
 ### format markers table
@@ -86,7 +56,7 @@ Zf_marker_subset <- Identify_CellType(Zf_subset,PowerCutoff=0.4,DifferenceCutoff
 ```
 
 
-# 3.Identify evolution-conserved markers
+# 2.Identify evolution-conserved markers
 In this part, CACIMAR first uses **homologous genes database** to refine markers, markers that exist in orthologs database will be retained. Then, CACIMAR selects markers that are in the same cell type between two species as evolution-conserved markers.
 
 ## Inputs data of this part
@@ -100,7 +70,7 @@ load(system.file("extdata", "zf_mm_markers.rda", package = "CACIMAR"))
 
 ### (2) Homologous gene database
 CACIMAR has already generated Homologous gene database for human, mouse, zebrafish and chicken, you can directly use the following codes to load database:
-```{r}
+```{r,message=FALSE,warning=FALSE}
 ### load homologous gene database of human and mouse
 OrthG <- OrthG_Hs_Mm
 ### load homologous gene database of human and chicken
@@ -131,7 +101,7 @@ MarkersPlot <- FormatConservedMarkers(ConservedMarker)
 ###plot conserved markers for mouse
 Plot_MarkersHeatmap(MarkersPlot[[1]],cellheight = 1.5,cellwidth = 6,legend = T)
 ```
-![Mm conserved markers](CACIMAR_tutorial_files/figure-html/Mm_Marker.png)
+![Mm conserved markers](CACIMAR_tutorial_files/figure-html/Mm_marker.png)
 ```r
 ###plot conserved markers for zebrafish
 Plot_MarkersHeatmap(MarkersPlot[[2]],cellheight = 1.5,cellwidth = 6,legend = T)
@@ -153,8 +123,8 @@ Plot_MarkersHeatmap(Zf_specific_markers,cellheight = 0.5,cellwidth = 6)
 ```
 
 
-# 4.Identify evolution-conserved cell types
-In this part, CACIMAR identify evolution-conserved cell types based on score of conserved cell types (SCT). SCT is calculated according to the power of evolution-conserved markers in each cluster and power of all markers in each cluster. Besides, CACIMAR can apply hierarchical clustering to explore the evolution relationship of cell types between species.
+# 3.Identify evolution-conserved cell types
+In this part, CACIMAR identify evolution-conserved cell types based on score of conserved cell types (SCT). SCT is calculated according to the power of evolution-conserved markers in each cluster and power of all markers in each cluster.
 
 ## Inputs data of this part
 
@@ -195,29 +165,12 @@ Heatmap_Cor(SNT,cluster_cols=F, cluster_rows=F,Color1 = c(rgb(102/255,46/255,115
 
 ![cross-species cell types](CACIMAR_tutorial_files/figure-html/Cell_type.png)
 
-```r
-### Plot cell types hierarchical clustering tree of different species based on the conserved markers
-
-### (1) get the conserved score matrix of cell types containing different species
-dist_matrix <- expression[[2]]
-species.vector <- substr(rownames(dist_matrix), 1, 2)
-
-### (2) plot Dendrogram
-Species_CellType_Tree <- Plot_Species_CellType_Tree(dist_matrix = dist_matrix, species.vector = species.vector, hcluster.method = "average", geom_nodepoint = 0, layout.tree = "rectangular", offset = 0.02, tiplab.size = 5, tippoint.shape = 22, tippoint.shape.size = 4)
-
-Species_CellType_Tree$Plot
-```
-![Dendrogram of Cell types](CACIMAR_tutorial_files/figure-html/Plot_Species_CellType_Tree.png)
-
-
-# 5. Identify evolution-conserved regulatory networks
-In this part, CACIMAR calculates the score of conserved networks (SCN) among modules in regulatory networks of different species. SCN is calculated according to three criterion: (I) fraction of homologous genes (nodes) and all genes; (II) fraction of interactions (edges) among homologous genes and all interactions; (III) fraction of consistent interactions and interactions  among homologous genes. Consistent interactions indicates the same direction and the same regulatory type (active or repressive) from the same pair of homologous genes. The following figure demonstrate the details of consistent interactions:
-
-![Example of consistent interactions](CACIMAR_tutorial_files/figure-html/SCN_example.png)
+# 4. Identify conserved intracellular regulation
+In this part, we utilized CACIMAR to examine the evolutionary conservation of two distinct regulatory networks: cell type-specific regulatory networks and regulatory subnetworks, also known as modules, across different species. CACIMAR calculates the score of conserved networks (SCN) among celltypes/modules in regulatory networks of different species. SCN is calculated according to three criterion: (I) fraction of homologous genes (nodes) and all genes; (II) fraction of interactions (edges) among homologous genes and all interactions.
 
 ## Inputs data of this part
-### (1) Modularized regulatory networks for two species
-Should contain 4 columns: 'Source', 'SourceGroup', 'Target', 'TargetGroup'. Modularized regulatory networks can be generated by [IReNA](https://github.com/jiang-junyao/IReNA) or [WGCNA](https://horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/).
+### (1) Cell type specific network or Modularized regulatory networks for two species
+Each network should contain 4 columns: 'Source', 'SourceGroup', 'Target', 'TargetGroup'. Modularized regulatory networks can be generated by [IReNA](https://github.com/jiang-junyao/IReNA) or [WGCNA](https://horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/).
 
 You can use following codes to load test data in this part.
 ```
@@ -242,10 +195,21 @@ OrthG <- OrthG_Zf_Ch
 ```
 In addition, you can use function in 'Build homologous gene database' part to generate your own homologous gene database.
 
-## Example
+## Example of cell type specific regulatory networks analysis
+The following cell type specific regulatory networks are constructed by [IReNA](https://github.com/jiang-junyao/IReNA), which can integrate scRNA-seq and scATAC-seq/ATAC-seq data or use scRNA-seq/RNA-seq data alone to construct modularized regulatory networks. 
+
+```{r warning=FALSE,message=FALSE}
+### load test data
+load(system.file("extdata", "ct_network.rda", package = "CACIMAR"))
+### identify evolution-conserved regulatory networks
+ConservedNetworks_ct <- identify_ct_ConservedNetworks(OrthG_Mm_Zf,Species1_GRN,Species2_GRN,'mm','zf')
+Heatmap_Cor(ConservedNetworks_ct[[2]],cluster_cols=F, cluster_rows=F,Color1 = c(rgb(102/255,46/255,115/255),rgb(31/255,153/255,139/255),rgb(251/255,232/255,48/255)))
+```
+
+## Example of modularized regulatory networks analysis
 Modular regulatory networks used here are constructed by R package [IReNA](https://github.com/jiang-junyao/IReNA), which can integrate scRNA-seq and scATAC-seq/ATAC-seq data or use scRNA-seq/RNA-seq data alone to construct modularized regulatory networks. [WGCNA](https://horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/) is an optional method that can generate the input. However, WGCNA only can construct regulatory networks through bulk RNA-seq data.
 
-```{r warning=FALSE}
+```{r warning=FALSE,message=FALSE}
 ### load test data
 load(system.file("extdata", "gene_network.rda", package = "CACIMAR"))
 ### identify evolution-conserved regulatory networks
@@ -254,7 +218,7 @@ Heatmap_Cor(ConservedNetworks[[2]],cluster_cols=F, cluster_rows=F,Color1 = c(rgb
 ```
 
 
-# 6.Identify evolution-conserved cell-cell communications (CCC)
+# 5.Identify conserved intercellular interactions (cell-cell interaction)
 In this part, CACIMAR identify evolution-conserved CCC based on CCC at level of ligands/receptors from [cellchat](http://www.cellchat.org/). CCC fulfill the following criteria will be considered as evolution-conserved CCC: (I) interactions between ligands and receptors are consistent (consistent interaction is defined in part 5); (II) cell type of ligand and cell type of receptor in species 1 should be the same as cell type of ligand and cell type of receptor in species2 respectively
 
 ## Inputs data of this part
@@ -310,60 +274,19 @@ zf.ccc.score <- read.delim("F:/platform/cci/zf_conserved_ccc_score.txt")
 df=read.delim('F:\\platform\\cci/mm_conserved_ccc_score.txt')
 print(df)
 ```
-
 Then, we visualize the result
-```r
+```{r warning=FALSE}
 ### visualize mm conserved ccc
-library(reshape2)
 mm.ccc.plot=dcast(mm.ccc.score[,3:5],sp1source~sp1target,sum,value.var = 'prob')
 rownames(mm.ccc.plot)=mm.ccc.plot[,1]
-```
-
-```r
-# long table of mm
-mm_long_df <- melt(mm.ccc.plot, id.vars = "sp1source", variable.name = "celltype2", value.name = "probility")
-colnames(mm_long_df)[1] <- "celltype1"
-mm_long_df$scale.probility <- scale(mm_long_df$probility, center = F)
-mm_long_df$score <- mm_long_df$scale.probility * 10
-mm_long_df <- mm_long_df[!mm_long_df$score == 0, ]
-mm_long_df <- na.omit(mm_long_df)
-mm_long_df$celltype1 <- droplevels(mm_long_df$celltype1)
-
-# colors
-mm_colors <- c(rgb(247/255,147/255,30/255), rgb(248/255,115/255,106/255), rgb(157/255,115/255,194/255), rgb(183/255,76/255,171/255), rgb(230/255,134/255,201/255), rgb(140/255,198/255,63/255), rgb(255/255,191/255,15/255), 
-            rgb(103/255,199/255,193/255), rgb(3/255,161/255,198/255), rgb(129/255,70/255,58/255), rgb(0/255,114/255,189/255))
-names(mm_colors) <- levels(mm_long_df$celltype1)
-
-# Celltype Communication Plot for mm
-Plot_Celltype.Communication(mm_long_df, sendercolumn = "celltype1", receivercolumn = "celltype2", widthcolumn = "score", useLabels = T, colors = mm_colors, nodeSize = 10, vertex.label.color = "black", vertex.label.cex = 1.2) 
-```
-![Mm celltypes communication](CACIMAR_tutorial_files/figure-html/Mm_CCC-plot_graph_network.png)
-
-```r
+mm.ccc.plot=mm.ccc.plot[,2:ncol(mm.ccc.plot)]
+Heatmap_Cor(mm.ccc.plot,cluster_cols=F, cluster_rows=F,Color1 = c(rgb(102/255,46/255,115/255),rgb(31/255,153/255,139/255),rgb(251/255,232/255,48/255)))
 ### visualize zf conserved ccc
 zf.ccc.plot=dcast(zf.ccc.score[,3:5],sp2source~sp2target,sum,value.var = 'prob')
 rownames(zf.ccc.plot)=zf.ccc.plot[,1]
+zf.ccc.plot=zf.ccc.plot[,2:ncol(zf.ccc.plot)]
+Heatmap_Cor(zf.ccc.plot,cluster_cols=F, cluster_rows=F,Color1 = c(rgb(102/255,46/255,115/255),rgb(31/255,153/255,139/255),rgb(251/255,232/255,48/255)))
 ```
-
-```r
-# long table of Zf
-zf_long_df <- melt(zf.ccc.plot, id.vars = "sp2source", variable.name = "celltype2", value.name = "probility")
-colnames(zf_long_df)[1] <- "celltype1"
-zf_long_df$scale.probility <- scale(zf_long_df$probility, center = F)
-zf_long_df$score <- zf_long_df$scale.probility * 10
-zf_long_df <- zf_long_df[!zf_long_df$score == 0, ]
-mm_long_df <- na.omit(mm_long_df)
-zf_long_df$celltype1 <- droplevels(zf_long_df$celltype1)
-
-# colors
-zf_colors <- c(rgb(247/255,147/255,30/255), rgb(248/255,115/255,106/255), rgb(157/255,115/255,194/255), rgb(183/255,76/255,171/255), rgb(230/255,134/255,201/255), rgb(140/255,198/255,63/255), rgb(255/255,191/255,15/255),
-            rgb(103/255,199/255,193/255), rgb(3/255,161/255,198/255), rgb(129/255,70/255,58/255), rgb(0/255,114/255,189/255))
-names(zf_colors) <- levels(zf_long_df$celltype1)
-
-# Celltype Communication Plot for Zf
-Plot_Celltype.Communication(zf_long_df, sendercolumn = "celltype1", receivercolumn = "celltype2", widthcolumn = "score", useLabels = T, colors = zf_colors, nodeSize = 10, vertex.label.color = "black", vertex.label.cex = 1.2)
-```
-![Zf celltypes communication](CACIMAR_tutorial_files/figure-html/Zf_CCC-plot_graph_network.png)
 
 
 

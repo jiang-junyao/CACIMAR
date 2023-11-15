@@ -27,9 +27,7 @@ knitr::opts_chunk$set(
 * **Comparative analysis of regulatory networks in evolutionally conserved cell types**
 
 
-
-![](Readme figure/Workflow.png){ width=75% height=75% }
-
+![](Readme figure/Workflow.png){ width=70% height=70% }
 
 ## Installation
 

@@ -3,17 +3,17 @@
 
 # CACIMAR: cross-species analysis of cell identities, markers and regulations using single-cell sequencing profiles
 
-- **Identify cell types using known markers in each species**
+CACIMAR has the following 4 main functions:
 
 - **Identify all cell-type specific markers in each species**
 
 - **Identify species-specific or evolutionally conserved markers**
 
-- **Identify cross-species cell types using evolutionally conserved
-  markers**
+- **Identify conserved intracellular regulations (gene regulatory
+  networks)**
 
-- **Comparative analysis of regulatory networks in evolutionally
-  conserved cell types**
+- **Identify conserved intercellular interactions (cell-cell
+  communications)**
 
 <img src="Readme%20figure/Workflow.png"
 style="width:70.0%;height:70.0%" />

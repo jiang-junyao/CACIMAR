@@ -72,8 +72,8 @@ Identify_ConservedMarkers <- function(OrthG,Species1_Marker_table,Species2_Marke
     Type1 <- paste0('Used_',Species_name[1],'_Symbol')
     Type2 <- paste0('Used_',Species_name[2],'_Symbol')
   }
-  Species1 <- Species1_Marker[match(Exp2[, Type1],Species1_Marker[,1]), ]
-  Species2 <- Species2_Marker[match(Exp2[, Type2],Species2_Marker[,1]), ]
+  Species1 <- Species1_Marker[match(Exp2[, Type1],Species1_Marker[,paste0(Species_name[1],'gene')]), ]
+  Species2 <- Species2_Marker[match(Exp2[, Type2],Species2_Marker[,paste0(Species_name[2],'gene')]), ]
   Exp3 <- cbind(Exp2, Species1, Species2)
   Exp4 <- Exp3[!is.na(Exp3[, dim(Exp2)[2]+1]) & !is.na(Exp3[,dim(Exp2)[2]+dim(Species1)[2]+1]), ]
   if (nrow(Exp4)==0) {
@@ -81,8 +81,8 @@ Identify_ConservedMarkers <- function(OrthG,Species1_Marker_table,Species2_Marke
   }
   if (filter_marker) {
       Exp5 <- cbind(Exp4[,1:7], Species12[match(Exp4[,Type1],
-                                            Species12[,1]), ],
-                Species22[match(Exp4[,Type2], Species22[,1]), ])
+                                            Species12[,paste0(Species_name[1],'gene')]), ],
+                Species22[match(Exp4[,Type2], Species22[,paste0(Species_name[2],'gene')]), ])
       Exp6 <- Refine_Used_OrthG(Exp5,Species_name,match_cell_name)
       return(Exp6)
   }else{

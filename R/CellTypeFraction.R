@@ -104,6 +104,7 @@ Identify_ConservedCellTypes <- function(OrthG,Species1_Marker_table,Species2_Mar
   Frac3[Frac3==1] <- NA
   ShMarker4[[2]] <- Frac3
   ShMarker4[[3]] <- Frac1
+
   return(ShMarker4)
 }
 
@@ -203,4 +204,34 @@ Cal_SharedMarkers_Species <- function(mmExp1, zfExp1, mmExpInd1, zfExpInd1, Spec
   ShMarker2 <- list(); ShMarker2[[1]] <- ShMarker1; ShMarker2[[2]] <- Fraction3; ShMarker2[[3]] <- Fraction4;
 
   return(ShMarker2)
+}
+
+
+
+#' Identify conserved pair
+#'
+#' @param conserved_score conserved celltype/GRN score
+#' @param quantile_threshold numeric, indicating
+#'
+#' @return
+#' @export
+#'
+#' @examples
+identify_conserved_pair <- function(conserved_score,
+                                        quantile_threshold = 0.75){
+  all_value = as.vector(conserved_score)
+  all_value = all_value[all_value!=0]
+  non_zero_median = quantile(all_value,quantile_threshold)
+
+  conserved_celltype = c()
+  for (i in 1:nrow(conserved_score)) {
+    match_idx = which(conserved_score[i,]==max(conserved_score[i,]))
+    score = conserved_score[i,match_idx]
+    if (score > non_zero_median) {
+      conserved_celltype = c(conserved_celltype,
+                             paste0(rownames(conserved_score)[i],'-',
+                                    colnames(conserved_score)[match_idx]))
+    }
+  }
+  return(conserved_celltype)
 }

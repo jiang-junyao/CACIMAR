@@ -254,7 +254,9 @@ check_orthg_NT1 <- function(db,gene1,gene2,db_idx){
 
 check_orthg_NTN <- function(db,gene1,gene2,db_idx){
   querry = unlist(strsplit(db[db_idx[1]],';'))
+  querry = unlist(strsplit(querry,'，'))
   target = unlist(strsplit(db[db_idx[2]],';'))
+  target = unlist(strsplit(target,'，'))
   if (gene1 %in% querry) {
     if (gene2 %in% target) {
       return(1)

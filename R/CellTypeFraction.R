@@ -225,13 +225,17 @@ identify_conserved_pair <- function(conserved_score,
 
   conserved_celltype = c()
   for (i in 1:nrow(conserved_score)) {
-    match_idx = which(conserved_score[i,]==max(conserved_score[i,]))
-    score = conserved_score[i,match_idx]
-    if (score > non_zero_median) {
-      conserved_celltype = c(conserved_celltype,
-                             paste0(rownames(conserved_score)[i],'-',
-                                    colnames(conserved_score)[match_idx]))
+    if (sum(conserved_score[i,])>0) {
+      match_idx = which(conserved_score[i,]==max(conserved_score[i,]))
+      mutual_idx = which(conserved_score[,match_idx]==max(conserved_score[,match_idx]))
+      score = conserved_score[i,match_idx]
+      if (score > non_zero_median & mutual_idx==i) {
+        conserved_celltype = c(conserved_celltype,
+                               paste0(rownames(conserved_score)[i],'-',
+                                      colnames(conserved_score)[match_idx]))
+      }
     }
+
   }
   return(conserved_celltype)
 }

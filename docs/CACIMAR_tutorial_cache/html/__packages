@@ -1,3 +1,16 @@
 Seurat
 SeuratObject
 CACIMAR
+sp
+tidyverse
+ggplot2
+tibble
+tidyr
+readr
+purrr
+dplyr
+stringr
+forcats
+lubridate
+ggtree
+reshape2

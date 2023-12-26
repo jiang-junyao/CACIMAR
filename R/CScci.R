@@ -1,5 +1,92 @@
 
-#' Identify conserved cell-cell interactions in conserved cell types
+#' Title
+#'
+#' @param OrthG ortholog genes database
+#' @param sp1_ccc cell-cell interactions in species1. First column should
+#' be ligand, second column should be target, third column should be corresponding
+#' cell type of ligand, fourth column should be corresponding cel type of target,
+#' fifth column should be weight of ligand-receptor interaction
+#' @param sp2_ccc cell-cell interactions in species2. First column should
+#' be ligand, second column should be target, third column should be corresponding
+#' cell type of ligand, fourth column should be corresponding cel type of target,
+#' fifth column should be weight of ligand-receptor interaction
+#' @param Species_name1 character, indicating the species names of Species1_GRN
+#' @param Species_name2 character, indicating the species names of Species2_GRN
+#'
+#' @return
+#' @export
+#'
+#' @examples
+Identify_Conserved_CCI <- function(OrthG,sp1_ccc,sp2_ccc,Species_name1,
+                                   Species_name2){
+  ### identify conserved CCC
+  OrthG = OrthG_Mm_Zf
+  ConservedCCI <- Identify_Conserved_LR(OrthG,sp1_ccc,sp2_ccc,
+                                        Species_name1=Species_name1,
+                                        Species_name2=Species_name2)
+  sp1_con_ccc=ConservedCCI[["sp1_orthg_ccc_df"]]
+  sp1_con_ccc$lr = paste0(sp1_con_ccc[,1],'-',sp1_con_ccc[,2],'-',
+                          sp1_con_ccc[,3],'-',sp1_con_ccc[,4])
+  sp1_con_ccc = sp1_con_ccc[!duplicated(sp1_con_ccc$lr),]
+  sp2_con_ccc=ConservedCCI[["sp2_orthg_ccc_df"]]
+  sp2_con_ccc$lr = paste0(sp2_con_ccc[,1],'-',sp2_con_ccc[,2],'-',
+                          sp2_con_ccc[,3],'-',sp2_con_ccc[,4])
+  sp2_con_ccc = sp2_con_ccc[!duplicated(sp2_con_ccc$lr),]
+
+  sp1_con_ccc$idx = paste0(sp1_con_ccc[,3],'-',sp1_con_ccc[,4])
+  sp1_con_ccc = sp1_con_ccc[order(sp1_con_ccc$idx),]
+
+  sp2_con_ccc$idx = paste0(sp2_con_ccc[,3],'-',sp2_con_ccc[,4])
+  sp2_con_ccc = sp2_con_ccc[order(sp2_con_ccc$idx),]
+  ### sigr
+
+  sp1_ccc$lr = paste0(sp1_ccc[,1],'-',sp1_ccc[,2],'-',sp1_ccc[,3],'-',sp1_ccc[,4])
+  sp2_ccc$lr = paste0(sp2_ccc[,1],'-',sp2_ccc[,2],'-',sp2_ccc[,3],'-',sp2_ccc[,4])
+  sp1_ccc$prob = sp1_ccc[,5]
+  sp2_ccc$prob = sp2_ccc[,5]
+  sp2_con_ccc$prob = sp2_ccc[match(sp2_con_ccc$lr,sp2_ccc$lr),]$prob
+  sp1_con_ccc$prob = sp1_ccc[match(sp1_con_ccc$lr,sp1_ccc$lr),]$prob
+  sp1_ccc$idx = paste0(sp1_ccc[,3],'-',sp1_ccc[,4])
+  sp2_ccc$idx = paste0(sp2_ccc[,3],'-',sp2_ccc[,4])
+  ### lr score
+  con_num = c()
+  all_sp1_num = c()
+  all_sp2_num = c()
+  con_weight = c()
+  all_sp1_weight = c()
+  all_sp2_weight = c()
+
+  for (i in unique(sp1_con_ccc$idx)) {
+    mm_con_use = sp1_con_ccc[sp1_con_ccc$idx==i,]
+    zf_con_use = sp2_con_ccc[sp2_con_ccc$idx==i,]
+    sp1_ccc.use = sp1_ccc[sp1_ccc$idx==i,]
+    sp2_ccc.use = sp2_ccc[sp2_ccc$idx==i,]
+    con_num = c(con_num,nrow(mm_con_use)+nrow(zf_con_use))
+    con_weight =c(con_weight,sum(mm_con_use$prob)+sum(zf_con_use$prob))
+    all_sp1_num = c(all_sp1_num,nrow(sp1_ccc.use))
+    all_sp2_num = c(all_sp2_num,nrow(sp2_ccc.use))
+    all_sp1_weight = c(all_sp1_weight,sum(sp1_ccc.use$prob))
+    all_sp2_weight = c(all_sp2_weight,sum(sp2_ccc.use$prob))
+
+  }
+  con_ccc_score = data.frame(unique(sp1_con_ccc$idx),con_weight,con_num,
+                             all_sp1_weight,all_sp2_weight,
+                             all_sp1_num,all_sp2_num)
+  con_ccc_score$score_num = con_ccc_score$con_num/(con_ccc_score$all_sp1_num+con_ccc_score$all_sp2_num)
+  con_ccc_score$score_weight = con_ccc_score$con_weight/(con_ccc_score$all_sp1_weight+con_ccc_score$all_sp2_weight)
+  con_ccc_score = cbind(t(as.data.frame(strsplit(con_ccc_score[,1],'-'))),con_ccc_score[,-1])
+  colnames(con_ccc_score)[1:2] = c('Source','Target')
+
+  score_weight = reshape2::dcast(con_ccc_score[,c(1,2,10)],Source~Target,fill = 0)
+  rownames(score_weight) = score_weight[,1]
+  score_weight = score_weight[,-1]
+  CCI_result = list(ConservedCCI,con_ccc_score,score_weight)
+  names(CCI_result) = c('Conserved_ligand_receptor',
+                        'Conserved_interaction_summary',
+                        'Conserved_CCI_score')
+  return(CCI_result)
+}
+#' Identify conserved ligand receptor interaction
 #' @description Identify conserved cell-cell interactions in conserved cell types
 #' @param OrthG ortholog genes database
 #' @param Species1_CCI cell-cell interactions in species1. First column should
@@ -18,7 +105,7 @@
 #'
 #' @examples load(system.file("extdata", "cci_test.rda", package = "CACIMAR"))
 #' Identify_ConservedCCI(OrthG_Hs_Mm,hs_cci_test,mm_cci_test,celltype,'hs','mm')
-Identify_ConservedCCI <- function(OrthG,
+Identify_Conserved_LR <- function(OrthG,
                                   Species1_CCI,
                                   Species2_CCI,
                                   ConservedCellType=NULL,

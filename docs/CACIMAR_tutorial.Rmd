@@ -116,8 +116,8 @@ Heatmap_Cor(SNT_h,cluster_cols=F, cluster_rows=F,Color1 = c(rgb(102/255,46/255,1
 conserved_hm_celltypes <- get_conserved_hm_celltypes(SNT_h)
 ### generate a phylogenetic tree
 p <- Plot_phylogenetic_tree(SCT_matrix = SCT_matrix,
-                       tree_method = "hierarchical clustering", 
-                       species.vector = species.vector,
+                       tree_method = "hierarchical clustering",
+                       species.vector = species.vector, 
                        conserved_hm_celltype = conserved_hm_celltypes,
                        colors_labels = c("Mouse", "Zebrafish")) 
 ```
@@ -202,6 +202,8 @@ ConservedNetworks_ct <- identify_ct_ConservedNetworks(OrthG, Species1_GRN, Speci
 Heatmap_Cor(ConservedNetworks_ct[[2]], cluster_cols=F, cluster_rows=F, Color1 = c(rgb(102/255,46/255,115/255), rgb(31/255,153/255,139/255), rgb(251/255,232/255,48/255)))
 ```
 
+![CSRN of cell type-specific regulatory networks](CACIMAR_tutorial_files/figure-html/cell_type_network_NCS_top_regulations_300.png)
+
 ## (3) Modularized regulatory networks analysis
   Modular regulatory networks used here are constructed by R package [IReNA](https://github.com/jiang-junyao/IReNA), which can integrate scRNA-seq and scATAC-seq/ATAC-seq data or use scRNA-seq/RNA-seq data alone to construct modularized regulatory networks. [WGCNA](https://horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/) is an optional method that can generate the input. However, WGCNA only can construct regulatory networks through bulk RNA-seq data.
 
@@ -210,14 +212,15 @@ ConservedNetworks <- Identify_ConservedNetworks(OrthG, mm_gene_network, zf_gene_
 Heatmap_Cor(ConservedNetworks[[2]], cluster_cols=F, cluster_rows=F, Color1 = c(rgb(102/255,46/255,115/255), rgb(31/255,153/255,139/255), rgb(251/255,232/255,48/255)))
 ```
 
+![CSRN of modularized regulatory networks](CACIMAR_tutorial_files/figure-html/NCS_module.png)
 
 # 5.Identify conserved intercellular interactions (cell-cell interaction)
-  CACIMAR identifies evolutionarily conserved cell-cell interactions (CCI) based on the level of ligands and receptors using the SingleCellSignalR algorithm from [liana](https://saezlab.github.io/liana/). CCI that fulfill the following criteria will be considered as evolutionarily conserved: (I) the interactions between ligands and receptors are consistent; (II) the cell type of the ligand and receptor in species 1 should match the cell type of the ligand and receptor in species 2, respectively.
+  CACIMAR identifies evolutionarily conserved cell-cell interactions (CCI) based on the level of ligands and receptors using the SingleCellSignalR algorithm from [liana](https://saezlab.github.io/liana/). CCI that fulfill the following criteria will be considered as evolutionarily conserved: (I) the interactions between ligands and receptors are consistent; (II) the cell type of the ligand and receptor in species 1 should match the cell type of the ligand and receptor in species 2, respectively. Then, we calculate the proportion of consistent intercellular interactions to measure the conservation score for intercellular interactions (CSII). 
 
 ## (1) Inputs data of this part
 - ***seurat object***
-```{r}
-# load(system.file("extdata", "cci_test.rda", package = "CACIMAR"))
+```{r, eval=FALSE}
+# load(system.file("extdata", "Mm_Zf_seurat_object.Rda", package = "CACIMAR"))
 ```
 
 - ***Homologous gene database***
@@ -225,58 +228,108 @@ Heatmap_Cor(ConservedNetworks[[2]], cluster_cols=F, cluster_rows=F, Color1 = c(r
 OrthG <- OrthG_Mm_Zf
 ```
 
-## (2) cell-cell interaction analysis with SingleCellSignalR algorithm through liana
+## (2) perform cell-cell interaction analysis with SingleCellSignalR algorithm 
 ```{r, eval=FALSE}
 # Mouse analysis
 SingleCellSignalR_mouse_result <- perform_CCI_analysis(seurat_obj=Mm_seurat, target_organism=10090)
 # Zebrafish analysis
 SingleCellSignalR_zebrafish_result <- perform_CCI_analysis(seurat_obj=Zf_seurat, target_organism=7955)
+# filter interactions with LRscore > 0.5
+SingleCellSignalR_mouse_result2 <- subset(SingleCellSignalR_mouse_result, LRscore > 0.5)
+SingleCellSignalR_zebrafish_result2 <- subset(SingleCellSignalR_zebrafish_result, LRscore > 0.5)
 ```
 
-## (3) identified the evolutionarily conserved cell-cell interactions (CCI)
-
-
-## Example
-Example dataset (mm_ccc.rds & zf_ccc.rds) can be download from [onedrive](https://westlakeu-my.sharepoint.com/:f:/g/personal/jiangjunyao_westlake_edu_cn/ElAKLi2XcIVHp8QV97hMRyQBI2mu_MQcb9zDGfd6TML_QQ?e=bfmhtC)
-```r
-### load test data
-mm_ccc <- readRDS('mm_ccc.rds')
-zf_ccc <- readRDS('zf_ccc.rds')
-### extract signalings dataframe
-mm.net <- subsetCommunication(mm_ccc)
-zf.net <- subsetCommunication(zf_ccc)
-mm.input <- mm.net[,c(3,4,1,2)]
-zf.input <- zf.net[,c(3,4,1,2)]
-### identify conserved CCC
-ConservedCCI <- Identify_ConservedCCI(OrthG,mm.input,zf.input,
-                      Species_name1='mm',Species_name2='zf')
-### add interactions probability from cellchat
-mm.ccc.score = add_cellchat_prob(ConservedCCI[[1]],mm.net)
-zf.ccc.score = add_cellchat_prob(ConservedCCI[[2]],zf.net)
-print(mm.ccc.score)
-```
-```{r echo=FALSE, eval=FALSE}
-### load test data
-mm.ccc.score <- read.delim("F:/platform/cci/mm_conserved_ccc_score.txt")
-zf.ccc.score <- read.delim("F:/platform/cci/zf_conserved_ccc_score.txt")
-df=read.delim('F:\\platform\\cci/mm_conserved_ccc_score.txt')
-print(df)
-```
-Then, we visualize the result
-```{r warning=FALSE, eval=FALSE}
-### visualize mm conserved ccc
-mm.ccc.plot=dcast(mm.ccc.score[,3:5],sp1source~sp1target,sum,value.var = 'prob')
-rownames(mm.ccc.plot)=mm.ccc.plot[,1]
-mm.ccc.plot=mm.ccc.plot[,2:ncol(mm.ccc.plot)]
-Heatmap_Cor(mm.ccc.plot,cluster_cols=F, cluster_rows=F,Color1 = c(rgb(102/255,46/255,115/255),rgb(31/255,153/255,139/255),rgb(251/255,232/255,48/255)))
-### visualize zf conserved ccc
-zf.ccc.plot=dcast(zf.ccc.score[,3:5],sp2source~sp2target,sum,value.var = 'prob')
-rownames(zf.ccc.plot)=zf.ccc.plot[,1]
-zf.ccc.plot=zf.ccc.plot[,2:ncol(zf.ccc.plot)]
-Heatmap_Cor(zf.ccc.plot,cluster_cols=F, cluster_rows=F,Color1 = c(rgb(102/255,46/255,115/255),rgb(31/255,153/255,139/255),rgb(251/255,232/255,48/255)))
+## (3) overall cell-cell interactions profile across two species
+ Here, we summarize the weight of all interactions within each pair of cell types and display the profile with a sankey plot. The left side represents the source of ligands in mouse, the right side represents the source of ligands in zebrafish, and the middle represents all the target receptors shared by both species.
+ 
+```{r, eval=FALSE}
+# sum Weights of each cell types
+all_weight_df_long <- calculate_Weights(species1_cci = SingleCellSignalR_mouse_result2,
+                                        species2_cci = SingleCellSignalR_zebrafish_result2)
+# used self-defined colors
+colors_file = "/data2/jinlianli/CACIMAR/git/Tree3_3/zf_mm_colors.txt"
+colors <- read.table(colors_file)
+# sankey plot will be saved in current directory by default
+# If the colors_file is set to NULL, the colors will be automatically assigned.
+create_sankey(links = all_weight_df_long[, c("Source2", "target", "scale_weight")],
+              output_file = "sankey_scale_weight.html",
+              specie_name1 = "Mm",
+              specie_name2 = "Zf",
+              colors_file = "/data2/jinlianli/CACIMAR/git/Tree3_3/zf_mm_colors.txt"
+)
 ```
 
+![cell-cell interaction weight profile across species](CACIMAR_tutorial_files/figure-html/sankey_scale_weight.html_github1.png)
+```{r, eval=FALSE}
+# show the weight result
+head(all_weight_df_long)
+            source       target    weight species scale_weight             Source            Source2
+1     Activated MG Activated MG 152.07967      Mm  0.008256281     MmActivated MG     MmActivated MG
+2       Astrocytes Activated MG 230.97254      Mm  0.012539310       MmAstrocytes       MmAstrocytes
+3            Cones Activated MG  51.89929      Mm  0.002817570            MmCones            MmCones
+4     GABAergic AC Activated MG  99.92955      Mm  0.005425093     MmGABAergic AC     MmGABAergic AC
+5   Glycinergic AC Activated MG  78.95619      Mm  0.004286467   MmGlycinergic AC   MmGlycinergic AC
+6 Horizontal cells Activated MG 106.23687      Mm  0.005767513 MmHorizontal cells MmHorizontal cells
 
+# show the colors dataframe which was used
+head(colors)
+  colors     celltype
+1 #F7931E   Resting MG
+2 #F8736A Activated MG
+3 #A9A9A9         Rods
+4 #96CEB4       Rod BC
+5 #A3A500   ON cone BC
+6 #C0C130  OFF cone BC
+```
+
+## (4) identified the evolutionarily conserved cell-cell interactions (CCI)
+```{r, eval=FALSE}
+## caculate the conservation score for intercellular interactions(CSII)
+
+#########
+######### continue this part! #########
+#########
+
+
+
+# load the test data
+load(system.file("extdata", "CCC_conserved_sumary.rda", package = "CACIMAR"))
+
+head(CCC_conserved_sumary)
+# Source           Target con_weight con_num all_sp1_weight all_sp2_weight all_sp1_num all_sp2_num  score_num score_weight
+# 1 Activated MG     Activated MG   9.872400      12      152.07967      12.666744         210          15 0.05333333   0.05992482
+# 2 Activated MG            Cones   6.548038       8       32.33672      10.590558          44          13 0.14035088   0.15253794
+# 3 Activated MG     GABAergic AC   6.693321       8       48.67964       5.077178          67           6 0.10958904   0.12451109
+# 4 Activated MG   Glycinergic AC   6.536769       8       54.39586       6.566076          78           8 0.09302326   0.10722706
+# 5 Activated MG Horizontal cells   8.007969      10      116.21857       7.431489         164           9 0.05780347   0.06476316
+# 6 Activated MG        Microglia  13.821581      18      147.82271      18.743382         206          23 0.07860262   0.08297956
+
+## ChordDiagram shows the CSII 
+# data for ChordDiagram
+cci_data <- CCC_conserved_sumary[, c("Source", "Target", "score_weight")]
+
+# colors for ChordDiagram
+# if you don't want to make colors for ChordDiagram, just set grid.col = NULL
+colors <- c(rgb(247/255,147/255,30/255), rgb(248/255,115/255,106/255), rgb(169/255,169/255,169/255),
+            rgb(150/255,206/255,180/255), rgb(163/255,165/255,0/255), rgb(192/255,193/255,48/255),
+            rgb(157/255,115/255,194/255), rgb(183/255,76/255,171/255), rgb(230/255,134/255,201/255),
+            rgb(140/255,198/255,63/255), rgb(255/255,191/255,15/255), rgb(103/255,199/255,193/255),
+            rgb(3/255,161/255,198/255), rgb(97/255,156/255,255/255), rgb(129/255,70/255,58/255),
+            rgb(0/255,114/255,189/255), rgb(74/255,76/255,191/255))
+grid.col_name <- c("Resting MG", "Activated MG", "Rods", "Rod BC", "ON cone BC", "OFF cone BC", "GABAergic AC", "Glycinergic AC", "Cones", "RGC", "Microglia", "V/E cells", "Horizontal cells", "Astrocytes", "RPE", "Pericytes", "Reticulocytes")
+names(colors) <- grid.col_name
+grid.col <- colors[c(unique(cci_data$Source), unique(cci_data$Target))]
+
+# plot ChordDiagram
+ChordDiagram(net = cci_data,
+             grid.col = grid.col,
+             order_grid = grid.col_name,
+             filename = "chordDiagram_cutoff0.75.pdf",
+             link_colors_threshold = 0.75
+)
+```
+
+![conservation score for intercellular interactions](CACIMAR_tutorial_files/figure-html/chordDiagram_cutoff0.75.png)
 
 # Build homologous gene database
   Under the situation that homologous gene database of your interested species is not included in our package, CACIMAR provides to build your own homologous gene database according to MGI database. 
@@ -315,9 +368,6 @@ Species_name1 <- 'cf'
 Species_name2 <- 'mm'
 OrthG_Cf_Mm <- buildHomDatabase(HOM, Species_name1, Species_name2)
 ```
-
-
-
 
 
 

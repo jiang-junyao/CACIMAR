@@ -10,21 +10,25 @@ Plot_phylogenetic_tree(
   hcluster.method = "average",
   species.vector,
   layout.tree = "rectangular",
+  tree_size = 1.4,
   xlim_tree = 0.65,
+  fontface_for_tiplab = TRUE,
+  set_fontface_for_tiplab = c("bold.italic", "italic", "plain"),
   conserved_hm_celltype = NULL,
-  bar_width = 0.021,
+  bar_width = 0.025,
   Show_Pairwise_distances = FALSE,
   boot_times = 100,
   offset = 0.04,
   offset2 = 0.022,
   offset_tiplab = 0.07,
-  fontface_tiplab = "bold",
+  fontface_tiplab_with_colors = "bold",
   tiplab.size = 7,
   tiplab_cols = NULL,
   tippoint.shape = 21,
   tippoint.shape.size = 0,
   geom_nodepoint = 5,
   annotation_colors_df = NULL,
+  brewer_pal_used = "Set3",
   col.value = c(rgb(102/255, 46/255, 115/255), rgb(31/255, 153/255, 139/255)),
   colors_labels = NULL,
   show_colnames = FALSE,
@@ -53,7 +57,13 @@ Plot_phylogenetic_tree(
 
 \item{layout.tree}{character, method used for the layout of the tree. it can be one of 'rectangular', 'dendrogram', 'fan', 'circular'}
 
+\item{tree_size}{numeric, size of the tree's branch}
+
 \item{xlim_tree}{numeric, x limit for the picture, used for the width of the picture}
+
+\item{fontface_for_tiplab}{logical, whether used fontface for tip label. If it is TRUE, then the tiplab_cols for tip label won't work}
+
+\item{set_fontface_for_tiplab}{if fontface_for_tiplab is TRUE, the parameter will work. By default, it is set with c("bold.italic", "italic", "plain")}
 
 \item{conserved_hm_celltype}{vector, contain the conserved cell types in heatmap, or celltypes defined by yourself}
 
@@ -69,7 +79,7 @@ Plot_phylogenetic_tree(
 
 \item{offset_tiplab}{numeric, the distance of labels from tip}
 
-\item{fontface_tiplab}{charcter, the fontface used for tip label}
+\item{fontface_tiplab_with_colors}{charcter, colors for tip label. if fontface_for_tiplab is FALSE, then can set one fontface for all tip labels, like "bold", "italic", "plain"}
 
 \item{tiplab.size}{numeric, the size of tip labels}
 
@@ -82,6 +92,8 @@ Plot_phylogenetic_tree(
 \item{geom_nodepoint}{integer, the size of the node point}
 
 \item{annotation_colors_df}{dataframe, must contain two column, named "colors" and "celltype", default is null}
+
+\item{brewer_pal_used}{character, the brewer_pal in RColorBrewer, like "Set1",  "Set3", "Paired". It set colors for tip label. It works when fontface_for_tiplab is FALSE}
 
 \item{col.value}{chacterize vector, colors used for species bar annotation, must be the same length of the number of species}
 
@@ -112,6 +124,8 @@ Plot_phylogenetic_tree(
 \item{plot.margin}{the plot margin, it should be something like margin(10, 10, 10, -10), the four number represent top, right, bottom, left, respectively}
 
 \item{legend.position}{character, one of "right", "left", "top", "bottom", the position of the legend}
+
+\item{fontface_tiplab}{charcter, the fontface used for tip label}
 }
 \value{
 save plot in present file directory
@@ -120,7 +134,6 @@ save plot in present file directory
 Build a phylogenetic tree to identify the conservation of the cell types across species
 }
 \examples{
-setwd("/data2/jinlianli/CACIMAR/git/Tree4_2/")
 library(CACIMAR, lib.loc = "/usr/local/lib/R/site-library")
 load(system.file("extdata", "zf_mm_markers.rda", package = "CACIMAR"))
 expression <- CACIMAR::Identify_ConservedCellTypes(OrthG_Mm_Zf,Zf_marker,Mm_marker,'zf','mm')
@@ -131,23 +144,7 @@ species.vector <- substr(rownames(SCT_matrix), 1, 2)
 SNT_h <- SCT_matrix[grep('mm',rownames(SCT_matrix)),as.numeric(grep('zf',colnames(SCT_matrix)))]
 conserved_hm_celltypes <- get_conserved_hm_celltypes(SNT_h)
 Plot_phylogenetic_tree(SCT_matrix = SCT_matrix,
-                       tree_method = "hierarchical clustering",
                        species.vector = species.vector,
-                       hcluster.method = "average",
-                       geom_nodepoint = 5,
-                       layout.tree = "rectangular",
-                       conserved_hm_celltype = conserved_hm_celltypes,
-                       tippoint.shape = 21,
-                       colors_labels = c("Mouse", "Zebrafish"), ####
-                       bar_width = .021,
-                       offset = 0.04,
-                       offset2 = 0.022,
-                       offset_tiplab = 0.07,
-                       tiplab_cols = NULL,
-                       tiplab.size = 7,
-                       legend.text_size = 18,
-                       width = 13,
-                       height = 22,
-                       plot.margin = margin(10, 10, 10, -10))
+                       conserved_hm_celltype = conserved_hm_celltypes)
 
 }

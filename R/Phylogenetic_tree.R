@@ -5,7 +5,10 @@
 #' @param hcluster.method character, method used for clustering phylogenetic tree, it can be one of "average", "single", "complete", "mcquitty", "median", "centroid"
 #' @param species.vector vector, length is equal to nrow(SCT_matrix), used for annotation bar
 #' @param layout.tree character, method used for the layout of the tree. it can be one of 'rectangular', 'dendrogram', 'fan', 'circular'
+#' @param tree_size numeric, size of the tree's branch
 #' @param xlim_tree numeric, x limit for the picture, used for the width of the picture
+#' @param fontface_for_tiplab logical, whether used fontface for tip label. If it is TRUE, then the tiplab_cols for tip label won't work
+#' @param set_fontface_for_tiplab if fontface_for_tiplab is TRUE, the parameter will work. By default, it is set with c("bold.italic", "italic", "plain")
 #' @param conserved_hm_celltype vector, contain the conserved cell types in heatmap, or celltypes defined by yourself
 #' @param bar_width integer, width of annotation bar
 #' @param Show_Pairwise_distances logical, whether save the plot of pairwise distances between input data and constructed tree or not
@@ -15,11 +18,13 @@
 #' @param offset_tiplab numeric, the distance of labels from tip
 #' @param fontface_tiplab charcter, the fontface used for tip label
 #' @param tiplab.size numeric, the size of tip labels
+#' @param fontface_tiplab_with_colors charcter, colors for tip label. if fontface_for_tiplab is FALSE, then can set one fontface for all tip labels, like "bold", "italic", "plain"
 #' @param tiplab_cols vector, colors for tip group
 #' @param tippoint.shape numeric, the shape used for tip point, such as 21, 17, 22, ......
 #' @param tippoint.shape.size numeric, the size of the tip point shape
 #' @param geom_nodepoint integer, the size of the node point
 #' @param annotation_colors_df dataframe, must contain two column, named "colors" and "celltype", default is null
+#' @param brewer_pal_used character, the brewer_pal in RColorBrewer, like "Set1",  "Set3", "Paired". It set colors for tip label. It works when fontface_for_tiplab is FALSE
 #' @param col.value chacterize vector, colors used for species bar annotation, must be the same length of the number of species
 #' @param colors_labels chacterize vector, labels for the legend, the length of colors_breaks
 #' @param show_colnames logical, whether show the colnames of annotation bar
@@ -40,7 +45,6 @@
 #' @export
 #'
 #' @examples
-#' setwd("/data2/jinlianli/CACIMAR/git/Tree4_2/")
 #' library(CACIMAR, lib.loc = "/usr/local/lib/R/site-library")
 #' load(system.file("extdata", "zf_mm_markers.rda", package = "CACIMAR"))
 #' expression <- CACIMAR::Identify_ConservedCellTypes(OrthG_Mm_Zf,Zf_marker,Mm_marker,'zf','mm')
@@ -51,24 +55,8 @@
 #' SNT_h <- SCT_matrix[grep('mm',rownames(SCT_matrix)),as.numeric(grep('zf',colnames(SCT_matrix)))]
 #' conserved_hm_celltypes <- get_conserved_hm_celltypes(SNT_h)
 #' Plot_phylogenetic_tree(SCT_matrix = SCT_matrix,
-#'                        tree_method = "hierarchical clustering",
 #'                        species.vector = species.vector,
-#'                        hcluster.method = "average",
-#'                        geom_nodepoint = 5,
-#'                        layout.tree = "rectangular",
-#'                        conserved_hm_celltype = conserved_hm_celltypes,
-#'                        tippoint.shape = 21,
-#'                        colors_labels = c("Mouse", "Zebrafish"), ####
-#'                        bar_width = .021,
-#'                        offset = 0.04,
-#'                        offset2 = 0.022,
-#'                        offset_tiplab = 0.07,
-#'                        tiplab_cols = NULL,
-#'                        tiplab.size = 7,
-#'                        legend.text_size = 18,
-#'                        width = 13,
-#'                        height = 22,
-#'                        plot.margin = margin(10, 10, 10, -10))
+#'                        conserved_hm_celltype = conserved_hm_celltypes)
 #'
 Plot_phylogenetic_tree <- function(
     SCT_matrix,
@@ -76,21 +64,25 @@ Plot_phylogenetic_tree <- function(
     hcluster.method = "average",
     species.vector,
     layout.tree = 'rectangular',
+    tree_size = 1.4,
     xlim_tree = 0.65,
+    fontface_for_tiplab = TRUE,
+    set_fontface_for_tiplab = c("bold.italic", "italic", "plain"),
     conserved_hm_celltype = NULL,
-    bar_width = .021,
+    bar_width = .025,
     Show_Pairwise_distances = FALSE,
     boot_times = 100,
     offset = 0.04,
     offset2 = 0.022,
     offset_tiplab = 0.07,
-    fontface_tiplab = "bold",
+    fontface_tiplab_with_colors = "bold",
     tiplab.size = 7,
     tiplab_cols = NULL,
     tippoint.shape = 21,
     tippoint.shape.size = 0,
     geom_nodepoint = 5,
     annotation_colors_df = NULL,
+    brewer_pal_used = "Set3",
     col.value = c(rgb(102/255,46/255,115/255), rgb(31/255,153/255,139/255)),
     colors_labels = NULL,
     show_colnames = FALSE,
@@ -190,13 +182,16 @@ Plot_phylogenetic_tree <- function(
   # Tree
   tree_plot <- Plot_Tree(tree,
                          layout.tree = layout.tree,
+                         tree_size = tree_size,
                          xlim_tree = xlim_tree,
+                         fontface_for_tiplab = fontface_for_tiplab,
+                         set_fontface_for_tiplab = set_fontface_for_tiplab,
                          conserved_hm_celltype = conserved_hm_celltype,
                          bar_width = bar_width,
                          offset = offset,
                          offset2 = offset2,
                          offset_tiplab = offset_tiplab,
-                         fontface_tiplab = fontface_tiplab,
+                         fontface_tiplab_with_colors = fontface_tiplab_with_colors,
                          tiplab.size = tiplab.size,
                          tiplab_cols = tiplab_cols,
                          tippoint.shape = tippoint.shape,
@@ -204,6 +199,7 @@ Plot_phylogenetic_tree <- function(
                          geom_nodepoint = geom_nodepoint,
                          col.value = col.value,
                          annotation_colors_df = annotation_colors_df,
+                         brewer_pal_used = brewer_pal_used,
                          colors_labels = colors_labels,
                          show_colnames = show_colnames,
                          colnames_angle = colnames_angle,
@@ -270,12 +266,16 @@ get_conserved_hm_celltypes <- function(data) {
 Plot_Tree <- function(
     tree,
     layout.tree,
+    tree_size,
     xlim_tree,
+    fontface_for_tiplab,
+    set_fontface_for_tiplab,
     conserved_hm_celltype,
     bar_width,
     geom_nodepoint,
     col.value, # species colors
     annotation_colors_df, # celltype colors df
+    brewer_pal_used,
     colors_labels, # 自定义显示标签的labels标签名
     show_colnames,
     colnames_angle,
@@ -290,7 +290,7 @@ Plot_Tree <- function(
     offset2,
     offset_tiplab,
     tiplab.size,
-    fontface_tiplab,
+    fontface_tiplab_with_colors,
     tiplab_cols,
     tippoint.shape,
     tippoint.shape.size,
@@ -302,7 +302,7 @@ Plot_Tree <- function(
   require(ggplot2)
   require(scales)
   # tree
-  tree.p <- ggtree::ggtree(tree, layout = layout.tree, size = 1.3, col = "black") + xlim(NA, xlim_tree) #text show
+  tree.p <- ggtree::ggtree(tree, layout = layout.tree, size = tree_size, col = "black") + xlim(NA, xlim_tree) #text show
   data <- fortify(tree)
   # annotation df
   tree.df <- data.frame("tip.label" = tree$tip.label)
@@ -320,8 +320,13 @@ Plot_Tree <- function(
   conserved_h_id <- as.vector(sapply(conserved_hm_celltype, function(x) grep(x, Tip1$label)))
   Tip1$Tip_group[conserved_h_id] <- "conserved"
   Tip1$Tip_group <- factor(Tip1$Tip_group, levels = c("conserved", "poorly_conserved", "not_conserved"))
-  Tip1$Node_group <- "not_conserved"
-  Tip1$Node_group[conserved_tree_node] <- "conserved"
+
+  if (fontface_for_tiplab) {
+    Tip1$fontface <- set_fontface_for_tiplab[3]
+    Tip1$fontface[which(Tip1$Tip_group == "poorly_conserved")] <- set_fontface_for_tiplab[2]
+    Tip1$fontface[which(Tip1$Tip_group == "conserved")] <- set_fontface_for_tiplab[1]
+    Tip1$fontface <- factor(Tip1$fontface, levels = set_fontface_for_tiplab)
+  }
 
   # show
   cat("The conservation of cell types are shown below:")
@@ -346,7 +351,7 @@ Plot_Tree <- function(
     species_prefix <- unique(substring(tree.df$tip.label, 1, 2))
     species_a_posible_celltypes <- paste0(species_prefix[1], no_species_prefix_celltypes_all)
     species_b_posible_celltypes <- paste0(species_prefix[2], no_species_prefix_celltypes_all)
-    species_a_posible_celltypes_col <- colorRampPalette(RColorBrewer::brewer.pal(11, "Set3"))(length(species_a_posible_celltypes))
+    species_a_posible_celltypes_col <- colorRampPalette(RColorBrewer::brewer.pal(11, brewer_pal_used))(length(species_a_posible_celltypes))
     colors_a <- c(species_a_posible_celltypes_col, species_a_posible_celltypes_col)
     colors_a <- setNames(colors_a, c(species_a_posible_celltypes, species_b_posible_celltypes))
   }
@@ -391,23 +396,39 @@ Plot_Tree <- function(
       breaks = rev(unique(tree.df2$species)),
       labels = colors_labels_used
     )
-  # tiplab
+  # colors3
   if (is_null(tiplab_cols) & length(unique(Tip1$Tip_group)) == 3) {
     tiplab_cols <- c("#003472","#4b5cc4", "#737373")
   } else  {
     tiplab_cols <-grDevices::colorRampPalette(c("#CC6666", "#9999CC", "#66CC99"))(length(unique(Tip1$Tip_group)))
   }
-  tregraph2 <- tregraph2 + ggnewscale::new_scale_fill()
-  tregraph3 <- tregraph2 %<+% Tip1 +
-    geom_tiplab(aes(label = substring(label, 3), colour = Tip_group),
-                offset = offset_tiplab,
-                size = tiplab.size, fontface = fontface_tiplab) +
-    scale_color_manual(values = tiplab_cols, breaks = NULL)+
-    geom_tippoint(
-      shape = tippoint.shape,
-      size = tippoint.shape.size
-    ) +
-    geom_nodepoint(size = geom_nodepoint)
+
+  # tiplab
+  if (fontface_for_tiplab) {
+    tregraph2 <- tregraph2 + ggnewscale::new_scale_fill()
+    tregraph3 <- tregraph2 %<+% Tip1 +
+      geom_tiplab(aes(label = substring(label, 3)),
+                  offset = offset_tiplab,
+                  size = tiplab.size,
+                  fontface = Tip1$fontface) +
+      geom_tippoint(
+        shape = tippoint.shape,
+        size = tippoint.shape.size
+      ) +
+      geom_nodepoint(size = geom_nodepoint)
+  } else {
+    tregraph2 <- tregraph2 + ggnewscale::new_scale_fill()
+    tregraph3 <- tregraph2 %<+% Tip1 +
+      geom_tiplab(aes(label = substring(label, 3), colour = Tip_group),
+                  offset = offset_tiplab,
+                  size = tiplab.size, fontface = fontface_tiplab_with_colors) +
+      scale_color_manual(values = tiplab_cols, breaks = NULL)+
+      geom_tippoint(
+        shape = tippoint.shape,
+        size = tippoint.shape.size
+      ) +
+      geom_nodepoint(size = geom_nodepoint)
+  }
 
   # Add labels to internal nodes with bootstrap values
   internal_nodes <- data[data$isTip == FALSE, ]
@@ -433,3 +454,4 @@ Plot_Tree <- function(
                                  legend.text = element_text(margin = margin(r = 30)))
   return(list("plot" = tregraph3, "conserved_table" = Tip1))
 }
+

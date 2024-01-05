@@ -52,7 +52,7 @@ ChordDiagram <- function(net,
                          filename = "chordDiagram.pdf",
                          order_grid = NULL,
                          directional = 1,
-                         direction.type = c("arrows"),  # "diffHeight"
+                         direction.type = c("arrows"),
                          diffHeight = -0.03,
                          annotationTrack = "grid",
                          reduce = -1,
@@ -75,7 +75,6 @@ ChordDiagram <- function(net,
                          picture_height = 9
 ) {
   # link value
-  # net <- as_tibble(net)
   colnames(net) <- c("source", "target", "Score")
   net$Score <- 2^(net$Score*Score_factor_size)
 
@@ -141,3 +140,54 @@ ChordDiagram <- function(net,
   dev.off()
 }
 
+#' Plot ligand-receptor pairs in a dot plot
+#' @description Construct a dot plot to show the conserved ligand-receptor pairs
+#' @param LR_data data frame only containing 3 column representing the ligand-receptor pairs, cell type pairs, and groups
+#' @param fill_colors vector, colors for the points
+#' @param brewer.pal_set if fill_colors = NULL, this can set the brewer.pal for colors used for the text and points. By default, brewer.pal_set = "Paired"
+#' @param color_x By default, colors for x text is set to be "black"
+#' @param color_x_in_group if color_x_in_group = T, points colors will be used for x text
+#' @param color_y By default, colors for y text is set to be "black", or it can be set to any colors you want, like "red", "blue"
+#' @param size numeric, size for points
+#' @param shape numeric, shape for points
+#' @param colour colors for points
+#' @param stroke numeric, width of the point’s outline
+#' @param theme_set theme used. By default it is theme_bw()
+#' @param text_size numeric, size of the text in this plot
+#' @param text_colour colors for the text in this plot
+#' @param legend.position the position of the legend. By default, we don't show the legend
+#'
+#' @return A dot plot. Row is the ligand-receptor pairs, while column is the cell type pairs
+#' @export
+#'
+#' @examples
+#' show_LR_pairs(LR_data = LRpair_show_0.75,  color_x_in_group = T)
+#'
+show_LR_pairs <- function(LR_data, fill_colors = NULL, brewer.pal_set = "Paired", color_x = "black", color_x_in_group = F, color_y = "black", size = 9, shape = 21, colour = "white", stroke = 2, theme_set = theme_bw(), text_size = 40, text_colour = "black", legend.position = "none") {
+  stopifnot(nrow(LR_data) == 3)
+  colnames(LR_data) <- c("LR", "Cell_Pair", "group")
+  if (is.null(fill_colors)) {
+    color_fill <- colorRampPalette(RColorBrewer::brewer.pal(11, brewer.pal_set))(length(unique(LR_data$group)))
+    color_fill <- setNames(color_fill, unique(LR_data$group))
+  } else {
+    color_fill <- fill_colors
+  }
+
+  if (color_x_in_group) {
+    x_text_colors <- color_fill[as.vector(unlist(sapply(unique(LR_data$Cell_Pair), function(x) strsplit(x, "_")[[1]][1])))]
+    color_x <- x_text_colors
+  } else {
+    color_x <- color_x
+  }
+  print(color_x)
+  p <- ggplot2::ggplot(LR_data) +
+    ggplot2::geom_point(mapping = aes(x = Cell_Pair, y = LR, fill = group), size = size, shape = shape, colour = colour, stroke = stroke) +
+    theme_set +
+    theme(text = element_text(size = text_size, colour = text_colour),
+          axis.text.x = element_text(colour = color_x, angle = 90, hjust = 1, vjust = 0.5),
+          axis.text.y = element_text(colour = color_y),
+          legend.position = legend.position) +
+    labs(y = "", x = "") +
+    scale_fill_manual(values = color_fill)
+  return(p)
+}

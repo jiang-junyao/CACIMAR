@@ -1,6 +1,6 @@
 ---
 title: "CACIMAR tutorial"
-author:  Jiang junyao
+author:  Jiang junyao, Li jinlian
 date: "`r Sys.Date()`"
 output:
   rmdformats::downcute:
@@ -43,7 +43,7 @@ library(reshape2)
 ## (1) Inputs data of this part
 
 - ***Seurat object***
-  Seurat object should have cell types information in 'active.ident' slot. Test data used here can be download from [Google drive](https://drive.google.com/drive/folders/15bqQmEH4cDFRiEHYZTEp4gYWK4FJAhBL?usp=sharing)
+  Seurat object should include cell types information in the ‘active.ident’ slot. Test data can be download from [Google drive](https://drive.google.com/drive/folders/15bqQmEH4cDFRiEHYZTEp4gYWK4FJAhBL?usp=sharing)
 
 ### (2) Identify markers
 
@@ -59,9 +59,9 @@ Mm_marker <- Format_Markers_Frac(Mm_marker)
 ```
 
 # 2.Identify evolutionarily conserved cell types
-   CACIMAR identifies evolutionarily conserved cell types and poorly conserved cell types using the conservation score of cell types (CSCT) and a phylogenetic tree. 
+   CACIMAR identifies evolutionarily conserved cell types and poorly conserved cell types utilizing conservation scores of cell types (CSCT) and a phylogenetic tree. 
   
-  CSCT is calculated based on the powers (or MP values) of shared markers in each pair of cell types, relative to the sum of the powers of all markers in each pair of cell types. Shared markers indicate the markers of one species that have homologs in the other species. If genes have multiple homologs, the gene with the highest power is selected. If the pair of cell types is mutually matched, and CSCT is greater than the third quartile of CSCT values, then this pair of cell types is considered a conserved cell type between two species. Mutually matched pair cell types mean that for every cell type in species 1, we look for the corresponding cell type in species 2 that has the highest CSCT value, and vice versa. The corresponding cell types in both species are said to be “mutually matched,” and they have the highest CSCT value relative to all other cell types in the other species.
+  CSCT is computed based on the powers (or MP values) of shared markers in each pair of cell types, relative to the sum of the powers of all markers in each pair of cell types. Shared markers indicate the markers of one species that have homologs in the other species. If genes have multiple homologs, the gene with the highest power is selected. If the pair of cell types is mutually matched, and CSCT is greater than the third quartile of CSCT values, then this pair of cell types is considered a conserved cell type between two species. Mutually matched pair cell types mean that for every cell type in species 1, we look for the corresponding cell type in species 2 that has the highest CSCT value, and vice versa. The corresponding cell types in both species are said to be “mutually matched,” and they have the highest CSCT value relative to all other cell types in the other species.
   
   Besides, we generate a phylogenetic tree based on the CSCT value using the hierarchical clustering method UPGMA (unweighted pair group method using arithmetic mean) to further identify the conserved cell types and the poorly conserved cell types. If cell types from two species are from the same clade of bipartition, the two cell types are considered conserved cell types across species. However, if these conserved cell types are only identified by the phylogenetic tree of cell types, they are regarded as poorly conserved cell types.
 
@@ -73,10 +73,8 @@ Mm_marker <- Format_Markers_Frac(Mm_marker)
 ```
 load(system.file("extdata", "zf_mm_markers.rda", package = "CACIMAR"))
 ```
-
-## (2) Homologous gene database
-  Homologous gene database is needed. Here, CACIMAR has already generated Homologous gene database for human, mouse, zebrafish and chicken, you can directly use the following codes to load database:
-  
+- ***Homologous gene database***
+  A homologous gene database is required. CACIMAR has already generated a homologous gene database for human, mouse, zebrafish, and chicken. You can use the following code to load the pre-built database, or you can generate your own homologous gene database using the instructions provided in the “Build homologous gene database” section of the tutorial. To load the pre-built database:
 ```{r}
 ### load homologous gene database of human and mouse
 OrthG <- OrthG_Hs_Mm
@@ -92,9 +90,7 @@ OrthG <- OrthG_Mm_Zf
 OrthG <- OrthG_Zf_Ch
 ```
 
-  In addition, you can use function in 'Build homologous gene database' part to generate your own homologous gene database if it does not provided here.
-
-## (3) Identify evolutionarily conserved cell types
+## (2) Identify evolutionarily conserved cell types
 
 ```r
 ### identify evolutionarily conserved cell types based on conservation score of cell types (CSCT)
@@ -108,45 +104,57 @@ Heatmap_Cor(SNT_h,cluster_cols=F, cluster_rows=F,Color1 = c(rgb(102/255,46/255,1
 
 ![cross-species cell types](CACIMAR_tutorial_files/figure-html/conserved_celltypes_heatmap.png)
 
-## (4) Further evaluate evolutionarily conserved cell types and poorly conserved cell types through phylogenetic tree
-  By default, dark blue shows the evolutionarily conserved cell types, light blue shows the poorly conserved cell types, and grey shows the unconserved cell types. You can use tiplab_cols to set the targeted colors you want. Besides, tree_method can be set to "classic Neighbor-Joining" if you want to change the method used to construct the phylogenetic tree.
+## (3) Further evaluate evolutionarily conserved cell types and poorly conserved cell types through phylogenetic tree
+  By default, distinct fonts are employed for tip labels to indicate the evolutionary conservation status of cell types. This allows for differentiation between evolutionarily conserved cell types(bold.italic), poorly conserved cell types(italic), and unconserved cell types(plain). To customize the colors for the tip labels, you can utilize the tiplab_cols parameter and specify the desired color scheme. The default color scheme assigns dark blue to represent evolutionarily conserved cell types, light blue to represent poorly conserved cell types, and grey to represent unconserved cell types. Additionally, if you wish to change the method used for constructing the phylogenetic tree, you can modify the tree_method parameter to "classic Neighbor-Joining" method.
 
 ```r
 ### get the conserved cell types based on the mutually matched and bigger than 3/4 CSCT score
 conserved_hm_celltypes <- get_conserved_hm_celltypes(SNT_h)
 ### generate a phylogenetic tree
 p <- Plot_phylogenetic_tree(SCT_matrix = SCT_matrix,
-                       tree_method = "hierarchical clustering",
-                       species.vector = species.vector, 
-                       conserved_hm_celltype = conserved_hm_celltypes,
-                       colors_labels = c("Mouse", "Zebrafish")) 
+                            tree_method = "hierarchical clustering",
+                            species.vector = species.vector, 
+                            conserved_hm_celltype = conserved_hm_celltypes,
+                            annotation_colors_df = bind_colors,
+                            colors_labels = c("Mouse", "Zebrafish")) 
+
+### Show the conservation status of cell types.
+head(p$conserved_table, n = 10)
+# # A tibble: 10 × 11
+# parent  node branch.length label            isTip     x     y branch angle Tip_group        fontface   
+# <int> <int>         <dbl> <chr>            <lgl> <dbl> <dbl>  <dbl> <dbl> <fct>            <fct>      
+#   1     62     1         0.296 zfRods           TRUE    0.5    18  0.352  202. conserved        bold.italic
+# 2     60     2         0.398 zfGABAergic AC   TRUE    0.5    29  0.301  326. conserved        bold.italic
+# 3     50     3         0.395 zfMicroglia      TRUE    0.5    13  0.303  146. conserved        bold.italic
+# 4     54     4         0.430 zfResting MG     TRUE    0.5     8  0.285   90  conserved        bold.italic
+# 5     58     5         0.480 zfGlycinergic AC TRUE    0.5    27  0.260  304. poorly_conserved italic     
+# 6     51     6         0.491 zfProgenitors    TRUE    0.5    15  0.255  169. not_conserved    plain      
+# 7     56     7         0.459 zfCone BC        TRUE    0.5    22  0.270  248. conserved        bold.italic
+# 8     55     8         0.436 zfV/E cells      TRUE    0.5    10  0.282  112. conserved        bold.italic
+# 9     63     9         0.394 zfCones          TRUE    0.5    20  0.303  225  conserved        bold.italic
+# 10     59    10         0.464 zfActivated MG   TRUE    0.5    16  0.268  180  conserved        bold.italic
+
 ```
 
-![cross-species cell types](CACIMAR_tutorial_files/figure-html/UPGMA_Tree.fontcolors2.png)
-
-```r
-### show the conservation of cell types in data frame
-head(p$conserved_table)
-```
+![cross-species cell types](CACIMAR_tutorial_files/figure-html/UPGMA_Tree_fontface_0.35.png)
 
 
 # 3.Identify evolutionarily conserved markers
-  CACIMAR first utilizes **homologous genes database** to refine markers found by "FindAllMarkers" function using ROC. And markers that exist in homologous database will be retained as shared markers. Then, CACIMAR selects markers that are in the same cell type between two species as evolution-conserved markers.
+  CACIMAR initially employs a **homologous gene database** to enhance the markers identified by the "FindAllMarkers" function using ROC. Markers that are present in the homologous database are then considered as shared markers. Subsequently, CACIMAR identifies markers present in the same cell type across two species and retains them as evolutionarily conserved markers.
 
 ## (1) Inputs data of this part
 - ***Marker tables for two species***
   First column should be gene name, second column should be cluster corresponding to marker gene. Marker tables can be generated by 'Identify_Markers' function in part one above. Or, you can use following codes to load test data.
-
 ```r
 load(system.file("extdata", "zf_mm_markers.rda", package = "CACIMAR"))
 ```
 
-## (2) Homologous gene database
+- ***Homologous gene database***
 ```r
 OrthG <- OrthG_Mm_Zf
 ```
 
-## (3) Find evolutionarily conserved markers 
+## (2) Find evolutionarily conserved markers 
 ```{r message=FALSE, eval=FALSE}
 ConservedMarker <- Identify_ConservedMarkers(OrthG, Mm_marker, Zf_marker,
                                                Species_name1 = 'mm', Species_name2 = 'zf')
@@ -176,11 +184,13 @@ Plot_MarkersHeatmap(Mm_specific_markers,cellheight = 0.2,cellwidth = 6)
 Zf_specific_markers <- Zf_marker[!Zf_marker$gene %in% ConservedMarker$zfgene
                             ,c(-1,-3,-4,-5)]
 Plot_MarkersHeatmap(Zf_specific_markers,cellheight = 0.5,cellwidth = 6)
+
+# The markers heatmap in this part contains too many elements to display, so it will not be shown.
 ```
 
 
 # 4. Identify conserved intracellular regulation
-  We utilized CACIMAR to examine the evolutionary conservation of two distinct regulatory networks: cell type-specific regulatory networks and regulatory subnetworks, also known as modules, across different species. CACIMAR calculates the conservation score of regulatory networks (CSRN) among cell types/modules in regulatory networks of different species. SCN is calculated based on two criteria: (I) fraction of homologous genes (nodes) and all genes; (II) fraction of interactions (edges) among homologous genes and all interactions. A higher CSRN indicates a more conserved regulatory network. 
+  We employed CACIMAR to assess the evolutionary conservation of two separate regulatory networks: cell type-specific regulatory networks and regulatory subnetworks, otherwise known as modules, across various species. CACIMAR calculates the conservation score of regulatory networks (CSRN) for different cell types/modules in regulatory networks of distinct species. CSRN is computed based on two criteria: (I) the proportion of homologous genes (nodes) compared to all genes, and (II) the proportion of interactions (edges) among homologous genes compared to all interactions. A higher CSRN indicates a more conserved regulatory network. 
 
 ## (1) Inputs data of this part
 - ***Cell type specific network or Modularized regulatory networks for two species***
@@ -215,13 +225,11 @@ Heatmap_Cor(ConservedNetworks[[2]], cluster_cols=F, cluster_rows=F, Color1 = c(r
 ![CSRN of modularized regulatory networks](CACIMAR_tutorial_files/figure-html/NCS_module.png)
 
 # 5.Identify conserved intercellular interactions (cell-cell interaction)
-  CACIMAR identifies evolutionarily conserved cell-cell interactions (CCI) based on the level of ligands and receptors using the SingleCellSignalR algorithm from [liana](https://saezlab.github.io/liana/). CCI that fulfill the following criteria will be considered as evolutionarily conserved: (I) the interactions between ligands and receptors are consistent; (II) the cell type of the ligand and receptor in species 1 should match the cell type of the ligand and receptor in species 2, respectively. Then, we calculate the proportion of consistent intercellular interactions to measure the conservation score for intercellular interactions (CSII). 
+  CACIMAR employs the SingleCellSignalR algorithm from [liana](https://saezlab.github.io/liana/) to identify evolutionarily conserved cell-cell interactions (CCI) based on the expression levels of ligands and receptors. CCI that satisfy the following criteria are regarded as evolutionarily conserved: (I) the interactions between ligands and receptors demonstrate consistency, and (II) the cell type of the ligand and receptor in species 1 should correspond to the cell type of the ligand and receptor in species 2, respectively. Subsequently, we compute the proportion of consistent intercellular interactions to gauge the conservation score for intercellular interactions (CSII).
 
 ## (1) Inputs data of this part
 - ***seurat object***
-```{r, eval=FALSE}
-# load(system.file("extdata", "Mm_Zf_seurat_object.Rda", package = "CACIMAR"))
-```
+  Seurat object should include cell types information in the ‘active.ident’ slot. Test data can be download from [Google drive](https://drive.google.com/drive/folders/15bqQmEH4cDFRiEHYZTEp4gYWK4FJAhBL?usp=sharing)
 
 - ***Homologous gene database***
 ```{r}
@@ -246,9 +254,29 @@ SingleCellSignalR_zebrafish_result2 <- subset(SingleCellSignalR_zebrafish_result
 # sum Weights of each cell types
 all_weight_df_long <- calculate_Weights(species1_cci = SingleCellSignalR_mouse_result2,
                                         species2_cci = SingleCellSignalR_zebrafish_result2)
+# show the weight result
+head(all_weight_df_long)
+#             source       target    weight species scale_weight             Source            Source2
+# 1     Activated MG Activated MG 152.07967      Mm  0.008256281     MmActivated MG     MmActivated MG
+# 2       Astrocytes Activated MG 230.97254      Mm  0.012539310       MmAstrocytes       MmAstrocytes
+# 3            Cones Activated MG  51.89929      Mm  0.002817570            MmCones            MmCones
+# 4     GABAergic AC Activated MG  99.92955      Mm  0.005425093     MmGABAergic AC     MmGABAergic AC
+# 5   Glycinergic AC Activated MG  78.95619      Mm  0.004286467   MmGlycinergic AC   MmGlycinergic AC
+# 6 Horizontal cells Activated MG 106.23687      Mm  0.005767513 MmHorizontal cells MmHorizontal cells
+
 # used self-defined colors
 colors_file = "/data2/jinlianli/CACIMAR/git/Tree3_3/zf_mm_colors.txt"
 colors <- read.table(colors_file)
+# show the colors dataframe which was used
+head(colors)
+#   colors     celltype
+# 1 #F7931E   Resting MG
+# 2 #F8736A Activated MG
+# 3 #A9A9A9         Rods
+# 4 #96CEB4       Rod BC
+# 5 #A3A500   ON cone BC
+# 6 #C0C130  OFF cone BC
+
 # sankey plot will be saved in current directory by default
 # If the colors_file is set to NULL, the colors will be automatically assigned.
 create_sankey(links = all_weight_df_long[, c("Source2", "target", "scale_weight")],
@@ -260,76 +288,86 @@ create_sankey(links = all_weight_df_long[, c("Source2", "target", "scale_weight"
 ```
 
 ![cell-cell interaction weight profile across species](CACIMAR_tutorial_files/figure-html/sankey_scale_weight.html_github1.png)
-```{r, eval=FALSE}
-# show the weight result
-head(all_weight_df_long)
-            source       target    weight species scale_weight             Source            Source2
-1     Activated MG Activated MG 152.07967      Mm  0.008256281     MmActivated MG     MmActivated MG
-2       Astrocytes Activated MG 230.97254      Mm  0.012539310       MmAstrocytes       MmAstrocytes
-3            Cones Activated MG  51.89929      Mm  0.002817570            MmCones            MmCones
-4     GABAergic AC Activated MG  99.92955      Mm  0.005425093     MmGABAergic AC     MmGABAergic AC
-5   Glycinergic AC Activated MG  78.95619      Mm  0.004286467   MmGlycinergic AC   MmGlycinergic AC
-6 Horizontal cells Activated MG 106.23687      Mm  0.005767513 MmHorizontal cells MmHorizontal cells
-
-# show the colors dataframe which was used
-head(colors)
-  colors     celltype
-1 #F7931E   Resting MG
-2 #F8736A Activated MG
-3 #A9A9A9         Rods
-4 #96CEB4       Rod BC
-5 #A3A500   ON cone BC
-6 #C0C130  OFF cone BC
-```
 
 ## (4) identified the evolutionarily conserved cell-cell interactions (CCI)
 ```{r, eval=FALSE}
 ## caculate the conservation score for intercellular interactions(CSII)
 
 #########
-######### continue this part! #########
+######### jiangjunyao will continue this part! ######### finish till getting the scaled_ccc_score.rds
 #########
 
 
 
-# load the test data
-load(system.file("extdata", "CCC_conserved_sumary.rda", package = "CACIMAR"))
-
+# load the test data if you don't want to perform analysis above:
+# load(system.file("extdata", "CCC_conserved_sumary.rda", package = "CACIMAR"))
 head(CCC_conserved_sumary)
-# Source           Target con_weight con_num all_sp1_weight all_sp2_weight all_sp1_num all_sp2_num  score_num score_weight
-# 1 Activated MG     Activated MG   9.872400      12      152.07967      12.666744         210          15 0.05333333   0.05992482
-# 2 Activated MG            Cones   6.548038       8       32.33672      10.590558          44          13 0.14035088   0.15253794
-# 3 Activated MG     GABAergic AC   6.693321       8       48.67964       5.077178          67           6 0.10958904   0.12451109
-# 4 Activated MG   Glycinergic AC   6.536769       8       54.39586       6.566076          78           8 0.09302326   0.10722706
-# 5 Activated MG Horizontal cells   8.007969      10      116.21857       7.431489         164           9 0.05780347   0.06476316
-# 6 Activated MG        Microglia  13.821581      18      147.82271      18.743382         206          23 0.07860262   0.08297956
+#         Source           Target  con_weight con_num all_sp1_weight all_sp2_weight all_sp1_num all_sp2_num  score_num score_weight
+# 1 Activated MG     Activated MG 0.002811320      12    0.008256281    0.006426577         210          15 0.05333333    0.1914696
+# 2 Activated MG            Cones 0.001794698       8    0.001755534    0.005373207          44          13 0.14035088    0.2517553
+# 3 Activated MG     GABAergic AC 0.001865299       8    0.002642778    0.002575948          67           6 0.10958904    0.3574241
+# 4 Activated MG   Glycinergic AC 0.001820697       8    0.002953106    0.003331352          78           8 0.09302326    0.2897142
+# 5 Activated MG Horizontal cells 0.002282194      10    0.006309411    0.003770427         164           9 0.05780347    0.2264118
+# 6 Activated MG        Microglia 0.004017660      18    0.008025174    0.009509609         206          23 0.07860262    0.2291252
 
 ## ChordDiagram shows the CSII 
 # data for ChordDiagram
 cci_data <- CCC_conserved_sumary[, c("Source", "Target", "score_weight")]
+head(cci_data)
+#         Source           Target score_weight
+# 1 Activated MG     Activated MG    0.1914696
+# 2 Activated MG            Cones    0.2517553
+# 3 Activated MG     GABAergic AC    0.3574241
+# 4 Activated MG   Glycinergic AC    0.2897142
+# 5 Activated MG Horizontal cells    0.2264118
+# 6 Activated MG        Microglia    0.2291252
 
 # colors for ChordDiagram
 # if you don't want to make colors for ChordDiagram, just set grid.col = NULL
-colors <- c(rgb(247/255,147/255,30/255), rgb(248/255,115/255,106/255), rgb(169/255,169/255,169/255),
-            rgb(150/255,206/255,180/255), rgb(163/255,165/255,0/255), rgb(192/255,193/255,48/255),
-            rgb(157/255,115/255,194/255), rgb(183/255,76/255,171/255), rgb(230/255,134/255,201/255),
-            rgb(140/255,198/255,63/255), rgb(255/255,191/255,15/255), rgb(103/255,199/255,193/255),
-            rgb(3/255,161/255,198/255), rgb(97/255,156/255,255/255), rgb(129/255,70/255,58/255),
+colors <- c(rgb(247/255,147/255,30/255), rgb(248/255,115/255,106/255), rgb(169/255,169/255,169/255), 
+            rgb(150/255,206/255,180/255), rgb(163/255,165/255,0/255), rgb(192/255,193/255,48/255), 
+            rgb(157/255,115/255,194/255), rgb(183/255,76/255,171/255), rgb(230/255,134/255,201/255), 
+            rgb(140/255,198/255,63/255), rgb(255/255,191/255,15/255), rgb(103/255,199/255,193/255), 
+            rgb(3/255,161/255,198/255), rgb(97/255,156/255,255/255), rgb(129/255,70/255,58/255), 
             rgb(0/255,114/255,189/255), rgb(74/255,76/255,191/255))
 grid.col_name <- c("Resting MG", "Activated MG", "Rods", "Rod BC", "ON cone BC", "OFF cone BC", "GABAergic AC", "Glycinergic AC", "Cones", "RGC", "Microglia", "V/E cells", "Horizontal cells", "Astrocytes", "RPE", "Pericytes", "Reticulocytes")
 names(colors) <- grid.col_name
 grid.col <- colors[c(unique(cci_data$Source), unique(cci_data$Target))]
 
 # plot ChordDiagram
-ChordDiagram(net = cci_data,
+ChordDiagram(net = cci_data, 
              grid.col = grid.col,
              order_grid = grid.col_name,
              filename = "chordDiagram_cutoff0.75.pdf",
-             link_colors_threshold = 0.75
-)
+             link_colors_threshold = 0.75)
 ```
 
-![conservation score for intercellular interactions](CACIMAR_tutorial_files/figure-html/chordDiagram_cutoff0.75.png)
+![conservation score for intercellular interactions](CACIMAR_tutorial_files/figure-html/chordDiagram_cutoff0.75_scale.png)
+
+## (5) show the conserved ligand-receptor pairs 
+```{r, eval=FALSE}
+# We only display the ligand-receptor pairs in the cell type pairs where the CSII is greater than or equal to the third quantile value of CSII
+CCC_conserved_sumary_0.75 <- subset(CCC_conserved_sumary, score_weight >= quantile(CCC_conserved_sumary$score_weight, probs = 0.75))
+LRpair_show_all <- data.frame("LR" = paste(mm_conserved_CCC$sp1ligand.complex, mm_conserved_CCC$sp1receptor.complex, sep = "_"), "Cell_Pair" = paste(mm_conserved_CCC$sp1source, mm_conserved_CCC$sp1target, sep = "_")) 
+index_0.75 <- as.vector(unlist(sapply(paste(CCC_conserved_sumary_0.75$Source, CCC_conserved_sumary_0.75$Target, sep = "_"), function(x) grep(x, LRpair_show_all$Cell_Pair))))
+LRpair_show_0.75 <- LRpair_show_all[index_0.75,]
+# We can create a group variable that determines the colors for both the text and points 
+LRpair_show_0.75$group <- as.vector(unlist(sapply(LRpair_show_0.75$Cell_Pair, function(x) strsplit(x, split = "_")[[1]][1])))
+head(LRpair_show_0.75)
+#             LR                   Cell_Pair        group
+# 38     App_Rpsa   Activated MG_GABAergic AC Activated MG
+# 168   App_Aplp2   Activated MG_GABAergic AC Activated MG
+# 391   App_Aplp1   Activated MG_GABAergic AC Activated MG
+# 438 Ncam1_Gfra1   Activated MG_GABAergic AC Activated MG
+# 41     App_Rpsa Activated MG_Glycinergic AC Activated MG
+# 171   App_Aplp2 Activated MG_Glycinergic AC Activated MG
+
+# we use the colors above, or you can set fill_colors = NULL
+# LR_data should only contain 3 columns, representing LR pairs, Cell type pairs, and groups
+show_LR_pairs(LR_data = LRpair_show_0.75, fill_colors = colors, color_x_in_group = T)
+```
+
+![conserved ligand-receptor pairs](CACIMAR_tutorial_files/figure-html/conserved_LR_0.75_xcolors.png)
 
 # Build homologous gene database
   Under the situation that homologous gene database of your interested species is not included in our package, CACIMAR provides to build your own homologous gene database according to MGI database. 

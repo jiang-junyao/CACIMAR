@@ -27,6 +27,10 @@ Plot_phylogenetic_tree(
   tippoint.shape = 21,
   tippoint.shape.size = 0,
   geom_nodepoint = 5,
+  show_branch.length = TRUE,
+  round_x = 2,
+  fill_brandlength = "lightgreen",
+  size_brandlength = 6,
   annotation_colors_df = NULL,
   brewer_pal_used = "Set3",
   col.value = c(rgb(102/255, 46/255, 115/255), rgb(31/255, 153/255, 139/255)),
@@ -90,6 +94,14 @@ Plot_phylogenetic_tree(
 \item{tippoint.shape.size}{numeric, the size of the tip point shape}
 
 \item{geom_nodepoint}{integer, the size of the node point}
+
+\item{show_branch.length}{logical, whether show the branch length, default is TRUE}
+
+\item{round_x}{numeric, the decimal places contained for round() function for branch length number}
+
+\item{fill_brandlength}{character, colors for branch length}
+
+\item{size_brandlength}{numeric, the size for the branch length label}
 
 \item{annotation_colors_df}{dataframe, must contain two column, named "colors" and "celltype", default is null}
 

@@ -45,14 +45,14 @@ library(reshape2)
 - ***Seurat object***
   Seurat object should include cell types information in the ‘active.ident’ slot. Test data can be download from [Google drive](https://drive.google.com/drive/folders/15bqQmEH4cDFRiEHYZTEp4gYWK4FJAhBL?usp=sharing)
 
-### (2) Identify markers
+## (2) Identify markers
 
 ```r
 ### identify markers
 Zf_seurat <- readRDS('Zf_seurat.rds')
 Mm_seurat <- readRDS('Mm_seurat.rds')
-Zf_marker <- Identify_Markers(Zf_seurat,PowerCutoff=0.35, DifferenceCutoff=0.1,PvalueCutoff=0.05)
-Mm_marker <- Identify_Markers(Mm_seurat,PowerCutoff=0.35, DifferenceCutoff=0.1,PvalueCutoff=0.05)
+Zf_marker <- Identify_Markers(Zf_seurat,PowerCutoff=0.35, DifferenceCutoff=0.1)
+Mm_marker <- Identify_Markers(Mm_seurat,PowerCutoff=0.35, DifferenceCutoff=0.1)
 ### format markers table
 Zf_marker <- Format_Markers_Frac(Zf_marker)
 Mm_marker <- Format_Markers_Frac(Mm_marker)
@@ -110,9 +110,20 @@ Heatmap_Cor(SNT_h,cluster_cols=F, cluster_rows=F,Color1 = c(rgb(102/255,46/255,1
 ```r
 ### get the conserved cell types based on the mutually matched and bigger than 3/4 CSCT score
 conserved_hm_celltypes <- get_conserved_hm_celltypes(SNT_h)
+
+### used my pointed colors
+load(system.file("extdata", "zf_mm_colors_prefix.Rda", package = "CACIMAR"))
+head(bind_colors)
+#    colors       celltype
+# 1 #F7931E   mmResting MG
+# 2 #F8736A mmActivated MG
+# 3 #A9A9A9         mmRods
+# 4 #96CEB4       mmRod BC
+# 5 #A3A500   mmON cone BC
+# 6 #C0C130  mmOFF cone BC
+
 ### generate a phylogenetic tree
 p <- Plot_phylogenetic_tree(SCT_matrix = SCT_matrix,
-                            tree_method = "hierarchical clustering",
                             species.vector = species.vector, 
                             conserved_hm_celltype = conserved_hm_celltypes,
                             annotation_colors_df = bind_colors,
@@ -136,7 +147,7 @@ head(p$conserved_table, n = 10)
 
 ```
 
-![cross-species cell types](CACIMAR_tutorial_files/figure-html/UPGMA_Tree_fontface_0.35.png)
+![cross-species cell types](CACIMAR_tutorial_files/figure-html/UPGMA_Tree_0.35_Brandlength.png)
 
 
 # 3.Identify evolutionarily conserved markers
@@ -264,30 +275,15 @@ head(all_weight_df_long)
 # 5   Glycinergic AC Activated MG  78.95619      Mm  0.004286467   MmGlycinergic AC   MmGlycinergic AC
 # 6 Horizontal cells Activated MG 106.23687      Mm  0.005767513 MmHorizontal cells MmHorizontal cells
 
-# used self-defined colors
-colors_file = "/data2/jinlianli/CACIMAR/git/Tree3_3/zf_mm_colors.txt"
-colors <- read.table(colors_file)
-# show the colors dataframe which was used
-head(colors)
-#   colors     celltype
-# 1 #F7931E   Resting MG
-# 2 #F8736A Activated MG
-# 3 #A9A9A9         Rods
-# 4 #96CEB4       Rod BC
-# 5 #A3A500   ON cone BC
-# 6 #C0C130  OFF cone BC
-
 # sankey plot will be saved in current directory by default
 # If the colors_file is set to NULL, the colors will be automatically assigned.
 create_sankey(links = all_weight_df_long[, c("Source2", "target", "scale_weight")],
               output_file = "sankey_scale_weight.html",
               specie_name1 = "Mm",
-              specie_name2 = "Zf",
-              colors_file = "/data2/jinlianli/CACIMAR/git/Tree3_3/zf_mm_colors.txt"
-)
+              specie_name2 = "Zf")
 ```
 
-![cell-cell interaction weight profile across species](CACIMAR_tutorial_files/figure-html/sankey_scale_weight.html_github1.png)
+![cell-cell interaction weight profile across species](CACIMAR_tutorial_files/figure-html/ankey_scale_weight_factor2.png)
 
 ## (4) identified the evolutionarily conserved cell-cell interactions (CCI)
 ```{r, eval=FALSE}

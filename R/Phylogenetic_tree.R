@@ -23,6 +23,10 @@
 #' @param tippoint.shape numeric, the shape used for tip point, such as 21, 17, 22, ......
 #' @param tippoint.shape.size numeric, the size of the tip point shape
 #' @param geom_nodepoint integer, the size of the node point
+#' @param show_branch.length logical, whether show the branch length, default is TRUE
+#' @param round_x numeric, the decimal places contained for round() function for branch length number
+#' @param fill_brandlength character, colors for branch length
+#' @param size_brandlength numeric, the size for the branch length label
 #' @param annotation_colors_df dataframe, must contain two column, named "colors" and "celltype", default is null
 #' @param brewer_pal_used character, the brewer_pal in RColorBrewer, like "Set1",  "Set3", "Paired". It set colors for tip label. It works when fontface_for_tiplab is FALSE
 #' @param col.value chacterize vector, colors used for species bar annotation, must be the same length of the number of species
@@ -81,6 +85,10 @@ Plot_phylogenetic_tree <- function(
     tippoint.shape = 21,
     tippoint.shape.size = 0,
     geom_nodepoint = 5,
+    show_branch.length = TRUE,
+    round_x = 2,
+    fill_brandlength = 'lightgreen',
+    size_brandlength = 6,
     annotation_colors_df = NULL,
     brewer_pal_used = "Set3",
     col.value = c(rgb(102/255,46/255,115/255), rgb(31/255,153/255,139/255)),
@@ -124,7 +132,6 @@ Plot_phylogenetic_tree <- function(
   stopifnot(is.numeric(width))
   stopifnot(is.numeric(height))
 
-  # Perform hierarchical clustering
   dist <- as.dist(1 - SCT_matrix)
   if (tree_method == "hierarchical clustering") {
     tree <- stats::hclust(dist, method = hcluster.method)
@@ -132,9 +139,8 @@ Plot_phylogenetic_tree <- function(
   } else if (tree_method == "classic Neighbor-Joining") {
     tree <- ape::nj(dist)
   }
-  # add species column
+
   tree$species <- species.vector
-  # Cat the method used for creating tree and get a title for Pairwise distances plot
   if (tree_method == "classic Neighbor-Joining") {
     Pairwise_distances_main <- "classic Neighbor-Joining algorithm"
     cat("Creating tree with classic Neighbor-Joining algorithm.\n")
@@ -147,11 +153,11 @@ Plot_phylogenetic_tree <- function(
     Pairwise_distances_main <- paste("hierarchical clustering", hcluster.method, sep = "_")
     cat(paste("Creating tree with hierarchical clustering", hcluster.method, sep = ":"))
   }
-  # Show_Pairwise_distances
+
   if (Show_Pairwise_distances) {
     plot_Pairwise_distances(dist, tree, Pairwise_distances_main)
   }
-  # Boostrap test
+
   set.seed(1234)
   if (tree_method == "classic Neighbor-Joining") {
     myBoots <- ape::boot.phylo(tree, SCT_matrix, function(d) {
@@ -179,7 +185,7 @@ Plot_phylogenetic_tree <- function(
     mc.cores = 1)
 
   }
-  # Tree
+
   tree_plot <- Plot_Tree(tree,
                          layout.tree = layout.tree,
                          tree_size = tree_size,
@@ -197,6 +203,10 @@ Plot_phylogenetic_tree <- function(
                          tippoint.shape = tippoint.shape,
                          tippoint.shape.size = tippoint.shape.size,
                          geom_nodepoint = geom_nodepoint,
+                         show_branch.length = show_branch.length,
+                         round_x = round_x,
+                         fill_brandlength = fill_brandlength,
+                         size_brandlength = size_brandlength,
                          col.value = col.value,
                          annotation_colors_df = annotation_colors_df,
                          brewer_pal_used = brewer_pal_used,
@@ -220,7 +230,6 @@ Plot_phylogenetic_tree <- function(
 plot_Pairwise_distances <- function(dist, tree, Pairwise_distances_main) {
   x <- as.vector(dist)
   y <- as.vector(as.dist(cophenetic(tree)))
-  # plot
   plot(x, y,
        xlab = "Original Pairwise Distances",
        ylab = "Pairwise Distances on the Tree",
@@ -240,7 +249,6 @@ plot_Pairwise_distances <- function(dist, tree, Pairwise_distances_main) {
   par(family = "serif")
   dev.copy(pdf, paste(Pairwise_distances_main, "Pairwise_distances.pdf", sep = "_"))
   dev.off()
-  # cat Correlation of the tree and distances
   cat("Correlation of the tree and distances:\n")
   cat(cor(x, y)^2, "\n")
 }
@@ -273,10 +281,14 @@ Plot_Tree <- function(
     conserved_hm_celltype,
     bar_width,
     geom_nodepoint,
+    show_branch.length,
+    round_x,
+    fill_brandlength,
+    size_brandlength,
     col.value, # species colors
     annotation_colors_df, # celltype colors df
     brewer_pal_used,
-    colors_labels, # 自定义显示标签的labels标签名
+    colors_labels,
     show_colnames,
     colnames_angle,
     colnames_position,
@@ -301,15 +313,15 @@ Plot_Tree <- function(
   require(ggtree)
   require(ggplot2)
   require(scales)
-  # tree
+
   tree.p <- ggtree::ggtree(tree, layout = layout.tree, size = tree_size, col = "black") + xlim(NA, xlim_tree) #text show
   data <- fortify(tree)
-  # annotation df
+
   tree.df <- data.frame("tip.label" = tree$tip.label)
   rownames(tree.df) <- tree$tip.label
   tree.df2 <- data.frame("species" = tree$species)
   rownames(tree.df2) <- tree$tip.label
-  # Tip df
+
   Tip1 <- filter(data, isTip == "TRUE")
   Tip_p <- as.data.frame(table(Tip1$parent))
   conserved_tree_node <- Tip_p$Var1[which(Tip_p$Freq == 2)]
@@ -328,7 +340,6 @@ Plot_Tree <- function(
     Tip1$fontface <- factor(Tip1$fontface, levels = set_fontface_for_tiplab)
   }
 
-  # show
   cat("The conservation of cell types are shown below:")
   print(table(Tip1$Tip_group))
   cat("\n\n")
@@ -342,7 +353,6 @@ Plot_Tree <- function(
   cat(Tip1$label[which(Tip1$Tip_group == "not_conserved")])
   cat("\n\n")
 
-  # colors1
   if (!is.null(annotation_colors_df)) {
     colors_a <- c(annotation_colors_df$colors)
     colors_a <- setNames(colors_a, annotation_colors_df$celltype)
@@ -356,7 +366,6 @@ Plot_Tree <- function(
     colors_a <- setNames(colors_a, c(species_a_posible_celltypes, species_b_posible_celltypes))
   }
 
-  # colors2
   col.value <- setNames(col.value, rev(unique(tree.df2$species)))
   if (is.null(colors_labels)) {
     colors_labels_used <- unique(tree.df2$species)
@@ -364,7 +373,6 @@ Plot_Tree <- function(
     colors_labels_used <- colors_labels
   }
 
-  # annotation
   tregraph <- gheatmap(
     tree.p,
     tree.df,
@@ -396,14 +404,13 @@ Plot_Tree <- function(
       breaks = rev(unique(tree.df2$species)),
       labels = colors_labels_used
     )
-  # colors3
+
   if (is_null(tiplab_cols) & length(unique(Tip1$Tip_group)) == 3) {
     tiplab_cols <- c("#003472","#4b5cc4", "#737373")
   } else  {
     tiplab_cols <-grDevices::colorRampPalette(c("#CC6666", "#9999CC", "#66CC99"))(length(unique(Tip1$Tip_group)))
   }
 
-  # tiplab
   if (fontface_for_tiplab) {
     tregraph2 <- tregraph2 + ggnewscale::new_scale_fill()
     tregraph3 <- tregraph2 %<+% Tip1 +
@@ -430,7 +437,10 @@ Plot_Tree <- function(
       geom_nodepoint(size = geom_nodepoint)
   }
 
-  # Add labels to internal nodes with bootstrap values
+  if (show_branch.length) {
+    tregraph3 <- tregraph3 + geom_label(aes(x=branch, label= round(data$branch.length, round_x)), fill=fill_brandlength, size = size_brandlength)
+  }
+
   internal_nodes <- data[data$isTip == FALSE, ]
   internal_nodes$bootstrap <- bootstrap_values
   tregraph3 <- tregraph3 +

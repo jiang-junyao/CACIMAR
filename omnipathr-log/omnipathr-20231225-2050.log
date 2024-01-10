@@ -1,0 +1,8 @@
+[2023-12-25 20:50:17] [INFO]    [OmnipathR] Welcome to OmnipathR!
+[2023-12-25 20:50:17] [INFO]    [OmnipathR] Initialized cache: `/home/lijinlian/.cache/OmnipathR`.
+[2023-12-25 22:06:40] [TRACE]   [OmnipathR] Looking up in cache: `https://ftp.ncbi.nih.gov/pub/HomoloGene/current/homologene.data`.
+[2023-12-25 22:06:41] [TRACE]   [OmnipathR] Loaded data from RDS `/home/lijinlian/.cache/OmnipathR/2ccc1998f0ab26ea421885e1334896d25db4554f-1.rds`.
+[2023-12-25 22:06:41] [SUCCESS] [OmnipathR] NCBI HomoloGene (ftp.ncbi.nih.gov): loaded 275237 records from cache
+[2023-12-25 22:07:15] [TRACE]   [OmnipathR] Looking up in cache: `https://ftp.ncbi.nih.gov/pub/HomoloGene/current/homologene.data`.
+[2023-12-25 22:07:16] [TRACE]   [OmnipathR] Loaded data from RDS `/home/lijinlian/.cache/OmnipathR/2ccc1998f0ab26ea421885e1334896d25db4554f-1.rds`.
+[2023-12-25 22:07:16] [SUCCESS] [OmnipathR] NCBI HomoloGene (ftp.ncbi.nih.gov): loaded 275237 records from cache

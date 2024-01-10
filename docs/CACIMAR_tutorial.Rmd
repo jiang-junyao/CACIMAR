@@ -286,14 +286,15 @@ create_sankey(links = all_weight_df_long[, c("Source2", "target", "scale_weight"
 ![cell-cell interaction weight profile across species](CACIMAR_tutorial_files/figure-html/ankey_scale_weight_factor2.png)
 
 ## (4) identified the evolutionarily conserved cell-cell interactions (CCI)
-```{r, eval=FALSE}
+```r
 ## caculate the conservation score for intercellular interactions(CSII)
 
-#########
-######### jiangjunyao will continue this part! ######### finish till getting the scaled_ccc_score.rds
-#########
-
-
+load(system.file("extdata", "mouse_cci_test.rda", package = "CACIMAR"))
+load(system.file("extdata", "zebrafish_cci_test.rda", package = "CACIMAR"))
+OrthG = OrthG_Mm_Zf
+ConservedCCI <- Identify_ConservedCCI(OrthG,mm.input,zf.input,
+                                      Species_name1='mm',Species_name2='zf')
+CCC_conserved_sumary = ConservedCCI[[2]]
 
 # load the test data if you don't want to perform analysis above:
 # load(system.file("extdata", "CCC_conserved_sumary.rda", package = "CACIMAR"))

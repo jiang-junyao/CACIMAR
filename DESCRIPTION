@@ -27,7 +27,9 @@ Imports:
     biomaRt,
     ape,
     ggplot2,
-    igraph
+    igraph,
+    purrr,
+    stringr
 Depends: 
     R (>= 4.0),
     Seurat,

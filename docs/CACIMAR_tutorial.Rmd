@@ -110,18 +110,8 @@ Heatmap_Cor(SNT_h,cluster_cols=F, cluster_rows=F,Color1 = c(rgb(102/255,46/255,1
 ```r
 ### get the conserved cell types based on the mutually matched and bigger than 3/4 CSCT score
 conserved_hm_celltypes <- get_conserved_hm_celltypes(SNT_h)
-
 ### used my pointed colors
 load(system.file("extdata", "zf_mm_colors_prefix.Rda", package = "CACIMAR"))
-head(bind_colors)
-#    colors       celltype
-# 1 #F7931E   mmResting MG
-# 2 #F8736A mmActivated MG
-# 3 #A9A9A9         mmRods
-# 4 #96CEB4       mmRod BC
-# 5 #A3A500   mmON cone BC
-# 6 #C0C130  mmOFF cone BC
-
 ### generate a phylogenetic tree
 p <- Plot_phylogenetic_tree(SCT_matrix = SCT_matrix,
                             species.vector = species.vector, 
@@ -265,15 +255,6 @@ SingleCellSignalR_zebrafish_result2 <- subset(SingleCellSignalR_zebrafish_result
 # sum Weights of each cell types
 all_weight_df_long <- calculate_Weights(species1_cci = SingleCellSignalR_mouse_result2,
                                         species2_cci = SingleCellSignalR_zebrafish_result2)
-# show the weight result
-head(all_weight_df_long)
-#             source       target    weight species scale_weight             Source            Source2
-# 1     Activated MG Activated MG 152.07967      Mm  0.008256281     MmActivated MG     MmActivated MG
-# 2       Astrocytes Activated MG 230.97254      Mm  0.012539310       MmAstrocytes       MmAstrocytes
-# 3            Cones Activated MG  51.89929      Mm  0.002817570            MmCones            MmCones
-# 4     GABAergic AC Activated MG  99.92955      Mm  0.005425093     MmGABAergic AC     MmGABAergic AC
-# 5   Glycinergic AC Activated MG  78.95619      Mm  0.004286467   MmGlycinergic AC   MmGlycinergic AC
-# 6 Horizontal cells Activated MG 106.23687      Mm  0.005767513 MmHorizontal cells MmHorizontal cells
 
 # sankey plot will be saved in current directory by default
 # If the colors_file is set to NULL, the colors will be automatically assigned.
@@ -286,38 +267,24 @@ create_sankey(links = all_weight_df_long[, c("Source2", "target", "scale_weight"
 ![cell-cell interaction weight profile across species](CACIMAR_tutorial_files/figure-html/ankey_scale_weight_factor2.png)
 
 ## (4) identified the evolutionarily conserved cell-cell interactions (CCI)
+If you don't want to run the cell-cell interaction above, you can load test data with ***load(system.file("extdata", "mouse_cci_test.rda", package = "CACIMAR"))*** for this part to caculate the conservation score for intercellular interactions(CSII).
 ```r
 ## caculate the conservation score for intercellular interactions(CSII)
-
-load(system.file("extdata", "mouse_cci_test.rda", package = "CACIMAR"))
-load(system.file("extdata", "zebrafish_cci_test.rda", package = "CACIMAR"))
+### scale the raw LRscore
+SingleCellSignalR_mouse_result2$LRscore_scale <- SingleCellSignalR_mouse_result2$LRscore/sum(SingleCellSignalR_mouse_result2$LRscore)
+SingleCellSignalR_zebrafish_result2$LRscore_scale <- SingleCellSignalR_zebrafish_result2$LRscore/sum(SingleCellSignalR_zebrafish_result2$LRscore)
+### get the input for function Identify_ConservedCCI
+SingleCellSignalR_mouse_result3 <- SingleCellSignalR_mouse_result2[, c("ligand", "receptor", "source", "target", "LRscore_scale")]
+SingleCellSignalR_zebrafish_result3 <- SingleCellSignalR_zebrafish_result2[, c("ligand", "receptor", "source", "target", "LRscore_scale")]
+###choose the database and calculate the conservation score
 OrthG = OrthG_Mm_Zf
-ConservedCCI <- Identify_ConservedCCI(OrthG,mm.input,zf.input,
-                                      Species_name1='mm',Species_name2='zf')
+ConservedCCI <- Identify_ConservedCCI(OrthG, SingleCellSignalR_mouse_result3, SingleCellSignalR_zebrafish_result3, 
+                                      Species_name1='mm', Species_name2='zf')
 CCC_conserved_sumary = ConservedCCI[[2]]
-
-# load the test data if you don't want to perform analysis above:
-# load(system.file("extdata", "CCC_conserved_sumary.rda", package = "CACIMAR"))
-head(CCC_conserved_sumary)
-#         Source           Target  con_weight con_num all_sp1_weight all_sp2_weight all_sp1_num all_sp2_num  score_num score_weight
-# 1 Activated MG     Activated MG 0.002811320      12    0.008256281    0.006426577         210          15 0.05333333    0.1914696
-# 2 Activated MG            Cones 0.001794698       8    0.001755534    0.005373207          44          13 0.14035088    0.2517553
-# 3 Activated MG     GABAergic AC 0.001865299       8    0.002642778    0.002575948          67           6 0.10958904    0.3574241
-# 4 Activated MG   Glycinergic AC 0.001820697       8    0.002953106    0.003331352          78           8 0.09302326    0.2897142
-# 5 Activated MG Horizontal cells 0.002282194      10    0.006309411    0.003770427         164           9 0.05780347    0.2264118
-# 6 Activated MG        Microglia 0.004017660      18    0.008025174    0.009509609         206          23 0.07860262    0.2291252
 
 ## ChordDiagram shows the CSII 
 # data for ChordDiagram
 cci_data <- CCC_conserved_sumary[, c("Source", "Target", "score_weight")]
-head(cci_data)
-#         Source           Target score_weight
-# 1 Activated MG     Activated MG    0.1914696
-# 2 Activated MG            Cones    0.2517553
-# 3 Activated MG     GABAergic AC    0.3574241
-# 4 Activated MG   Glycinergic AC    0.2897142
-# 5 Activated MG Horizontal cells    0.2264118
-# 6 Activated MG        Microglia    0.2291252
 
 # colors for ChordDiagram
 # if you don't want to make colors for ChordDiagram, just set grid.col = NULL
@@ -344,21 +311,13 @@ ChordDiagram(net = cci_data,
 ## (5) show the conserved ligand-receptor pairs 
 ```{r, eval=FALSE}
 # We only display the ligand-receptor pairs in the cell type pairs where the CSII is greater than or equal to the third quantile value of CSII
+mm_conserved_CCC <- ConservedCCI$Conserved_ligand_receptor$sp1_orthg_ccc_df
 CCC_conserved_sumary_0.75 <- subset(CCC_conserved_sumary, score_weight >= quantile(CCC_conserved_sumary$score_weight, probs = 0.75))
 LRpair_show_all <- data.frame("LR" = paste(mm_conserved_CCC$sp1ligand.complex, mm_conserved_CCC$sp1receptor.complex, sep = "_"), "Cell_Pair" = paste(mm_conserved_CCC$sp1source, mm_conserved_CCC$sp1target, sep = "_")) 
 index_0.75 <- as.vector(unlist(sapply(paste(CCC_conserved_sumary_0.75$Source, CCC_conserved_sumary_0.75$Target, sep = "_"), function(x) grep(x, LRpair_show_all$Cell_Pair))))
 LRpair_show_0.75 <- LRpair_show_all[index_0.75,]
 # We can create a group variable that determines the colors for both the text and points 
 LRpair_show_0.75$group <- as.vector(unlist(sapply(LRpair_show_0.75$Cell_Pair, function(x) strsplit(x, split = "_")[[1]][1])))
-head(LRpair_show_0.75)
-#             LR                   Cell_Pair        group
-# 38     App_Rpsa   Activated MG_GABAergic AC Activated MG
-# 168   App_Aplp2   Activated MG_GABAergic AC Activated MG
-# 391   App_Aplp1   Activated MG_GABAergic AC Activated MG
-# 438 Ncam1_Gfra1   Activated MG_GABAergic AC Activated MG
-# 41     App_Rpsa Activated MG_Glycinergic AC Activated MG
-# 171   App_Aplp2 Activated MG_Glycinergic AC Activated MG
-
 # we use the colors above, or you can set fill_colors = NULL
 # LR_data should only contain 3 columns, representing LR pairs, Cell type pairs, and groups
 show_LR_pairs(LR_data = LRpair_show_0.75, fill_colors = colors, color_x_in_group = T)

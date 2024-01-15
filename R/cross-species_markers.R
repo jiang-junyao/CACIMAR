@@ -91,6 +91,119 @@ Identify_ConservedMarkers <- function(OrthG,Species1_Marker_table,Species2_Marke
 
 }
 
+#' Identify conserved markers in conserved celltype
+#'
+#' Identify orthologs marker genes for two species
+#' @description Identify orthologs marker genes for two species based on orthologs database
+#' @param OrthG ortholog genes database
+#' @param Species1_Marker_table data.frame of species 1, should contain 'gene' and
+#' 'Allcluster' columns.
+#' @param Species2_Marker_table data.frame of species 2, should contain 'gene' and
+#' 'Allcluster' columns.
+#' @param Species_name1 character, indicating the species names of Species1_Marker_table.
+#' @param Species_name2 character, indicating the species names of Species2_Marker_table
+#' @param conserved_celltype_pair character, indicating the conserved celltypes
+#'
+#' @return
+#' @export
+#'
+#' @examples
+identify_conserved_marker <- function(OrthG,Species1_Marker_table,
+                                      Species2_Marker_table,
+                                      Species_name1,Species_name2,
+                                      conserved_celltype_pair){
+  ### check species name
+  Species_name1 <- tolower(Species_name1)
+  Species_name2 <- tolower(Species_name2)
+  Spec1 <- colnames(OrthG)[2]
+  Spec2 <- colnames(OrthG)[4]
+  Spec1 <- gsub('_ID','',Spec1)
+  Spec2 <- gsub('_ID','',Spec2)
+  if (Spec1 == Species_name1 & Spec2 == Species_name2) {
+    Species_name <- c(Spec1,Spec2)
+    Species1_Marker <- Species1_Marker_table
+    Species2_Marker <- Species2_Marker_table
+  }else if(Spec2 == Species_name1 & Spec1 == Species_name2){
+    Species_name <- c(Spec2,Spec1)
+    Species2_Marker <- Species1_Marker_table
+    Species1_Marker <- Species2_Marker_table
+  }else{stop('please input correct Species name')}
+
+  conserved_list = list()
+  for (i in conserved_celltype_pair) {
+    spc1_cluster = unlist(strsplit(i,'-'))[1]
+    spc2_cluster = unlist(strsplit(i,'-'))[2]
+    spc1_marker = Species1_Marker_table[Species1_Marker_table$cluster==spc1_cluster,]
+    spc2_marker = Species2_Marker_table[Species2_Marker_table$cluster==spc2_cluster,]
+    conserved_gene = identify_conserved_gene(OrthG,spc1_marker$gene,
+                                             spc2_marker$gene,
+                                             Species_name1,Species_name2)
+    conserved_gene = as.data.frame(conserved_gene[,6:7])
+    conserved_gene$spc1_cluster = spc1_cluster
+    conserved_gene$spc2_cluster = spc2_cluster
+    conserved_list[[i]] = conserved_gene
+  }
+  conserved_df = do.call(bind_rows,conserved_list)
+  colnames(conserved_df) = c(paste0(Species_name1,'_conserved_marker'),
+                             paste0(Species_name2,'_conserved_marker'),
+                             paste0(Species_name1,'_cluster'),
+                             paste0(Species_name2,'_cluster'))
+  return(conserved_df)
+}
+
+#' Title
+#'
+#' @param OrthG ortholog genes database
+#' @param spc1_marker vector, indicating the gene of species 1
+#' @param spc2_marker vector, indicating the gene of species 2
+#' @param Species_name1 character, indicating the species names of Species1_Marker_table.
+#' @param Species_name2 character, indicating the species names of Species2_Marker_table
+#'
+#' @return
+#' @export
+#'
+#' @examples
+identify_conserved_gene <- function(OrthG,spc1_marker,spc2_marker,Species_name1,
+                                    Species_name2){
+  Species_name1 <- tolower(Species_name[1])
+  Species_name2 <- tolower(Species_name[2])
+  Spec1 <- colnames(OrthG)[2]
+  Spec2 <- colnames(OrthG)[4]
+  Spec1 <- gsub('_ID','',Spec1)
+  Spec2 <- gsub('_ID','',Spec2)
+  if (Spec1 == Species_name1 & Spec2 == Species_name2) {
+    Species_name <- c(Spec1,Spec2)
+    Species1_Marker <- Species1_Marker_table
+    Species2_Marker <- Species2_Marker_table
+  }else if(Spec2 == Species_name1 & Spec1 == Species_name2){
+    Species_name <- c(Spec2,Spec1)
+    Species2_Marker <- Species1_Marker_table
+    Species1_Marker <- Species2_Marker_table
+  }else{stop('please input correct Species name')}
+  Spec1_gene <- data.frame(rep(0,length(spc1_marker)),
+                           rep(1,length(spc1_marker)))
+  rownames(Spec1_gene) <- spc1_marker
+  Spec2_gene <- data.frame(rep(0,length(spc2_marker)),
+                           rep(1,length(spc2_marker)))
+  rownames(Spec2_gene) <- spc2_marker
+  Species_name = c(Species_name1,Species_name2)
+  Exp2 <- Get_OrthG(OrthG, Spec1_gene, Spec2_gene, Species_name)
+  if (grepl('ENS',rownames(Spec1_gene)[1])) {
+    Type1 <- paste0('Used_',Species_name[1],'_ID')
+    Type2 <- paste0('Used_',Species_name[2],'_ID')
+  }else{
+    Type1 <- paste0('Used_',Species_name[1],'_Symbol')
+    Type2 <- paste0('Used_',Species_name[2],'_Symbol')
+  }
+  Exp2 = Exp2[Exp2[,6] %in% spc1_marker,]
+  Exp2 = Exp2[Exp2[,7] %in% spc2_marker,]
+  if (nrow(Exp2)==0) {
+    stop('No homologous genes appear!')
+  }
+  return(Exp2)
+}
+
+
 
 Get_OrthG <- function(OrthG1, MmRNA1, ZfRNA1, Spec1, MmPattern1='', ZfPattern1=''){
   tOrthG1 <- table(OrthG1$Type)

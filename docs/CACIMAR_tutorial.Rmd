@@ -38,7 +38,7 @@ library(reshape2)
 ```
 
 # 1.Identify markers
-  In this part, CACIMAR first uses receiver operating characteristic (ROC) based method in 'FindAllMarkers' function of [Seurat](https://satijalab.org/seurat/articles/get_started.html) to identify markers in each cluster for every species individually. Then, based on marker genes identified above, CACIMAR calculates the power of markers(MP, MP= 2 × abs(AUC-0.5)) in each cluster and the expression differences of markers(logFC) between clusters. Markers with MP > 0.35 and logFC > 0.1 will be retained. 
+  In this part, CACIMAR first used receiver operating characteristic (ROC) based method in 'FindAllMarkers' function of [Seurat](https://satijalab.org/seurat/articles/get_started.html) to identify markers in each cluster for every species individually. Then, based on marker genes identified above, CACIMAR calculates the power of markers(MP, MP= 2 × abs(AUC-0.5)) in each cluster and the expression differences of markers(logFC) between clusters. Markers with MP > 0.35 and logFC > 0.1 will be retained. 
   
 ## (1) Inputs data of this part
 

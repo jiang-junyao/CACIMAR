@@ -138,7 +138,12 @@ identify_conserved_marker <- function(OrthG,Species1_Marker_table,
     conserved_gene = identify_conserved_gene(OrthG,spc1_marker$gene,
                                              spc2_marker$gene,
                                              Species_name1,Species_name2)
-    conserved_gene = as.data.frame(conserved_gene[,6:7])
+    if (class(conserved_gene)=="matrix") {
+      conserved_gene = as.data.frame(conserved_gene[,6:7])
+    }else{
+      conserved_gene = as.data.frame(t(as.data.frame(conserved_gene[6:7])))
+    }
+
     conserved_gene$spc1_cluster = spc1_cluster
     conserved_gene$spc2_cluster = spc2_cluster
     conserved_list[[i]] = conserved_gene
@@ -165,21 +170,12 @@ identify_conserved_marker <- function(OrthG,Species1_Marker_table,
 #' @examples
 identify_conserved_gene <- function(OrthG,spc1_marker,spc2_marker,Species_name1,
                                     Species_name2){
-  Species_name1 <- tolower(Species_name[1])
-  Species_name2 <- tolower(Species_name[2])
+  Species_name1 <- tolower(Species_name1)
+  Species_name2 <- tolower(Species_name2)
   Spec1 <- colnames(OrthG)[2]
   Spec2 <- colnames(OrthG)[4]
   Spec1 <- gsub('_ID','',Spec1)
   Spec2 <- gsub('_ID','',Spec2)
-  if (Spec1 == Species_name1 & Spec2 == Species_name2) {
-    Species_name <- c(Spec1,Spec2)
-    Species1_Marker <- Species1_Marker_table
-    Species2_Marker <- Species2_Marker_table
-  }else if(Spec2 == Species_name1 & Spec1 == Species_name2){
-    Species_name <- c(Spec2,Spec1)
-    Species2_Marker <- Species1_Marker_table
-    Species1_Marker <- Species2_Marker_table
-  }else{stop('please input correct Species name')}
   Spec1_gene <- data.frame(rep(0,length(spc1_marker)),
                            rep(1,length(spc1_marker)))
   rownames(Spec1_gene) <- spc1_marker
@@ -197,10 +193,12 @@ identify_conserved_gene <- function(OrthG,spc1_marker,spc2_marker,Species_name1,
   }
   Exp2 = Exp2[Exp2[,6] %in% spc1_marker,]
   Exp2 = Exp2[Exp2[,7] %in% spc2_marker,]
-  if (nrow(Exp2)==0) {
-    stop('No homologous genes appear!')
+  if (!is_empty(Exp2)) {
+      return(Exp2)
+  }else{
+    print('no marker find!')
   }
-  return(Exp2)
+
 }
 
 

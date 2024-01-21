@@ -1,6 +1,8 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
+[![](https://img.shields.io/badge/Seurat-version4.2-red.svg)](https://satijalab.org/seurat/articles/get_started.html)
+
 # CACIMAR: cross-species analysis of cell identities, markers and regulations using single-cell sequencing profiles
 
 CACIMAR has the following 4 main functions:

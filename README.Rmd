@@ -13,6 +13,8 @@ knitr::opts_chunk$set(
 )
 ```
 
+`r badger::badge_custom("Seurat", "version4.2", "red", "https://satijalab.org/seurat/articles/get_started.html")`
+
 # CACIMAR: cross-species analysis of cell identities, markers and regulations using single-cell sequencing profiles
 
 CACIMAR has the following 4 main functions:

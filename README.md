@@ -29,9 +29,7 @@ devtools::install_github("jiang-junyao/CACIMAR")
 
 ## News
 
-### Version1.1.0 (developing version)
-
-Add function to build homologous gene database
+### Version1.0.0: First version of CACIMAR was published!
 
 ## Tutorial
 

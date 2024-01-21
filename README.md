@@ -20,13 +20,7 @@ style="width:70.0%;height:70.0%" />
 
 ## Installation
 
-Install CACIMAR from CRAN, run:
-
-``` r
-install.packages('CACIMAR')
-```
-
-Install developing version of CACIMAR from github, run:
+Install CACIMAR from github, run:
 
 ``` r
 # install.packages("devtools")
@@ -41,8 +35,8 @@ Add function to build homologous gene database
 
 ## Tutorial
 
-[Cross-species marker genes and cell types analysis of
-retina](https://jiang-junyao.github.io/CACIMAR/CACIMAR_tutorial)
+[Using CACIMAR to analyze retina scRNA-seq data from mouse and
+zebrafish](https://jiang-junyao.github.io/CACIMAR/CACIMAR_tutorial)
 
 ## Citation
 

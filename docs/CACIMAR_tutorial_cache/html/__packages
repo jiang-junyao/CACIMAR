@@ -1,6 +1,5 @@
 Seurat
 SeuratObject
-CACIMAR
 sp
 tidyverse
 ggplot2
@@ -11,6 +10,5 @@ purrr
 dplyr
 stringr
 forcats
-lubridate
 ggtree
-reshape2
+CACIMAR

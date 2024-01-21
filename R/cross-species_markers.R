@@ -156,7 +156,7 @@ identify_conserved_marker <- function(OrthG,Species1_Marker_table,
   return(conserved_df)
 }
 
-#' Title
+#' Identify conserved gene
 #'
 #' @param OrthG ortholog genes database
 #' @param spc1_marker vector, indicating the gene of species 1

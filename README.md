@@ -40,6 +40,4 @@ zebrafish](https://jiang-junyao.github.io/CACIMAR/CACIMAR_tutorial)
 
 ## Citation
 
-[Hoang T, Wang J, Boyd P, et al. Gene regulatory networks controlling
-vertebrate retinal regeneration. Science 2020;
-370(6519):eabb8598](https://www.science.org/doi/10.1126/science.abb8598)
+Preprint: CACIMAR Cross-species Analysis of Cell Identities, Markers, Regulations and Interactions Using Single-cell RNA Sequencing Data(https://www.biorxiv.org/content/10.1101/2024.01.23.576964v1)

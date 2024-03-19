@@ -100,25 +100,26 @@ mm_marker <- Identify_Markers(Mm_seurat,PowerCutoff=0.35, DifferenceCutoff=0.1)
   Besides, we generate a phylogenetic tree based on the CSCT value using the hierarchical clustering method UPGMA (unweighted pair group method using arithmetic mean) to further identify the conserved cell types and the poorly conserved cell types. If cell types from two species are from the same clade of bipartition, the two cell types are considered conserved cell types across species. However, if these conserved cell types are only identified by the phylogenetic tree of cell types, they are regarded as poorly conserved cell types.
 
 If you haven't run step1, you can just use the following code to get input data
-```
+```{r}
 load(system.file("extdata", "zf_mm_markers.rda", package = "CACIMAR"))
 ```
 
-```r
+```{r}
 ### identify evolutionarily conserved cell types based on conservation score of cell types (CSCT)
 OrthG <- OrthG_Mm_Zf
-expression <- Identify_ConservedCellTypes(OrthG, Zf_marker, Mm_marker,'zf','mm')
+expression <- Identify_ConservedCellTypes(OrthG, zf_marker, mm_marker,'zf','mm')
 SCT_matrix <- expression[[2]]
-SNT_h <- SNT[grep('mm',rownames(SCT_matrix)),as.numeric(grep('zf',colnames(SCT_matrix)))]
+SNT_h <- expression[[2]][grep('mm',rownames(SCT_matrix)),as.numeric(grep('zf',colnames(SCT_matrix)))]
 ### show the CSCT value with a heatmap
 Heatmap_Cor(SNT_h,cluster_cols=F, cluster_rows=F,Color1 = c(rgb(102/255,46/255,115/255),rgb(31/255,153/255,139/255),rgb(251/255,232/255,48/255)))
 ```
 
 Then, we identify conserved cell type based on the CSCT.
-```r
-conserved_celltypes = identify_conserved_pair(SNT)
+```{r}
+conserved_celltypes = identify_conserved_pair(SNT_h)
+print(conserved_celltypes)
 ```
-![cross-species cell types](CACIMAR_tutorial_files/figure-html/conserved_celltypes_heatmap.png)
+
 
 Then we can evaluate evolutionarily conserved cell types and poorly conserved cell types through phylogenetic tree. By default, distinct fonts are employed for tip labels to indicate the evolutionary conservation status of cell types. This allows for differentiation between evolutionarily conserved cell types(bold.italic), poorly conserved cell types(italic), and unconserved cell types(plain). To customize the colors for the tip labels, you can utilize the tiplab_cols parameter and specify the desired color scheme. The default color scheme assigns dark blue to represent evolutionarily conserved cell types, light blue to represent poorly conserved cell types, and grey to represent unconserved cell types. Additionally, if you wish to change the method used for constructing the phylogenetic tree, you can modify the tree_method parameter to "classic Neighbor-Joining" method.
 
@@ -201,7 +202,7 @@ ConservedNetworks_ct <- identify_ct_ConservedNetworks(OrthG, Species1_GRN, Speci
 Heatmap_Cor(ConservedNetworks_ct[[2]], cluster_cols=F, cluster_rows=F, Color1 = c(rgb(102/255,46/255,115/255), rgb(31/255,153/255,139/255), rgb(251/255,232/255,48/255)))
 ```
 
-![CSRN of cell type-specific regulatory networks](CACIMAR_tutorial_files/figure-html/cell_type_network_NCS_top_regulations_300.png)
+![CSRN of cell type-specific regulatory networks](./fig_use/cell_type_network_NCS_top_regulations_300.png)
 
 ### Assess the evolutionary conservation of Modularized regulatory networks
   Modular regulatory networks used here are constructed by R package [IReNA](https://github.com/jiang-junyao/IReNA), which can integrate scRNA-seq and scATAC-seq/ATAC-seq data or use scRNA-seq/RNA-seq data alone to construct modularized regulatory networks. [WGCNA](https://horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/) is an optional method that can generate the input. However, WGCNA only can construct regulatory networks through bulk RNA-seq data.
@@ -211,7 +212,7 @@ ConservedNetworks <- Identify_ConservedNetworks(OrthG, mm_gene_network, zf_gene_
 Heatmap_Cor(ConservedNetworks[[2]], cluster_cols=F, cluster_rows=F, Color1 = c(rgb(102/255,46/255,115/255), rgb(31/255,153/255,139/255), rgb(251/255,232/255,48/255)))
 ```
 
-![CSRN of modularized regulatory networks](CACIMAR_tutorial_files/figure-html/NCS_module.png)
+![CSRN of modularized regulatory networks](./fig_use/NCS_module.png)
 
 ## Step5:Identify conserved intercellular interactions (cell-cell interaction)
   CACIMAR employs the SingleCellSignalR algorithm from [liana](https://saezlab.github.io/liana/) to identify evolutionarily conserved cell-cell interactions (CCI) based on the expression levels of ligands and receptors. CCI that satisfy the following criteria are regarded as evolutionarily conserved: (I) the interactions between ligands and receptors demonstrate consistency, and (II) the cell type of the ligand and receptor in species 1 should correspond to the cell type of the ligand and receptor in species 2, respectively. Subsequently, we compute the proportion of consistent intercellular interactions to gauge the conservation score for intercellular interactions (CSII).

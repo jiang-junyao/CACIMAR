@@ -127,33 +127,17 @@ Then we can evaluate evolutionarily conserved cell types and poorly conserved ce
 ### get the conserved cell types based on the mutually matched and bigger than 3/4 CSCT score
 conserved_hm_celltypes <- get_conserved_hm_celltypes(SNT_h)
 ### used my pointed colors
-load(system.file("extdata", "zf_mm_colors_prefix.Rda", package = "CACIMAR"))
+load(system.file("extdata", "bind_colors.rda", package = "CACIMAR"))
 ### generate a phylogenetic tree
+species.vector <- substr(rownames(SCT_matrix), 1, 2)
 p <- Plot_phylogenetic_tree(SCT_matrix = SCT_matrix,
                             species.vector = species.vector, 
                             conserved_hm_celltype = conserved_hm_celltypes,
                             annotation_colors_df = bind_colors,
                             colors_labels = c("Mouse", "Zebrafish")) 
-
-### Show the conservation status of cell types.
-head(p$conserved_table, n = 10)
-# # A tibble: 10 × 11
-# parent  node branch.length label            isTip     x     y branch angle Tip_group        fontface   
-# <int> <int>         <dbl> <chr>            <lgl> <dbl> <dbl>  <dbl> <dbl> <fct>            <fct>      
-#   1     62     1         0.296 zfRods           TRUE    0.5    18  0.352  202. conserved        bold.italic
-# 2     60     2         0.398 zfGABAergic AC   TRUE    0.5    29  0.301  326. conserved        bold.italic
-# 3     50     3         0.395 zfMicroglia      TRUE    0.5    13  0.303  146. conserved        bold.italic
-# 4     54     4         0.430 zfResting MG     TRUE    0.5     8  0.285   90  conserved        bold.italic
-# 5     58     5         0.480 zfGlycinergic AC TRUE    0.5    27  0.260  304. poorly_conserved italic     
-# 6     51     6         0.491 zfProgenitors    TRUE    0.5    15  0.255  169. not_conserved    plain      
-# 7     56     7         0.459 zfCone BC        TRUE    0.5    22  0.270  248. conserved        bold.italic
-# 8     55     8         0.436 zfV/E cells      TRUE    0.5    10  0.282  112. conserved        bold.italic
-# 9     63     9         0.394 zfCones          TRUE    0.5    20  0.303  225  conserved        bold.italic
-# 10     59    10         0.464 zfActivated MG   TRUE    0.5    16  0.268  180  conserved        bold.italic
-
 ```
 
-![cross-species cell types](CACIMAR_tutorial_files/figure-html/UPGMA_Tree_0.35_Brandlength.png)
+![cross-species cell types](./fig_use/classic_Neighbor_Joining_Tree.png)
 
 
 ## Step3:Identify evolutionarily conserved markers
@@ -167,7 +151,6 @@ load(system.file("extdata", "zf_mm_markers.rda", package = "CACIMAR"))
 ```{r message=FALSE,warning=FALSE}
 conserved_markers = Identify_ConservedMarkers(OrthG_Mm_Zf,mm_marker,zf_marker,
                                               'mm','zf',conserved_celltypes)
-
 ```
 
 ### Plot conserved markers
@@ -228,6 +211,9 @@ SingleCellSignalR_zebrafish_result <- perform_CCI_analysis(seurat_obj=Zf_seurat,
 # filter interactions with LRscore > 0.5
 SingleCellSignalR_mouse_result2 <- subset(SingleCellSignalR_mouse_result, LRscore > 0.5)
 SingleCellSignalR_zebrafish_result2 <- subset(SingleCellSignalR_zebrafish_result, LRscore > 0.5)
+### scale the raw LRscore
+SingleCellSignalR_mouse_result2$LRscore_scale <- SingleCellSignalR_mouse_result2$LRscore/sum(SingleCellSignalR_mouse_result2$LRscore)
+SingleCellSignalR_zebrafish_result2$LRscore_scale <- SingleCellSignalR_zebrafish_result2$LRscore/sum(SingleCellSignalR_zebrafish_result2$LRscore)
 ```
 
 ### Overall cell-cell interactions profile across two species
@@ -240,22 +226,51 @@ all_weight_df_long <- calculate_Weights(species1_cci = SingleCellSignalR_mouse_r
 
 # sankey plot will be saved in current directory by default
 # If the colors_file is set to NULL, the colors will be automatically assigned.
-create_sankey(links = all_weight_df_long[, c("Source2", "target", "scale_weight")],
-              output_file = "sankey_scale_weight.html",
+# we change the order of celltypes
+library(tidyverse)
+vector_factor1 <- c("MmActivated MG", "MmCones", "MmGABAergic AC", "MmGlycinergic AC",
+                    "MmHorizontal cells", "MmMicroglia", "MmPericytes", "MmResting MG", 
+                    "MmRGC", "MmRods","MmRPE", "MmV/E cells", "MmRod BC", "MmOFF cone BC", 
+                    "MmON cone BC", "MmReticulocytes", "MmAstrocytes",
+                    "Activated MG", "Cones", "GABAergic AC", "Glycinergic AC", 
+                    "Horizontal cells", "Microglia",
+                    "Pericytes", "Resting MG", "RGC", "Rods",
+                    "RPE", "V/E cells", "BC", "Progenitors", "Cone BC")
+vector_factor2 <- c(
+  "ZfActivated MG", "ZfCones", "ZfGABAergic AC", "ZfGlycinergic AC", 
+  "ZfHorizontal cells", "ZfMicroglia", "ZfPericytes", "ZfResting MG", 
+  "ZfRGC", "ZfRods","ZfRPE", "ZfV/E cells",
+  "ZfCone BC", "ZfBC", "ZfProgenitors", 
+  "Activated MG",  "Cones", "GABAergic AC", "Glycinergic AC",
+  "Horizontal cells", "Microglia",  "Pericytes",
+  "Resting MG", "RGC", "Rods", "RPE", "V/E cells",
+  "Rod BC", "OFF cone BC", "ON cone BC", "Reticulocytes", "Astrocytes" )
+df <- all_weight_df_long %>%
+  mutate(target = factor(target, levels = vector_factor2)) %>%
+  arrange(target)
+df_factor <- df %>%
+  mutate(Source2 = factor(Source2, levels = vector_factor1)) %>%
+  arrange(Source2)
+
+# if you don't want to change the order, just substitude df_factor with all_weight_df_long
+load(system.file("extdata", "sankey_cell_type_color.rda", package = "CACIMAR"))
+create_sankey(links = df_factor[, c("Source2", "target", "scale_weight")],
+              output_file = "sankey.html",
+              node_width = 80,
+              x_scaling_factor = 1.22,
+              font_size = 50,
               specie_name1 = "Mm",
-              specie_name2 = "Zf")
+              specie_name2 = "Zf",
+              colors_file = sankey_cell_type_color
+)
 ```
 
-![cell-cell interaction weight profile across species](CACIMAR_tutorial_files/figure-html/ankey_scale_weight_factor2.png)
+![cell-cell interaction weight profile across species](./fig_use/sankey_plot.png)
 
 ### Identified the evolutionarily conserved cell-cell interactions (CCI)
 If you don't want to run the cell-cell interaction above, you can load test data with ***load(system.file("extdata", "mouse_cci_test.rda", package = "CACIMAR"))*** for this part to caculate the conservation score for intercellular interactions(CSII).
 ```r
 ## caculate the conservation score for intercellular interactions(CSII)
-### scale the raw LRscore
-SingleCellSignalR_mouse_result2$LRscore_scale <- SingleCellSignalR_mouse_result2$LRscore/sum(SingleCellSignalR_mouse_result2$LRscore)
-SingleCellSignalR_zebrafish_result2$LRscore_scale <- SingleCellSignalR_zebrafish_result2$LRscore/sum(SingleCellSignalR_zebrafish_result2$LRscore)
-### get the input for function Identify_ConservedCCI
 SingleCellSignalR_mouse_result3 <- SingleCellSignalR_mouse_result2[, c("ligand", "receptor", "source", "target", "LRscore_scale")]
 SingleCellSignalR_zebrafish_result3 <- SingleCellSignalR_zebrafish_result2[, c("ligand", "receptor", "source", "target", "LRscore_scale")]
 ###choose the database and calculate the conservation score
@@ -266,46 +281,46 @@ CCC_conserved_sumary = ConservedCCI[[2]]
 
 ## ChordDiagram shows the CSII 
 # data for ChordDiagram
+# you can load test data: load(system.file("extdata", "CCC_conserved_sumary.rda", package = "CACIMAR"))
 cci_data <- CCC_conserved_sumary[, c("Source", "Target", "score_weight")]
 
 # colors for ChordDiagram
 # if you don't want to make colors for ChordDiagram, just set grid.col = NULL
-colors <- c(rgb(247/255,147/255,30/255), rgb(248/255,115/255,106/255), rgb(169/255,169/255,169/255), 
-            rgb(150/255,206/255,180/255), rgb(163/255,165/255,0/255), rgb(192/255,193/255,48/255), 
-            rgb(157/255,115/255,194/255), rgb(183/255,76/255,171/255), rgb(230/255,134/255,201/255), 
-            rgb(140/255,198/255,63/255), rgb(255/255,191/255,15/255), rgb(103/255,199/255,193/255), 
-            rgb(3/255,161/255,198/255), rgb(97/255,156/255,255/255), rgb(129/255,70/255,58/255), 
-            rgb(0/255,114/255,189/255), rgb(74/255,76/255,191/255))
-grid.col_name <- c("Resting MG", "Activated MG", "Rods", "Rod BC", "ON cone BC", "OFF cone BC", "GABAergic AC", "Glycinergic AC", "Cones", "RGC", "Microglia", "V/E cells", "Horizontal cells", "Astrocytes", "RPE", "Pericytes", "Reticulocytes")
-names(colors) <- grid.col_name
+load(system.file("extdata", "sankey_cell_type_color.rda", package = "CACIMAR"))
+colors <- sankey_cell_type_color$colors
+names(colors) <- sankey_cell_type_color$celltype
 grid.col <- colors[c(unique(cci_data$Source), unique(cci_data$Target))]
 
 # plot ChordDiagram
-ChordDiagram(net = cci_data, 
+ChordDiagram(net = cci_data,
              grid.col = grid.col,
-             order_grid = grid.col_name,
-             filename = "chordDiagram_cutoff0.75.pdf",
-             link_colors_threshold = 0.75)
+             cex = 1.3,
+             filename = "chordDiagram.pdf",
+             link_colors_threshold = 0.75
+)
 ```
 
-![conservation score for intercellular interactions](CACIMAR_tutorial_files/figure-html/chordDiagram_cutoff0.75_scale.png)
+![conservation score for intercellular interactions](./fig_use/chordDiagram_edit.png)
 
 ### Show the conserved ligand-receptor pairs 
 ```{r, eval=FALSE}
 # We only display the ligand-receptor pairs in the cell type pairs where the CSII is greater than or equal to the third quantile value of CSII
+# mm
 mm_conserved_CCC <- ConservedCCI$Conserved_ligand_receptor$sp1_orthg_ccc_df
 CCC_conserved_sumary_0.75 <- subset(CCC_conserved_sumary, score_weight >= quantile(CCC_conserved_sumary$score_weight, probs = 0.75))
-LRpair_show_all <- data.frame("LR" = paste(mm_conserved_CCC$sp1ligand.complex, mm_conserved_CCC$sp1receptor.complex, sep = "_"), "Cell_Pair" = paste(mm_conserved_CCC$sp1source, mm_conserved_CCC$sp1target, sep = "_")) 
-index_0.75 <- as.vector(unlist(sapply(paste(CCC_conserved_sumary_0.75$Source, CCC_conserved_sumary_0.75$Target, sep = "_"), function(x) grep(x, LRpair_show_all$Cell_Pair))))
-LRpair_show_0.75 <- LRpair_show_all[index_0.75,]
-# We can create a group variable that determines the colors for both the text and points 
-LRpair_show_0.75$group <- as.vector(unlist(sapply(LRpair_show_0.75$Cell_Pair, function(x) strsplit(x, split = "_")[[1]][1])))
-# we use the colors above, or you can set fill_colors = NULL
-# LR_data should only contain 3 columns, representing LR pairs, Cell type pairs, and groups
-show_LR_pairs(LR_data = LRpair_show_0.75, fill_colors = colors, color_x_in_group = T)
+# Mm_seurat_symbol and Zf_seurat_symbol are seurat objects 
+# species_set can only be two charater, like "Mm"
+LRpair_show_mm <- get_average_expression(CCC_conserved_sumary = CCC_conserved_sumary_0.75, specie_conserved_CCC = mm_conserved_CCC, seurat_object = Mm_seurat_symbol, avg_group = "celltype", species_set = "Mm")
+# zf
+CCC_conserved_sumary_0.75_for_zf <- subset(CCC_conserved_sumary, score_weight >= quantile(CCC_conserved_sumary$score_weight, probs = 0.75))
+LRpair_show_zf <- get_average_expression(CCC_conserved_sumary = CCC_conserved_sumary_0.75_for_zf, specie_conserved_CCC = zf_conserved_CCC, seurat_object = Zf_seurat_symbol, avg_group = "celltype", species_set = "Zf")
+
+merge_width_df <- Merge_data_for_heatmap(LRpair_show_mm, LRpair_show_zf)
+colors_list <- list(species = c(Mm = rgb(102/255,46/255,115/255), Zf = rgb(31/255,153/255,139/255)))
+pheatmap_LR(width_df = merge_width_df, filename = "lr_avg_pheatmap.pdf", colors_list = colors_list)
 ```
 
-![conserved ligand-receptor pairs](CACIMAR_tutorial_files/figure-html/conserved_LR_0.75_xcolors.png)
+![conserved ligand-receptor pairs](./fig_use/lr_avg_pheatmap.png)
 
 # Addtional function: Build homologous gene database
   Under the situation that homologous gene database of your interested species is not included in our package, CACIMAR provides to build your own homologous gene database according to MGI database. 

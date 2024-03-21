@@ -85,7 +85,7 @@ Plot_phylogenetic_tree <- function(
     tippoint.shape = 21,
     tippoint.shape.size = 0,
     geom_nodepoint = 5,
-    show_branch.length = TRUE,
+    show_branch.length = FALSE,
     round_x = 2,
     fill_brandlength = 'lightgreen',
     size_brandlength = 6,
@@ -131,7 +131,6 @@ Plot_phylogenetic_tree <- function(
   stopifnot(is.character(bootstrap_value_col))
   stopifnot(is.numeric(width))
   stopifnot(is.numeric(height))
-
   dist <- as.dist(1 - SCT_matrix)
   if (tree_method == "hierarchical clustering") {
     tree <- stats::hclust(dist, method = hcluster.method)
@@ -139,7 +138,6 @@ Plot_phylogenetic_tree <- function(
   } else if (tree_method == "classic Neighbor-Joining") {
     tree <- ape::nj(dist)
   }
-
   tree$species <- species.vector
   if (tree_method == "classic Neighbor-Joining") {
     Pairwise_distances_main <- "classic Neighbor-Joining algorithm"
@@ -153,11 +151,9 @@ Plot_phylogenetic_tree <- function(
     Pairwise_distances_main <- paste("hierarchical clustering", hcluster.method, sep = "_")
     cat(paste("Creating tree with hierarchical clustering", hcluster.method, sep = ":"))
   }
-
   if (Show_Pairwise_distances) {
     plot_Pairwise_distances(dist, tree, Pairwise_distances_main)
   }
-
   set.seed(1234)
   if (tree_method == "classic Neighbor-Joining") {
     myBoots <- ape::boot.phylo(tree, SCT_matrix, function(d) {
@@ -170,7 +166,6 @@ Plot_phylogenetic_tree <- function(
     B = boot_times,
     block = ceiling(ncol(SCT_matrix)/2),
     mc.cores = 1)
-
   } else if (tree_method == "hierarchical clustering") {
     myBoots <- ape::boot.phylo(tree, SCT_matrix, function(d, method = hcluster.method) {
       dist <- as.dist(1 - d)
@@ -185,11 +180,11 @@ Plot_phylogenetic_tree <- function(
     mc.cores = 1)
 
   }
-
   tree_plot <- Plot_Tree(tree,
                          layout.tree = layout.tree,
                          tree_size = tree_size,
                          xlim_tree = xlim_tree,
+                         tree_method = tree_method,
                          fontface_for_tiplab = fontface_for_tiplab,
                          set_fontface_for_tiplab = set_fontface_for_tiplab,
                          conserved_hm_celltype = conserved_hm_celltype,
@@ -230,6 +225,7 @@ Plot_phylogenetic_tree <- function(
 plot_Pairwise_distances <- function(dist, tree, Pairwise_distances_main) {
   x <- as.vector(dist)
   y <- as.vector(as.dist(cophenetic(tree)))
+  # plot
   plot(x, y,
        xlab = "Original Pairwise Distances",
        ylab = "Pairwise Distances on the Tree",
@@ -276,6 +272,7 @@ Plot_Tree <- function(
     layout.tree,
     tree_size,
     xlim_tree,
+    tree_method,
     fontface_for_tiplab,
     set_fontface_for_tiplab,
     conserved_hm_celltype,
@@ -285,8 +282,8 @@ Plot_Tree <- function(
     round_x,
     fill_brandlength,
     size_brandlength,
-    col.value, # species colors
-    annotation_colors_df, # celltype colors df
+    col.value,
+    annotation_colors_df,
     brewer_pal_used,
     colors_labels,
     show_colnames,
@@ -313,16 +310,15 @@ Plot_Tree <- function(
   require(ggtree)
   require(ggplot2)
   require(scales)
-
+  # tree
   tree.p <- ggtree::ggtree(tree, layout = layout.tree, size = tree_size, col = "black") + xlim(NA, xlim_tree) #text show
   data <- fortify(tree)
-
+  print(head(data))
   tree.df <- data.frame("tip.label" = tree$tip.label)
   rownames(tree.df) <- tree$tip.label
   tree.df2 <- data.frame("species" = tree$species)
   rownames(tree.df2) <- tree$tip.label
-
-  Tip1 <- filter(data, isTip == "TRUE")
+  Tip1 <- subset(data, isTip == "TRUE")
   Tip_p <- as.data.frame(table(Tip1$parent))
   conserved_tree_node <- Tip_p$Var1[which(Tip_p$Freq == 2)]
   not_conserved_tree_node <- Tip_p$Var1[which(Tip_p$Freq == 1)]
@@ -332,17 +328,18 @@ Plot_Tree <- function(
   conserved_h_id <- as.vector(sapply(conserved_hm_celltype, function(x) grep(x, Tip1$label)))
   Tip1$Tip_group[conserved_h_id] <- "conserved"
   Tip1$Tip_group <- factor(Tip1$Tip_group, levels = c("conserved", "poorly_conserved", "not_conserved"))
-
+  rm_conserved <- subset(Tip1, branch.length == x)
+  if (tree_method == "classic Neighbor-Joining" & nrow(rm_conserved) != 0) {
+    for (i in 1:nrow(rm_conserved)) {
+      Tip1$Tip_group[grep(rm_conserved[i,"label"], Tip1[["label"]])] <- "not_conserved"
+    }
+  }
   if (fontface_for_tiplab) {
     Tip1$fontface <- set_fontface_for_tiplab[3]
     Tip1$fontface[which(Tip1$Tip_group == "poorly_conserved")] <- set_fontface_for_tiplab[2]
     Tip1$fontface[which(Tip1$Tip_group == "conserved")] <- set_fontface_for_tiplab[1]
     Tip1$fontface <- factor(Tip1$fontface, levels = set_fontface_for_tiplab)
   }
-
-  cat("The conservation of cell types are shown below:")
-  print(table(Tip1$Tip_group))
-  cat("\n\n")
   cat("conserved cell types are:\n")
   cat(Tip1$label[which(Tip1$Tip_group == "conserved")])
   cat("\n\n")
@@ -352,7 +349,6 @@ Plot_Tree <- function(
   cat("not conserved cell types are:\n")
   cat(Tip1$label[which(Tip1$Tip_group == "not_conserved")])
   cat("\n\n")
-
   if (!is.null(annotation_colors_df)) {
     colors_a <- c(annotation_colors_df$colors)
     colors_a <- setNames(colors_a, annotation_colors_df$celltype)
@@ -365,14 +361,12 @@ Plot_Tree <- function(
     colors_a <- c(species_a_posible_celltypes_col, species_a_posible_celltypes_col)
     colors_a <- setNames(colors_a, c(species_a_posible_celltypes, species_b_posible_celltypes))
   }
-
   col.value <- setNames(col.value, rev(unique(tree.df2$species)))
   if (is.null(colors_labels)) {
     colors_labels_used <- unique(tree.df2$species)
   } else {
     colors_labels_used <- colors_labels
   }
-
   tregraph <- gheatmap(
     tree.p,
     tree.df,
@@ -404,13 +398,11 @@ Plot_Tree <- function(
       breaks = rev(unique(tree.df2$species)),
       labels = colors_labels_used
     )
-
-  if (is_null(tiplab_cols) & length(unique(Tip1$Tip_group)) == 3) {
+  if (is.null(tiplab_cols) & length(unique(Tip1$Tip_group)) == 3) {
     tiplab_cols <- c("#003472","#4b5cc4", "#737373")
   } else  {
     tiplab_cols <-grDevices::colorRampPalette(c("#CC6666", "#9999CC", "#66CC99"))(length(unique(Tip1$Tip_group)))
   }
-
   if (fontface_for_tiplab) {
     tregraph2 <- tregraph2 + ggnewscale::new_scale_fill()
     tregraph3 <- tregraph2 %<+% Tip1 +
@@ -436,11 +428,8 @@ Plot_Tree <- function(
       ) +
       geom_nodepoint(size = geom_nodepoint)
   }
-
   if (show_branch.length) {
     tregraph3 <- tregraph3 + geom_label(aes(x=branch, label= round(data$branch.length, round_x)), fill=fill_brandlength, size = size_brandlength)
-  }
-
   internal_nodes <- data[data$isTip == FALSE, ]
   internal_nodes$bootstrap <- bootstrap_values
   tregraph3 <- tregraph3 +
@@ -463,5 +452,5 @@ Plot_Tree <- function(
                                  legend.key.width = unit(1.5, "lines"),
                                  legend.text = element_text(margin = margin(r = 30)))
   return(list("plot" = tregraph3, "conserved_table" = Tip1))
+  }
 }
-

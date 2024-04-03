@@ -21,22 +21,23 @@ ChordDiagram(
   annotationTrack = "grid",
   reduce = -1,
   link.arr.type = "big.arrow",
-  link.border = "#F8F8F8",
-  link.lwd = 0.6,
+  link.border = "white",
+  link.lwd = 1,
   link.sort = TRUE,
   link.decreasing = TRUE,
   link.largest.ontop = TRUE,
   link.overlap = F,
   transparency = 0,
-  cex = 1.3,
+  cex = 1.5,
   ylim_edit = 0,
   facing = "clockwise",
   niceFacing = TRUE,
   col = "black",
   adj = c(0, 0.5),
-  start.degree = 70,
-  picture_width = 7,
-  picture_height = 9
+  start.degree = -5,
+  magnify_set = TRUE,
+  picture_width = 14,
+  picture_height = 10
 )
 }
 \arguments{
@@ -113,6 +114,6 @@ Construct a ChordDiagram to show the conservation score for intercellular intera
 \examples{
 load(system.file("extdata", "CCC_conserved_sumary.rda", package = "CACIMAR"))
 cci_data = CCC_conserved_sumary[, c("Source", "Target", "score_weight")]
-ChordDiagram(net = cci_data, filename = "chordDiagram_cutoff0.75.pdf", link_colors_threshold = 0.75)
+ChordDiagram(net = cci_data, filename = "chordDiagram.pdf", link_colors_threshold = 0.75)
 
 }

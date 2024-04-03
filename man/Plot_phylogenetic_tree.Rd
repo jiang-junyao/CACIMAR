@@ -27,7 +27,7 @@ Plot_phylogenetic_tree(
   tippoint.shape = 21,
   tippoint.shape.size = 0,
   geom_nodepoint = 5,
-  show_branch.length = TRUE,
+  show_branch.length = FALSE,
   round_x = 2,
   fill_brandlength = "lightgreen",
   size_brandlength = 6,

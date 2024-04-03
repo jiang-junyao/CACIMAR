@@ -109,16 +109,6 @@ a sankey plot
 Build a sankey plot to show the cell-cell interaction profile of two species
 }
 \examples{
-# show the weight result
-head(all_weight_df_long)
-source       target    weight species scale_weight             Source            Source2
-1     Activated MG Activated MG 152.07967      Mm  0.008256281     MmActivated MG     MmActivated MG
-2       Astrocytes Activated MG 230.97254      Mm  0.012539310       MmAstrocytes       MmAstrocytes
-3            Cones Activated MG  51.89929      Mm  0.002817570            MmCones            MmCones
-4     GABAergic AC Activated MG  99.92955      Mm  0.005425093     MmGABAergic AC     MmGABAergic AC
-5   Glycinergic AC Activated MG  78.95619      Mm  0.004286467   MmGlycinergic AC   MmGlycinergic AC
-6 Horizontal cells Activated MG 106.23687      Mm  0.005767513 MmHorizontal cells MmHorizontal cells
-
 create_sankey(links = all_weight_df_long[, c("Source2", "target", "scale_weight")],
 output_file = "sankey_scale_weight.html",
 specie_name1 = "Mm",

@@ -39,7 +39,7 @@
 #' @examples
 #' load(system.file("extdata", "CCC_conserved_sumary.rda", package = "CACIMAR"))
 #' cci_data = CCC_conserved_sumary[, c("Source", "Target", "score_weight")]
-#' ChordDiagram(net = cci_data, filename = "chordDiagram_cutoff0.75.pdf", link_colors_threshold = 0.75)
+#' ChordDiagram(net = cci_data, filename = "chordDiagram.pdf", link_colors_threshold = 0.75)
 #'
 ChordDiagram <- function(net,
                          Score_factor_size = 20,
@@ -57,49 +57,52 @@ ChordDiagram <- function(net,
                          annotationTrack = "grid",
                          reduce = -1,
                          link.arr.type = "big.arrow",
-                         link.border = "#F8F8F8",
-                         link.lwd = 0.6,
+                         link.border = "white",
+                         link.lwd = 1,
                          link.sort = TRUE,
                          link.decreasing = TRUE,
                          link.largest.ontop = TRUE,
                          link.overlap = F,
                          transparency = 0,
-                         cex = 1.3,
+                         cex = 1.5,
                          ylim_edit = 0,
                          facing = "clockwise",
                          niceFacing = TRUE,
                          col = "black",
                          adj = c(0, 0.5),
-                         start.degree = 70,
-                         picture_width = 7,
-                         picture_height = 9
+                         start.degree = -5,
+                         magnify_set = TRUE,
+                         picture_width = 14,
+                         picture_height = 10
 ) {
-  # link value
+  # net <- as_tibble(net)
   colnames(net) <- c("source", "target", "Score")
-  net$Score <- 2^(net$Score*Score_factor_size)
-
   if (is.null(grid.col)) {
     grid.col <- colorRampPalette(RColorBrewer::brewer.pal(11, brewer_pal_used))(length(c(unique(net$source), unique(net$target))))
     grid.col <- setNames(grid.col, c(unique(net$source), unique(net$target)))
   } else {
     grid.col <- grid.col
   }
-
   # grid colors
   grid.cols_df <- as.data.frame(grid.col)
   colnames(grid.cols_df) <- c("colors")
   grid.cols_df$celltype <- names(grid.col)
-
   # link colors
   net$colors <- grid.cols_df$colors[match(net$source, grid.cols_df$celltype)]
   net$link_colors <- net$colors
-
   if (is_link_colors_threshold) {
     Score <- as.vector(unlist(net$Score))
     median_value <- quantile(Score, probs = link_colors_threshold)
     net$link_colors[which(net$Score < median_value)] <- link_colors_down_threshold_col
   }
 
+  if (magnify_set) {
+    net$Score <- 1.3^(net$Score*Score_factor_size)
+  } else {
+    net$Score <- net$Score*Score_factor_size
+  }
+
+  circlize::circos.clear()
   pdf(file = filename, width = picture_width, height = picture_height)
   circlize::circos.par(start.degree = start.degree)
   circlize::chordDiagram(net,
@@ -108,7 +111,7 @@ ChordDiagram <- function(net,
                          col = net$link_colors,
                          order = order_grid,
                          directional = directional,
-                         direction.type = direction.type,  # "diffHeight"
+                         direction.type = direction.type,
                          diffHeight = diffHeight,
                          annotationTrack = annotationTrack,
                          reduce = reduce,
@@ -122,7 +125,6 @@ ChordDiagram <- function(net,
                          transparency = transparency,
                          preAllocateTracks = list(track.height = max(strwidth(unlist(dimnames(net)))))
   )
-  # text
   for(si in circlize::get.all.sector.index()) {
     xlim = circlize::get.cell.meta.data("xcenter", sector.index = si, track.index = 1)
     ylim = circlize::get.cell.meta.data("ylim", sector.index = si, track.index = 1)
@@ -138,56 +140,4 @@ ChordDiagram <- function(net,
                           adj = adj)
   }
   dev.off()
-}
-
-#' Plot ligand-receptor pairs in a dot plot
-#' @description Construct a dot plot to show the conserved ligand-receptor pairs
-#' @param LR_data data frame only containing 3 column representing the ligand-receptor pairs, cell type pairs, and groups
-#' @param fill_colors vector, colors for the points
-#' @param brewer.pal_set if fill_colors = NULL, this can set the brewer.pal for colors used for the text and points. By default, brewer.pal_set = "Paired"
-#' @param color_x By default, colors for x text is set to be "black"
-#' @param color_x_in_group if color_x_in_group = T, points colors will be used for x text
-#' @param color_y By default, colors for y text is set to be "black", or it can be set to any colors you want, like "red", "blue"
-#' @param size numeric, size for points
-#' @param shape numeric, shape for points
-#' @param colour colors for points
-#' @param stroke numeric, width of the point’s outline
-#' @param theme_set theme used. By default it is theme_bw()
-#' @param text_size numeric, size of the text in this plot
-#' @param text_colour colors for the text in this plot
-#' @param legend.position the position of the legend. By default, we don't show the legend
-#'
-#' @return A dot plot. Row is the ligand-receptor pairs, while column is the cell type pairs
-#' @export
-#'
-#' @examples
-#' show_LR_pairs(LR_data = LRpair_show_0.75,  color_x_in_group = T)
-#'
-show_LR_pairs <- function(LR_data, fill_colors = NULL, brewer.pal_set = "Paired", color_x = "black", color_x_in_group = F, color_y = "black", size = 9, shape = 21, colour = "white", stroke = 2, theme_set = theme_bw(), text_size = 40, text_colour = "black", legend.position = "none") {
-  stopifnot(nrow(LR_data) == 3)
-  colnames(LR_data) <- c("LR", "Cell_Pair", "group")
-  if (is.null(fill_colors)) {
-    color_fill <- colorRampPalette(RColorBrewer::brewer.pal(11, brewer.pal_set))(length(unique(LR_data$group)))
-    color_fill <- setNames(color_fill, unique(LR_data$group))
-  } else {
-    color_fill <- fill_colors
-  }
-
-  if (color_x_in_group) {
-    x_text_colors <- color_fill[as.vector(unlist(sapply(unique(LR_data$Cell_Pair), function(x) strsplit(x, "_")[[1]][1])))]
-    color_x <- x_text_colors
-  } else {
-    color_x <- color_x
-  }
-  print(color_x)
-  p <- ggplot2::ggplot(LR_data) +
-    ggplot2::geom_point(mapping = aes(x = Cell_Pair, y = LR, fill = group), size = size, shape = shape, colour = colour, stroke = stroke) +
-    theme_set +
-    theme(text = element_text(size = text_size, colour = text_colour),
-          axis.text.x = element_text(colour = color_x, angle = 90, hjust = 1, vjust = 0.5),
-          axis.text.y = element_text(colour = color_y),
-          legend.position = legend.position) +
-    labs(y = "", x = "") +
-    scale_fill_manual(values = color_fill)
-  return(p)
 }

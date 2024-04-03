@@ -4,13 +4,7 @@
 \alias{buildHomDatabase}
 \title{Build homologous gene database}
 \usage{
-buildHomDatabase(
-  MGI,
-  Species_name1,
-  Species_name2,
-  AddENS = TRUE,
-  host = "https://uswest.ensembl.org"
-)
+buildHomDatabase(MGI, Species_name1, Species_name2)
 }
 \arguments{
 \item{MGI}{MGI database, download from http://www.informatics.jax.org/}
@@ -22,11 +16,6 @@ for human, 'zf' for zebrafish, 'ch' for chicken, 'cf' for dog, 'pt' for chimpanz
 \item{Species_name2}{The name of the second species.  input 'mm' for mouse, 'hs'
 for human, 'zf' for zebrafish, 'ch' for chicken, 'cf' for dog, 'pt' for chimpanzee,
 'xt' for frog, 'rn' for rat, 'bt' for cattle, and 'rh' for macaque.}
-
-\item{AddENS}{logical, indicating whether add ENSEMBL ID for each gene in homologous gene database}
-
-\item{host}{Parameter from biomaRt: Host to connect to. Only needs to be
-specified if different from www.ensembl.org}
 }
 \value{
 homologous gene database of two species

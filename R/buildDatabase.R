@@ -12,9 +12,6 @@
 #' @param Species_name2 The name of the second species.  input 'mm' for mouse, 'hs'
 #' for human, 'zf' for zebrafish, 'ch' for chicken, 'cf' for dog, 'pt' for chimpanzee,
 #' 'xt' for frog, 'rn' for rat, 'bt' for cattle, and 'rh' for macaque.
-#' @param AddENS logical, indicating whether add ENSEMBL ID for each gene in homologous gene database
-#' @param host Parameter from biomaRt: Host to connect to. Only needs to be
-#' specified if different from www.ensembl.org
 #' @param
 #' @importFrom  stats na.omit
 #' @importFrom dplyr group_by
@@ -26,9 +23,8 @@
 #' @export
 #'
 #' @example load(system.file("extdata", "MGIrda", package = "CACIMAR"))
-#' buildHomDatabase(MGI,'mm','pt',AddENS = F)
-buildHomDatabase <- function(MGI,Species_name1,Species_name2,
-                             AddENS = TRUE,host = 'https://uswest.ensembl.org'){
+#' buildHomDatabase(MGI,'mm','pt')
+buildHomDatabase <- function(MGI,Species_name1,Species_name2){
   ### set information for species 1
   if (Species_name1=='mm') {
     Sp1name <- 'mouse, laboratory'
@@ -137,6 +133,7 @@ buildHomDatabase <- function(MGI,Species_name1,Species_name2,
 
   ### build database
   HOM_AllOrganism <- MGI
+  colnames(HOM_AllOrganism)[1] = 'HomoloGene.ID'
   typeName <-paste0(use_name1,'_',use_name2,'_')
   Sp1 <- HOM_AllOrganism[HOM_AllOrganism$Common.Organism.Name==Sp1name,]
   Sp1 <- Sp1[order(Sp1$HomoloGene.ID),]
@@ -155,35 +152,39 @@ buildHomDatabase <- function(MGI,Species_name1,Species_name2,
   Sp1_orthg$Species2Symbol <- Sp2_orthg[match(Sp1_orthg$OrthID1,Sp2_orthg$OrthID2),2]
   Sp1_orthg$Species2Type <- Sp2_orthg[match(Sp1_orthg$OrthID1,Sp2_orthg$OrthID2),3]
   Sp1_orthg <- na.omit(Sp1_orthg)
-  OrthType <- paste0(typeName,Sp1_orthg$V3,'T',Sp1_orthg$Species2Type)
+  OrthType <- paste0(typeName,Sp1_orthg[,4],'T',Sp1_orthg[,4])
   Sp1_orthg$Type <- OrthType
-  final_orthg <- Sp1_orthg[,c(6,2,4)]
-
-  ### add ens
-  if (AddENS == TRUE) {
-    mart1 <- biomaRt::useMart("ensembl",Mart_ID1,host = host)
-    gene_id1 <- biomaRt::getBM(attributes=c("external_gene_name","ensembl_gene_id"),
-                             filters = "external_gene_name",values = unlist(strsplit(final_orthg$V2,';')),
-                             mart = mart1)
-    ENS_ID1 <- purrr::map_chr(final_orthg$V2,~match_gene1(.x,gene_id1))
-    final_orthg$Species1ENS <- ENS_ID1
-
-
-    mart2 <- biomaRt::useMart("ensembl",Mart_ID2,host = host)
-    gene_id2<-biomaRt::getBM(attributes=c("external_gene_name","ensembl_gene_id"),
-                             filters = "external_gene_name",values = unlist(strsplit(final_orthg$Species2Symbol,';')),
-                             mart = mart2)
-    ENS_ID2 <- purrr::map_chr(final_orthg$Species2Symbol,~match_gene2(.x,gene_id2))
-    final_orthg$Species2ENS <- ENS_ID2
-    final_orthg <- final_orthg[,c(1,4,2,5,3)]
-    colnames(final_orthg)[2:5] <- c(paste0(use_name1,'_ID'),paste0(use_name1,'_Symbol')
-                                    ,paste0(use_name2,'_ID'),paste0(use_name2,'_Symbol'))
-    return(final_orthg)
-  }else{
-    colnames(final_orthg) <- c('Type',paste0(use_name1,'_Symbol'),
-                               paste0(use_name2,'_Symbol'))
-    return(final_orthg)
-    }
+  final_orthg <- Sp1_orthg[,c(7,3,2,6,5)]
+  colnames(final_orthg)[2:5] = c(paste0(Species_name1,'_ID'),
+                            paste0(Species_name1,'_Symbol'),
+                            paste0(Species_name2,'_ID'),
+                            paste0(Species_name2,'_Symbol'))
+  return(final_orthg)
+  # ### add ens
+  # if (AddENS == TRUE) {
+  #   mart1 <- biomaRt::useMart("ensembl",Mart_ID1,host = host)
+  #   gene_id1 <- biomaRt::getBM(attributes=c("external_gene_name","ensembl_gene_id"),
+  #                            filters = "external_gene_name",values = unlist(strsplit(final_orthg$V2,';')),
+  #                            mart = mart1)
+  #   ENS_ID1 <- purrr::map_chr(final_orthg$V2,~match_gene1(.x,gene_id1))
+  #   final_orthg$Species1ENS <- ENS_ID1
+  #
+  #
+  #   mart2 <- biomaRt::useMart("ensembl",Mart_ID2,host = host)
+  #   gene_id2<-biomaRt::getBM(attributes=c("external_gene_name","ensembl_gene_id"),
+  #                            filters = "external_gene_name",values = unlist(strsplit(final_orthg$Species2Symbol,';')),
+  #                            mart = mart2)
+  #   ENS_ID2 <- purrr::map_chr(final_orthg$Species2Symbol,~match_gene2(.x,gene_id2))
+  #   final_orthg$Species2ENS <- ENS_ID2
+  #   final_orthg <- final_orthg[,c(1,4,2,5,3)]
+  #   colnames(final_orthg)[2:5] <- c(paste0(use_name1,'_ID'),paste0(use_name1,'_Symbol')
+  #                                   ,paste0(use_name2,'_ID'),paste0(use_name2,'_Symbol'))
+  #   return(final_orthg)
+  # }else{
+  #   colnames(final_orthg) <- c('Type',paste0(use_name1,'_Symbol'),
+  #                              paste0(use_name2,'_Symbol'))
+  #   return(final_orthg)
+  #   }
 }
 
 
@@ -191,11 +192,12 @@ buildHomDatabase <- function(MGI,Species_name1,Species_name2,
 
 
 get_genes <- function(data1){
-  gene<-paste(as.character(data1$Symbol),collapse = ';')
+  gene<-paste(as.character(data1$Symbol),collapse = ',')
+  ent<-paste(as.character(data1$EntrezGene.ID),collapse = ',')
   if (length(data1$Symbol)>1) {
     type <- 'N'
   }else{type<-'1'}
-  df=c(gene,type)
+  df=c(gene,ent,type)
   return(df)
 }
 

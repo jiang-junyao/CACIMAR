@@ -132,9 +132,11 @@ identify_conserved_marker <- function(OrthG,Species1_Marker_table,
   conserved_list = list()
   for (i in conserved_celltype_pair) {
     spc1_cluster = unlist(strsplit(i,'-'))[1]
+    spc1_cluster = gsub(Species_name1,'',spc1_cluster)
     spc2_cluster = unlist(strsplit(i,'-'))[2]
-    spc1_marker = Species1_Marker_table[Species1_Marker_table$cluster==spc1_cluster,]
-    spc2_marker = Species2_Marker_table[Species2_Marker_table$cluster==spc2_cluster,]
+    spc2_cluster = gsub(Species_name2,'',spc2_cluster)
+    spc1_marker = Species1_Marker_table[grep(spc1_cluster,Species1_Marker_table$Allcluster),]
+    spc2_marker = Species2_Marker_table[grep(spc2_cluster,Species2_Marker_table$Allcluster),]
     conserved_gene = identify_conserved_gene(OrthG,spc1_marker$gene,
                                              spc2_marker$gene,
                                              Species_name1,Species_name2)

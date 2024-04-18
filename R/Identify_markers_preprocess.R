@@ -9,7 +9,7 @@ Cal_MarkersRoc <- function(pbmc01, marker01) {
     } else {
       markerRoc02 <- cbind(markerRoc02, markerRoc01[order(rownames(markerRoc01)), ])
     }
-    colnames(markerRoc02)[(ncol(markerRoc02)-2):ncol(markerRoc02)] <- paste0(paste(paste0("Cluster", cluster01[i]), collapse = ""),
+    colnames(markerRoc02)[(ncol(markerRoc02)-2):ncol(markerRoc02)] <- paste0(paste(paste0("", cluster01[i]), collapse = ""),
                                                                              "_", colnames(markerRoc02)[(ncol(markerRoc02)-2):ncol(markerRoc02)])
   }
 

@@ -72,6 +72,7 @@ Identify_Markers1<-function(Seurat_object, PowerThr1=1/3,diffthr1){
   Marker1 <- as.data.frame(Marker0)
   Marker2 <- Marker1[Marker1[,'avg_diff'] > diffthr1 & Marker1[,'power']>PowerThr1,]
   uMarker2 <- unique(Marker2[,'gene'])
+  uMarker2 <- uMarker2[uMarker2 %in% rownames(Seurat_object)]
   MarkerRoc1 <- Cal_MarkersRoc(Seurat_object, uMarker2)
   MarkerRoc2 <- Select_MarkersPower2(MarkerRoc1)
   return(MarkerRoc2)

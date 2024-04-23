@@ -87,7 +87,7 @@ Identify_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,
                            rep(1,nrow(Sp2Gene)))
   rownames(Spec2_gene) <- Sp2Gene[,1]
   Exp2 <- Get_OrthG(OrthG, Spec1_gene, Spec2_gene, Species_name)
-  if (str_sub(Sp1Gene$mmGene[1],1,3) == 'ENS') {
+  if (str_sub(Sp1Gene[,1][1],1,3) == 'ENS') {
     Type1 <- paste0('Used_',Species_name[1],'_ID')
     Type2 <- paste0('Used_',Species_name[2],'_ID')
   }else{

@@ -104,7 +104,7 @@ Identify_ConservedCellTypes <- function(OrthG,Species1_Marker_table,Species2_Mar
   Frac3[Frac3==1] <- NA
   ShMarker4[[2]] <- Frac3
   ShMarker4[[3]] <- Frac1
-
+  #ShMarker4[[4]] <- ShMarker2[[1]]
   return(ShMarker4)
 }
 

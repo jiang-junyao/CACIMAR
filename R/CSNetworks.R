@@ -95,8 +95,8 @@ Identify_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,
     Type2 <- paste0('Used_',Species_name[2],'_Symbol')
   }
 
-  Species1 <- Sp1Gene[match(Exp2[, Type1],Sp1Gene$mmGene), ]
-  Species2 <- Sp2Gene[match(Exp2[, Type2],Sp2Gene$zfGene), ]
+  Species1 <- Sp1Gene[match(Exp2[, Type1],Sp1Gene[,1]), ]
+  Species2 <- Sp2Gene[match(Exp2[, Type2],Sp2Gene[,1]), ]
   Exp3 <- cbind(Exp2, Species1, Species2)
   Exp4 <- Exp3[!is.na(Exp3[, dim(Exp2)[2]+1]) &
                  !is.na(Exp3[,dim(Exp2)[2]+dim(Species1)[2]+1]), ]
@@ -110,9 +110,10 @@ Identify_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,
   }
 
   ### calculate orthology fraction
-  Sp1Freq <- as.data.frame(table(Sp1Gene$mmGroup))
-  Sp2Freq <- as.data.frame(table(Sp2Gene$zfGroup))
-  OrthG_df <- as.data.frame(table(Exp4$mmGroup,Exp4$zfGroup))
+  Sp1Freq <- as.data.frame(table(Sp1Gene[,2]))
+  Sp2Freq <- as.data.frame(table(Sp2Gene[,2]))
+  OrthG_df <- as.data.frame(table(Exp4[,dim(Exp2)[2]+2],
+                                  Exp4[,colnames(Exp4)[dim(Exp2)[2]+dim(Species1)[2]+2]]))
   OrthG_df <- OrthG_df[OrthG_df$Freq>0,]
   Sp1GeneNum <- Sp1Freq[match(OrthG_df$Var1,Sp1Freq$Var1),2]
   Sp2GeneNum <- Sp2Freq[match(OrthG_df$Var2,Sp2Freq$Var1),2]

@@ -231,19 +231,24 @@ Identify_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,
 #'
 #' @examples
 identify_ct_ConservedNetworks <- function(OrthG,Species1_GRN,Species2_GRN,
-                                          Species_name1,Species_name2){
+                                          Species_name1,Species_name2,
+                                          network_regulation_num=NULL){
   df_final <- list()
   for (i in unique(Species1_GRN$SourceGroup)) {
     for (j in unique(Species2_GRN$SourceGroup)) {
 
       spe1_network_use <- Species1_GRN[Species1_GRN$SourceGroup==i,]
       spe2_network_use <- Species2_GRN[Species2_GRN$SourceGroup==j,]
+      if (!is.null(network_regulation_num)) {
+        spe1_network_use = spe1_network_use[1:network_regulation_num,]
+        spe2_network_use = spe2_network_use[1:network_regulation_num,]
+      }
       rownames(spe1_network_use) <- 1:nrow(spe1_network_use)
       rownames(spe2_network_use) <- 1:nrow(spe2_network_use)
-      n1 <- Identify_ConservedNetworks(OrthG_Mm_Zf,
+      n1 <- Identify_ConservedNetworks(OrthG,
                                        spe1_network_use,
                                        spe2_network_use,
-                                       'mm','zf')
+                                       Species_name1,Species_name2)
       if (!is.na(n1[[1]])) {
         homo_summary <- n1[[1]]
         n1[[1]]$pvalue <- chisq.test(data.frame(c(homo_summary[,3],homo_summary[,5]-homo_summary[,3]),

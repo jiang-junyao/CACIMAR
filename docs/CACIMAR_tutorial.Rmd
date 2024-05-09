@@ -40,11 +40,11 @@ library(reshape2)
 
 # Introduction
 
-In this tutorial, we analyze retina regeneration scRNA-seq data from mouse and to identify conserved markers, cell types, intracellular regulations and intercellular interactions in the retina between mice and zebrafish. This tutorial contains following 5 steps: (1) Identify markers; (2) Identify evolutionarily conserved cell types; (3) Identify evolutionarily conserved markers; (4) Identify conserved intracellular regulation; (5) Identify conserved intercellular interactions (cell-cell interaction)
+In this tutorial, we analyze retina regeneration scRNA-seq data from mouse and zebrafish to identify conserved markers, cell types, intracellular regulations and intercellular interactions in the retina between mice and zebrafish. This tutorial contains following 5 steps: (1) Identify markers; (2) Identify evolutionarily conserved cell types; (3) Identify evolutionarily conserved markers; (4) Identify conserved intracellular regulation; (5) Identify conserved intercellular interactions (cell-cell interaction)
 
 # Tutorial
 
-In this tutorial, we analyze retina regeneration scRNA-seq data from mouse and to identify conserved markers, cell types, intracellular regulations and intercellular interactions in the retina between mice and zebrafish. This tutorial contains following XX steps: 
+In this tutorial, we analyze retina regeneration scRNA-seq data from mouse and zebrafish to identify conserved markers, cell types, intracellular regulations and intercellular interactions in the retina between mice and zebrafish. This tutorial contains following 5 steps: 
 
 ## Input data of this tutorial
 

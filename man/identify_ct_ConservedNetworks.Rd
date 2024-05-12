@@ -9,7 +9,8 @@ identify_ct_ConservedNetworks(
   Species1_GRN,
   Species2_GRN,
   Species_name1,
-  Species_name2
+  Species_name2,
+  network_regulation_num = NULL
 )
 }
 \arguments{

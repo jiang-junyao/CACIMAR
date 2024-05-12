@@ -198,7 +198,7 @@ identify_conserved_gene <- function(OrthG,spc1_marker,spc2_marker,Species_name1,
   if (!is_empty(Exp2)) {
       return(Exp2)
   }else{
-    print('no marker find!')
+    return('no marker')
   }
 
 }

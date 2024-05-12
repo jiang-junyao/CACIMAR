@@ -33,11 +33,28 @@ devtools::install_github("jiang-junyao/CACIMAR")
 
 ### Version1.0.0: First version of CACIMAR was published!
 
-## Tutorial
+## Qucik start (Run CACIMAR in 1 minutes)
+
+[1 minutes tutorial for identifying evolutionally conserved celltype and
+markers based on scRNA-seq data]()
+
+[1 minutes tutorial for identifying evolutionally conserved gene
+regulatory networks]()
+
+[1 minutes tutorial for identifying evolutionally conserved
+ligand-receptor interaction and cell-cell communications]()
+
+## Examples
 
 [Using CACIMAR to analyze retina scRNA-seq data from mouse and
 zebrafish](https://jiang-junyao.github.io/CACIMAR/CACIMAR_tutorial)
 
+[Using CACIMAR to analyze retina scRNA-seq data from mouse, zebrafish,
+and
+chick](https://jiang-junyao.github.io/CACIMAR/three_species_tutorial)
+
 ## Citation
 
-Preprint: CACIMAR Cross-species Analysis of Cell Identities, Markers, Regulations and Interactions Using Single-cell RNA Sequencing Data(https://www.biorxiv.org/content/10.1101/2024.01.23.576964v1)
+[Hoang T, Wang J, Boyd P, et al. Gene regulatory networks controlling
+vertebrate retinal regeneration. Science 2020;
+370(6519):eabb8598](https://www.science.org/doi/10.1126/science.abb8598)

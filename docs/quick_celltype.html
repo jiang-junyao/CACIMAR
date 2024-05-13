@@ -1881,6 +1881,12 @@ to avoid the batch effect between species.</p>
 each cluster. ‘marker_spec1’ and ‘marker_spec2’ are data.frame of marker
 power, and should contain three columns <strong>gene</strong>,
 <strong>power</strong>, and <strong>cluster</strong>.</p>
+<p>The ouput of this part is ‘conserved_celltype’. ‘conserved_celltype’
+is a list contains three elements, first element is the detailed
+conserved analysis, including, all gene number in each cell type pair,
+conserved gene number in each cell type pair, and conserved gene name in
+each cell type pair. The second element is the conservation score among
+all cell type pairs.</p>
 <pre class="r"><code>conserved_celltype &lt;- Identify_ConservedCellTypes(OrthG_Mm_Zf, marker_spec1, marker_spec2,&#39;mm&#39;,&#39;zf&#39;)
 CSCT_plot = conserved_celltype[[2]]
 CSCT_plot = CSCT_plot[grep(&#39;mm&#39;,rownames(CSCT_plot)),grep(&#39;zf&#39;,colnames(CSCT_plot))]
@@ -1928,8 +1934,8 @@ head(unbiased_markers)</code></pre>
 ## mm_zf_1T1G2279  ENSMUSG00000022528  ENSDARG00000006514 Resting MG Resting MG
 ## mm_zf_1T1G3476  ENSMUSG00000026701  ENSDARG00000043511 Resting MG Resting MG
 ## mm_zf_1T1G6196  ENSMUSG00000035805  ENSDARG00000063026 Resting MG Resting MG</code></pre>
-<p>Finally, we provide inner functions to visualize conserved markers
-across species.</p>
+<p>Finally, we provide inner functions to visualize conserved markers in
+conserved cell types across species.</p>
 <pre class="r"><code>marker_spec_visualize1 = marker_spec1[conserved_markers$mm_conserved_marker,4:9]
 marker_spec_visualize1 = marker_spec_visualize1[order(marker_spec_visualize1[,1]),]
 Plot_MarkersHeatmap(marker_spec_visualize1,cellheight = 2.5,cellwidth = 10,border_color=NA,show_colnames = TRUE)</code></pre>

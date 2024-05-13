@@ -44,7 +44,7 @@ markers based on scRNA-seq
 data](https://jiang-junyao.github.io/CACIMAR/quick_celltype.html)
 
 [Quick tutorial for identifying evolutionally conserved gene regulatory
-networks]()
+networks](https://jiang-junyao.github.io/CACIMAR/quick_grn.html)
 
 [Quick tutorial for identifying evolutionally conserved ligand-receptor
 interaction and cell-cell communications (coming soon)]()

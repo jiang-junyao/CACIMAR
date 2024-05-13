@@ -35,16 +35,24 @@ devtools::install_github("jiang-junyao/CACIMAR")
 
 ## Qucik start (Run CACIMAR in 1 minutes)
 
-[1 minutes tutorial for identifying evolutionally conserved celltype and
-markers based on scRNA-seq data]()
+For users who want to perform cross-species analysis quickly, we provide
+a brief tutorial based on small single-cell RNA sequencing (scRNA-seq)
+data to demonstrate the functionality and API of CACIMAR.
 
-[1 minutes tutorial for identifying evolutionally conserved gene
-regulatory networks]()
+[Quick tutorial for identifying evolutionally conserved celltype and
+markers based on scRNA-seq
+data](https://jiang-junyao.github.io/CACIMAR/quick_celltype.html)
 
-[1 minutes tutorial for identifying evolutionally conserved
-ligand-receptor interaction and cell-cell communications]()
+[Quick tutorial for identifying evolutionally conserved gene regulatory
+networks]()
+
+[Quick tutorial for identifying evolutionally conserved ligand-receptor
+interaction and cell-cell communications (coming soon)]()
 
 ## Examples
+
+We also provide comprehensive examples to demonstrate the practical
+applications of CACIMAR.
 
 [Using CACIMAR to analyze retina scRNA-seq data from mouse and
 zebrafish](https://jiang-junyao.github.io/CACIMAR/CACIMAR_tutorial)
@@ -55,6 +63,6 @@ chick](https://jiang-junyao.github.io/CACIMAR/three_species_tutorial)
 
 ## Citation
 
-[Hoang T, Wang J, Boyd P, et al. Gene regulatory networks controlling
-vertebrate retinal regeneration. Science 2020;
-370(6519):eabb8598](https://www.science.org/doi/10.1126/science.abb8598)
+[CACIMAR: Cross-species Analysis of Cell Identities, Markers,
+Regulations and Interactions Using Single-cell RNA Sequencing Data.
+(preprint)](https://www.biorxiv.org/content/10.1101/2024.01.23.576964v1)

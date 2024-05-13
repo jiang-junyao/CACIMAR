@@ -32,10 +32,24 @@ Identify_Markers<-function(Seurat_object, PowerCutoff=0.4,
   MarkerRoc<-Identify_Markers1(Seurat_object,PowerCutoff,DifferenceCutoff)
   MarkerRoc<-as.data.frame(MarkerRoc)
   Marker<-Identify_Markers2(Seurat_object,MarkerRoc,PowerThr1=DifferenceCutoff)
-  #final_Markers<-Refine_Markers(Seurat_object,Marker,p.value = PvalueCutoff)
+  #final_Markers<-Refine_Markers(Seurat_object,Marker,p.value = 1)
+
+  Seurat_object@assays$RNA@data <- GetAssayData(Seurat_object)[rownames(Marker), ]
+  Frac1 <- Get_scRNA_AggExp(Seurat_object)
+  colnames(Frac1) <- gsub('_0', '', colnames(Frac1))
+  colnames(Frac1) <- gsub('FracC', 'Cluster', colnames(Frac1))
+  MarkerRoc3 <- cbind(Marker, Frac1)
   #final_Markers <- final_Markers[,c(1:4,ncol(final_Markers),5:(ncol(final_Markers)-1))]
-  #colnames(final_Markers)[2] <- 'Allpower'
-  return(Marker)
+  colnames(MarkerRoc3)[1] = 'Allcluster'
+  colnames(MarkerRoc3)[2] = 'Allpower'
+  colnames(MarkerRoc3)[4] = 'cluster'
+  MarkerRoc3$gene = rownames(MarkerRoc3)
+  ### get max power
+  list_power_numeric <- lapply(strsplit(MarkerRoc3$Allpower,','),
+                               function(x) as.numeric(x))
+  max_values <- sapply(list_power_numeric, max)
+  MarkerRoc3$power = max_values
+  return(MarkerRoc3)
 }
 
 

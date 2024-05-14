@@ -154,6 +154,8 @@ create_sankey <- function(links,
 #' @param select_DB character, databased used for analysis, more option can run liana::show_resources()
 #' @param target_organism ncbi_taxid' or 'name' of the target organism. See ‘show_homologene' for available organisms via OmnipathR’s 'HomoloGene'
 #' @param method character, method use for cell-cell interaction analysis. By default, we set it to SingleCellSignalR
+#' @param LRscore_threshold numeric, the threshold the filter the cell-cell interactions, the larger the lesser interactions left
+#' @param scale_score logical, whether scale the score of the interaction,default is TRUE
 #'
 #' @return data frame of cell cell interaction analysis result
 #' @export
@@ -164,7 +166,7 @@ create_sankey <- function(links,
 #'
 # Zebrafish analysis
 #'SingleCellSignalR_zebrafish_result <- perform_CCI_analysis(seurat_obj=Zf_seurat, target_organism=7955)
-perform_CCI_analysis <- function(seurat_obj, expre_cell = 10, select_DB = "Consensus", target_organism, method = 'sca') {
+perform_CCI_analysis <- function(seurat_obj, expre_cell = 10, select_DB = "Consensus", target_organism, method = 'sca', LRscore_threshold = 0.5, scale_score = TRUE) {
   seurat_obj <- seurat_obj[apply(GetAssayData(seurat_obj, slot = "counts"), 1, function(x) sum(x > 0) > expre_cell),]
   op_resource <- liana::select_resource(select_DB)[[1]]
   ortholog_resource <- liana::generate_homologs(op_resource = op_resource, target_organism = target_organism)
@@ -172,6 +174,10 @@ perform_CCI_analysis <- function(seurat_obj, expre_cell = 10, select_DB = "Conse
                                     method = method,
                                     resource = 'custom',
                                     external_resource = ortholog_resource)
+  liana_result <- liana_result[, LRscore > LRscore_threshold]
+  if (scale_score) {
+    liana_result$LRscore_scale <- liana_result$LRscore/sum(liana_result$LRscore)
+  }
   return(liana_result)
 }
 
@@ -206,7 +212,6 @@ calculate_Weights <- function(
                                                   specie_name = specie_name1)
   species2_all_weight_df_long <- calculateWeights(data = species2_cci,
                                                   specie_name = specie_name2)
-  # bind df
   all_weight_df_long <- rbind(species1_all_weight_df_long, species2_all_weight_df_long)
   all_weight_df_long <- subset(all_weight_df_long, weight > 0)
   all_weight_df_long$Source <- paste0(all_weight_df_long$species, all_weight_df_long$source)
@@ -219,9 +224,8 @@ calculate_Weights <- function(
   all_weight_df_long$target[which(all_weight_df_long$species == specie_name2)] <- edit_target
   return(all_weight_df_long)
 }
-
 calculateWeights <- function(data, specie_name) {
-  ccc_weight <- reshape2::dcast(data[, c(2, 3, 11)],
+  ccc_weight <- reshape2::dcast(data[, c("source", "target", "LRscore")],
                                 source ~ target,
                                 sum,
                                 value.var = 'LRscore')

@@ -9,7 +9,9 @@ perform_CCI_analysis(
   expre_cell = 10,
   select_DB = "Consensus",
   target_organism,
-  method = "sca"
+  method = "sca",
+  LRscore_threshold = 0.5,
+  scale_score = TRUE
 )
 }
 \arguments{
@@ -22,6 +24,10 @@ perform_CCI_analysis(
 \item{target_organism}{ncbi_taxid' or 'name' of the target organism. See ‘show_homologene' for available organisms via OmnipathR’s 'HomoloGene'}
 
 \item{method}{character, method use for cell-cell interaction analysis. By default, we set it to SingleCellSignalR}
+
+\item{LRscore_threshold}{numeric, the threshold the filter the cell-cell interactions, the larger the lesser interactions left}
+
+\item{scale_score}{logical, whether scale the score of the interaction,default is TRUE}
 }
 \value{
 data frame of cell cell interaction analysis result

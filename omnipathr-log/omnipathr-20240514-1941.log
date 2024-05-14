@@ -1,0 +1,12 @@
+[2024-05-14 19:41:11] [INFO]    [OmnipathR] Welcome to OmnipathR!
+[2024-05-14 19:41:11] [TRACE]   [OmnipathR] Reading JSON from `/home/lijinlian/.cache/OmnipathR/cache.json` (encoding: UTF-8).
+[2024-05-14 19:41:11] [TRACE]   [OmnipathR] JSON validation successful: TRUE
+[2024-05-14 19:41:11] [INFO]    [OmnipathR] Initialized cache: `/home/lijinlian/.cache/OmnipathR`.
+[2024-05-14 19:41:11] [TRACE]   [OmnipathR] Reading JSON from `/home/lijinlian/R/x86_64-pc-linux-gnu-library/4.3/OmnipathR/db/db_def.json` (encoding: UTF-8).
+[2024-05-14 19:41:11] [TRACE]   [OmnipathR] JSON validation successful: TRUE
+[2024-05-14 19:41:11] [TRACE]   [OmnipathR] Reading JSON from `/home/lijinlian/R/x86_64-pc-linux-gnu-library/4.3/OmnipathR/internal/magic_bytes.json` (encoding: UTF-8).
+[2024-05-14 19:41:11] [TRACE]   [OmnipathR] JSON validation successful: TRUE
+[2024-05-14 19:41:11] [TRACE]   [OmnipathR] Reading JSON from `/home/lijinlian/R/x86_64-pc-linux-gnu-library/4.3/OmnipathR/internal/urls.json` (encoding: UTF-8).
+[2024-05-14 19:41:11] [TRACE]   [OmnipathR] JSON validation successful: TRUE
+[2024-05-14 19:41:11] [TRACE]   [OmnipathR] Reading JSON from `/home/lijinlian/R/x86_64-pc-linux-gnu-library/4.3/OmnipathR/internal/id_types.json` (encoding: UTF-8).
+[2024-05-14 19:41:11] [TRACE]   [OmnipathR] JSON validation successful: TRUE

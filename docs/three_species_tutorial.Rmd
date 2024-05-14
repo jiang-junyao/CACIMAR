@@ -47,7 +47,7 @@ ch_marker <- Identify_Markers(Ch_seurat,PowerCutoff=0.35, DifferenceCutoff=0.1)
 ```
 # Step2: Identify evolutionarily conserved cell types
 
-CACIMAR identifies evolutionarily conserved cell types and poorly conserved cell types utilizing conservation scores of cell types (CSCT) and a phylogenetic tree.
+CACIMAR identifies evolutionarily conserved cell types utilizing conservation scores of cell types (CSCT) and a phylogenetic tree.
 
 CSCT is computed based on the powers (or MP values) of shared markers in each pair of cell types, relative to the sum of the powers of all markers in each pair of cell types. Shared markers indicate the markers of one species that have homologs in the other species. If genes have multiple homologs, the gene with the highest power is selected. If the pair of cell types is mutually matched, and CSCT is greater than the third quartile of CSCT values, then this pair of cell types is considered a conserved cell type between two species. Mutually matched pair cell types mean that for every cell type in species 1, we look for the corresponding cell type in species 2 that has the highest CSCT value, and vice versa. The corresponding cell types in both species are said to be “mutually matched,” and they have the highest CSCT value relative to all other cell types in the other species.
 
@@ -60,7 +60,8 @@ ch_zf_csct=ch_zf_csct_revised
 mm_zf_csct=mm_zf_csct_revised
 mm_ch_csct=mm_ch_csct_revised
 ```
-```r
+
+```{r, eval=FALSE}
 load(system.file("extdata", "zf_mm_ch_markers.rda", package = "CACIMAR"))
 ```
 
@@ -99,6 +100,16 @@ print(mm_zf_conserved_ct)
 ### conserved celltypes between mouse and zebrafish
 print(mm_ch_conserved_ct)
 ```
+
+Next, we can drop a phylogenetic tree to visualize the distance of cell types across species
+
+```{r, eval=FALSE}
+# load test data: a csct matrix
+load(system.file("extdata", "CSCT_matrix.rda", package = "CACIMAR"))
+p <- phylogenetic_tree_circle(CSCT, tree_method = "Neighbor-Joining")
+p
+```
+![phylogenetic tree of cross-species cell types](./fig_use/1.phylogenetic_tree.png)
 
 # Step3:Identify evolutionarily conserved markers
 
@@ -214,3 +225,146 @@ Heatmap_Cor(ConservedNetworks_Mm_Ch[[2]], cluster_cols=F, cluster_rows=F, Color1
 ConservedNetworks_Ch_Zf <- Identify_ConservedNetworks(OrthG_Zf_Ch, chick_gene_network, zf_gene_network, 'ch', 'zf')
 Heatmap_Cor(ConservedNetworks_Ch_Zf[[2]], cluster_cols=F, cluster_rows=F, Color1 = c(rgb(102/255,46/255,115/255), rgb(31/255,153/255,139/255), rgb(251/255,232/255,48/255)))
 ```
+
+# Step5: Identify the conservation of intercellular interactions
+  We utilized the ‘SingleCellSignalR’ algorithm in the LIANA to perform the ligand-receptor analysis for each species individually, including mice, zebrafish and chick. 
+```{r, eval=FALSE}
+##### Perform cell-cell interaction analysis
+# By default, we contained the interactions that have a LRscore greater than 0.5 and scale the LRscore
+SingleCellSignalR_mouse_result <- perform_CCI_analysis(seurat_obj=Mm_seurat, target_organism=10090)
+SingleCellSignalR_zebrafish_result <- perform_CCI_analysis(seurat_obj=Zf_seurat, target_organism=7955)
+SingleCellSignalR_chick_result <- perform_CCI_analysis(seurat_obj=ch_seurat, target_organism=9031)
+```
+
+  The weights of cell-cell interaction were calculated by the sum of all weights of ligand-receptor pairs within each intercellular interaction, indicating the degree of cell-cell interactions within species. A higher weight represents a stronger intercellular interaction. We visualize the weight through a heatmap or sankey plots for any two species.
+
+``` {r, eval=FALSE}
+load(system.file("extdata", "SingleCellSignalR_results.rda", package = "CACIMAR"))
+```
+
+```{r, eval=FALSE}
+all_weight_df_long_Mm_zf <- calculate_Weights(species1_cci = SingleCellSignalR_mouse_result,
+                                              species2_cci = SingleCellSignalR_zebrafish_result,
+                                              specie_name1 = "mm",
+                                              specie_name2 = "zf")
+all_weight_df_long_Mm_ch <- calculate_Weights(species1_cci = SingleCellSignalR_mouse_result,
+                                              species2_cci = SingleCellSignalR_chick_result,
+                                              specie_name1 = "mm",
+                                              specie_name2 = "ch")
+all_weight_df_long_zf_ch <- calculate_Weights(species1_cci = SingleCellSignalR_zebrafish_result,
+                                              species2_cci = SingleCellSignalR_chick_result,
+                                              specie_name1 = "zf",
+                                              specie_name2 = "ch")
+```
+
+### heapmap to show the weight of interactions between conserved cell types
+```{r, eval=FALSE}
+##### interaction heapmap
+# names of celltype_colors must be paste0(species_name, celltype_name), like "mmCones"
+# species_name must be only two characters
+mm_conserved_celltype <- c("Activated MG", "Cones", "GABAergic AC","Microglia", "Pericytes", "Resting MG", "RGC", "Rod BC", "Rods", "RPE", "V/E cells")
+zf_conserved_celltype <- c("Activated MG",  "Cones", "GABAergic AC", "Microglia", "Pericytes", "Resting MG", "RGC","Cone BC", "Rods", "RPE", "V/E cells")
+ch_conserved_celltype <- c("Activated MG", "Cones", "GABAergic AC", "Resting MG", "RGC", "Cone BC", "Rods")
+plot_interaction_heatmap(SingleCellSignalR_sp1_result = SingleCellSignalR_mouse_result,
+                         SingleCellSignalR_sp2_result = SingleCellSignalR_zebrafish_result,
+                         SingleCellSignalR_sp3_result = SingleCellSignalR_chick_result,
+                         species_name1 = "mm",
+                         species_name2 = "zf",
+                         species_name3 = "ch",
+                         sp1_conserved_celltype = mm_conserved_celltype,
+                         sp2_conserved_celltype = zf_conserved_celltype,
+                         sp3_conserved_celltype = ch_conserved_celltype)
+``` 
+![cell-cell interaction weight of conserved cell types across mm, zf and ch](./fig_use/3.interaction heapmap.png)
+### sankey plot to show the weight of interactions between cell types
+```{r, eval=FALSE}
+create_sankey(links = all_weight_df_long_Mm_zf[, c("Source2", "target", "scale_weight")],
+              output_file = "Mm_Zf_sankey.html",
+              specie_name1 = "mm",
+              specie_name2 = "zf")
+```
+![cell-cell interaction weight profile across mm and zf](./fig_use/2_1.Mm_Zf_sankey.png)
+```{r, eval=FALSE}
+create_sankey(links = all_weight_df_long_Mm_ch[, c("Source2", "target", "scale_weight")],
+              output_file = "Mm_Ch_sankey.html",
+              specie_name1 = "mm",
+              specie_name2 = "ch")
+```
+![cell-cell interaction weight profile across mm and ch](./fig_use/2_2.Mm_Ch_sankey.png)
+```{r, eval=FALSE}
+create_sankey(links = all_weight_df_long_zf_ch[, c("Source2", "target", "scale_weight")],
+              output_file = "Zf_Ch_sankey.html",
+              specie_name1 = "zf",
+              specie_name2 = "ch")
+```
+![cell-cell interaction weight profile across zf and ch](./fig_use/2_3.Zf_Ch_sankey.png)
+### conservation score for intercellular interactions (CSII)
+  We selected cell types conserved across three species to calculate the conservation score for intercellular interactions (CSII), which is defined as the proportion of the summed weights of consistent ligand-receptor interactions relative to the summed weights of all ligand-receptor interactions. Consistent ligand-receptor interaction was defined as the interaction between homologous ligand and homologous receptor with the same direction. 
+  
+```{r, eval=FALSE}
+# if you want to see the database and reference names for species, run these codes
+# reference homolog database
+load(system.file("extdata", "HOM_matrix.rda", package = "CACIMAR"))
+# reference species name
+load(system.file("extdata", "species_names_ref.rda", package = "CACIMAR"))
+```
+  
+```{r, eval=FALSE}
+# Our function to find the conserved interaction using the celltype'names with prefix, so, the conserved cell types provided should be in prefix+celltype, like mmResting MG
+conserved_cell_types_mm_zf_ch <- data.frame('mm' = c("mmResting MG","mmGABAergic AC", "mmRGC", "mmCones"), "zf" = c("zfResting MG", "zfGABAergic AC", "zfRGC", "zfCones"), 'ch' = c("chResting MG","chGABAergic AC", "chRGC", "chCones"))
+conserved_result_mm_zf_ch <- Identify_Conserved_CCI2(species1_cci=SingleCellSignalR_mouse_result,
+                                                     species2_cci=SingleCellSignalR_zebrafish_result,
+                                                     species3_cci = SingleCellSignalR_chick_result,
+                                                     conserved_cell_types_df=conserved_cell_types_mm_zf_ch,
+                                                     species_name1 = "mm",
+                                                     species_name2 = "zf",
+                                                     species_name3 = "ch")
+conserved_cci_result <- conserved_interaction_score(conserved_result_species = conserved_result_mm_zf_ch,
+                                                    SingleCellSignalR_sp1_result = SingleCellSignalR_mouse_result,
+                                                    SingleCellSignalR_sp2_result = SingleCellSignalR_zebrafish_result,
+                                                    SingleCellSignalR_sp3_result = SingleCellSignalR_chick_result,
+                                                    conserved_cell_types_df = conserved_cell_types_mm_zf_ch,
+                                                    species_name1 = "mm",
+                                                    species_name2 = "zf",
+                                                    species_name3 = "ch")
+# We visualize the CSII of conserved cell types in three species through ChordDiagram
+ChordDiagram(net = conserved_cci_result$chordDiagram_data,filename = paste(species_name1, species_name2, species_name3, "chordDiagram.pdf", sep = "_"))
+``` 
+![conservation score for intercellular interactions](./fig_use/4.mm_zf_ch_chordDiagram.png)
+We can also visualize the CSII of conserved cell types in any two species through ChordDiagram
+```{r}
+##### ChordDiagram, two species
+# mm and zf conserved score of interaction
+conserved_cell_types_mm_zf <- data.frame("mm" = c("mmRods", "mmRod BC", "mmCones", "mmPericytes", "mmV/E cells", "mmRGC", "mmGABAergic AC", "mmRPE", "mmResting MG", "mmActivated MG", "mmMicroglia"), "zf" = c("zfRods", "zfCone BC", "zfCones", "zfPericytes", "zfV/E cells", "zfRGC", "zfGABAergic AC", "zfRPE", "zfResting MG", "zfActivated MG", "zfMicroglia"))
+conserved_result_mm_zf <- Identify_Conserved_CCI1(species1_cci=SingleCellSignalR_mouse_result,
+                                                 species2_cci=SingleCellSignalR_zebrafish_result,
+                                                 conserved_cell_types_df=conserved_cell_types_mm_zf,
+                                                 species_name1 = "mm",
+                                                 species_name2 = "zf")
+cci_conserved_Weights_table_mm_zf <- Caculate_cell_pair_cci_score(conserved_result_df=conserved_result_mm_zf,
+                                                                  species1_cci = SingleCellSignalR_mouse_result,
+                                                                  species2_cci = SingleCellSignalR_zebrafish_result,
+                                                                  conserved_cell_types_df = conserved_cell_types_mm_zf,
+                                                                  species_name1 = "mm",
+                                                                  species_name2 = "zf")
+cci_data_mm_zf <- Make_ChordDiagram_data(cci_conserved_Weights_table = cci_conserved_Weights_table_mm_zf, species_name1 = "mm", species_name2 = "zf")
+ChordDiagram(net = cci_data_mm_zf, filename = paste("mm", "zf", "chordDiagram.pdf", sep = "_"))
+```
+![conservation score for intercellular interactions](./fig_use/5.mm_zf_chordDiagram.png)
+### average expression of ligand-receptor pairs
+  We can visualize the average expression of ligand-receptor pairs conserved in three species through heatmap.
+```{r, eval=FALSE}
+##### ligand_receptor_pheatmap
+merge_avg_width_df <- make_pheatmap_LR_data2(cci_conserved_results = conserved_result_mm_zf_ch,
+                                            seurat_object_sp1 = Mm_seurat,
+                                            seurat_object_sp2 = Zf_seurat,
+                                            seurat_object_sp3 = ch_seurat,
+                                            avg_group = "cellname",
+                                            species_name1 = "mm",
+                                            species_name2 = "zf",
+                                            species_name3 = "ch",
+                                            cci_conserved_Weights = conserved_cci_result$cci_conserved_Weights)
+pheatmap_LR_multi(width_df = merge_avg_width_df$merge_width_df_width, filename = "lr_avg_pheatmap.pdf")
+``` 
+![conserved ligand-receptor pairs](./fig_use/6.lr_avg_pheatmap.png)
+

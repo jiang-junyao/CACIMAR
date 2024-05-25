@@ -332,7 +332,7 @@ ChordDiagram(net = conserved_cci_result$chordDiagram_data,filename = paste(speci
 ``` 
 ![conservation score for intercellular interactions](./fig_use/4.mm_zf_ch_chordDiagram.png)
 We can also visualize the CSII of conserved cell types in any two species through ChordDiagram
-```{r}
+```r
 ##### ChordDiagram, two species
 # mm and zf conserved score of interaction
 conserved_cell_types_mm_zf <- data.frame("mm" = c("mmRods", "mmRod BC", "mmCones", "mmPericytes", "mmV/E cells", "mmRGC", "mmGABAergic AC", "mmRPE", "mmResting MG", "mmActivated MG", "mmMicroglia"), "zf" = c("zfRods", "zfCone BC", "zfCones", "zfPericytes", "zfV/E cells", "zfRGC", "zfGABAergic AC", "zfRPE", "zfResting MG", "zfActivated MG", "zfMicroglia"))
@@ -353,7 +353,7 @@ ChordDiagram(net = cci_data_mm_zf, filename = paste("mm", "zf", "chordDiagram.pd
 ![conservation score for intercellular interactions](./fig_use/5.mm_zf_chordDiagram.png)
 ### average expression of ligand-receptor pairs
   We can visualize the average expression of ligand-receptor pairs conserved in three species through heatmap.
-```{r, eval=FALSE}
+```r
 ##### ligand_receptor_pheatmap
 merge_avg_width_df <- make_pheatmap_LR_data2(cci_conserved_results = conserved_result_mm_zf_ch,
                                             seurat_object_sp1 = Mm_seurat,

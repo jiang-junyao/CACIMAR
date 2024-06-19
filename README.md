@@ -65,3 +65,7 @@ chick](https://jiang-junyao.github.io/CACIMAR/three_species_tutorial)
 
 [CACIMAR: Cross-species Analysis of Cell Identities, Markers,
 Regulations and Interactions Using Single-cell RNA Sequencing Data. Briefings in Bioinformatics, Volume 25, Issue 4, July 2024, bbae283](https://academic.oup.com/bib/article/25/4/bbae283/7690342)
+
+## Contact
+
+If you have any suggestions or find bugs, please feel free to contact jyjiang@link.cuhk.edu.hk.

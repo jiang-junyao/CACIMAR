@@ -40,7 +40,7 @@ In this tutorial, we analyze retina regeneration scRNA-seq data from mouse, zebr
 ### identify markers
 Zf_seurat <- readRDS('Zf_seurat.rds')
 Mm_seurat <- readRDS('Mm_seurat.rds')
-Ch_seurat <- readRDS('Mm_seurat.rds')
+Ch_seurat <- readRDS('Ch_seurat.rds')
 zf_marker <- Identify_Markers(Zf_seurat,PowerCutoff=0.35, DifferenceCutoff=0.1)
 mm_marker <- Identify_Markers(Mm_seurat,PowerCutoff=0.35, DifferenceCutoff=0.1)
 ch_marker <- Identify_Markers(Ch_seurat,PowerCutoff=0.35, DifferenceCutoff=0.1)

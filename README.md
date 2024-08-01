@@ -31,6 +31,8 @@ devtools::install_github("jiang-junyao/CACIMAR")
 
 ## News
 
+2024.08.02: Bugs in ‘Identify_CellType’ have been fixed.
+
 ### Version1.0.0: First version of CACIMAR was published!
 
 ## Qucik start (Run CACIMAR in 1 minutes)
@@ -47,7 +49,7 @@ data](https://jiang-junyao.github.io/CACIMAR/quick_celltype.html)
 networks](https://jiang-junyao.github.io/CACIMAR/quick_grn.html)
 
 [Quick tutorial for identifying evolutionally conserved ligand-receptor
-interaction and cell-cell communications](https://jiang-junyao.github.io/CACIMAR/quick_interaction.html)
+interaction and cell-cell communications (coming soon)]()
 
 ## Examples
 
@@ -64,8 +66,5 @@ chick](https://jiang-junyao.github.io/CACIMAR/three_species_tutorial)
 ## Citation
 
 [CACIMAR: Cross-species Analysis of Cell Identities, Markers,
-Regulations and Interactions Using Single-cell RNA Sequencing Data. Briefings in Bioinformatics, Volume 25, Issue 4, July 2024, bbae283](https://academic.oup.com/bib/article/25/4/bbae283/7690342)
-
-## Contact
-
-If you have any suggestions or find bugs, please feel free to contact jyjiang@link.cuhk.edu.hk.
+Regulations and Interactions Using Single-cell RNA Sequencing Data.
+(preprint)](https://www.biorxiv.org/content/10.1101/2024.01.23.576964v1)

@@ -65,16 +65,23 @@ Identify_ConservedCellTypes <- function(OrthG,Species1_Marker_table,Species2_Mar
   ShMarker3 <- rbind(ShMarker1[[1]],ShMarker2[[1]])
   ### fraction between different species
   Sp1Gene <- Species1_Marker_table$gene
+  if (str_detect('ENS',Sp1Gene[1])) {
+    idx1 = 2
+    idx2 = 4
+  }else{
+    idx1 = 3
+    idx2 = 5
+  }
   ExpInd01 <- t(apply(as.matrix(Sp1Gene), 1, function(x1){
-    if(length(grep(x1, OrthG[,2]))==1){ x3 <- c(x1, grep(x1, OrthG[,2])) }
-    else if(length(grep(x1, OrthG[,4]))==1){ x3 <- c(x1, grep(x1, OrthG[,4])) }else{ x3 <- c(x1, NA) }
+    if(length(grep(x1, OrthG[,idx1]))==1){ x3 <- c(x1, grep(x1, OrthG[,idx1])) }
+    else if(length(grep(x1, OrthG[,idx2]))==1){ x3 <- c(x1, grep(x1, OrthG[,idx2])) }else{ x3 <- c(x1, NA) }
   }) )
   Sp1Ind2 <- ExpInd01[!is.na(ExpInd01[, 2]), ]
   colnames(Sp1Ind2) <- c('ID', 'RowNum')
   Sp2Gene <- Species2_Marker_table$gene
   ExpInd02 <- t(apply(as.matrix(Sp2Gene), 1, function(x1){
-    if(length(grep(x1, OrthG[,2]))==1){ x3 <- c(x1, grep(x1, OrthG[,2])) }
-    else if(length(grep(x1, OrthG[,4]))==1){ x3 <- c(x1, grep(x1, OrthG[,4])) }else{ x3 <- c(x1, NA) }
+    if(length(grep(x1, OrthG[,idx1]))==1){ x3 <- c(x1, grep(x1, OrthG[,idx1])) }
+    else if(length(grep(x1, OrthG[,idx2]))==1){ x3 <- c(x1, grep(x1, OrthG[,idx2])) }else{ x3 <- c(x1, NA) }
   }) )
   Sp2Ind2 <- ExpInd02[!is.na(ExpInd02[, 2]), ]
   colnames(Sp2Ind2) <- c('ID', 'RowNum')

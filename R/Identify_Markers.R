@@ -28,7 +28,7 @@ Identify_Markers<-function(Seurat_object, PowerCutoff=0.4,
   validInput(PowerCutoff,'PowerCutoff','numeric')
   validInput(DifferenceCutoff,'DifferenceCutoff','numeric')
   validInput(PvalueCutoff,'PvalueCutoff','numeric')
-
+  DefaultAssay(Seurat_object) = 'RNA'
   MarkerRoc<-Identify_Markers1(Seurat_object,PowerCutoff,DifferenceCutoff)
   MarkerRoc<-as.data.frame(MarkerRoc)
   Marker<-Identify_Markers2(Seurat_object,MarkerRoc,PowerThr1=DifferenceCutoff)

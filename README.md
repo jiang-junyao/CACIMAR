@@ -49,7 +49,11 @@ data](https://jiang-junyao.github.io/CACIMAR/quick_celltype.html)
 networks](https://jiang-junyao.github.io/CACIMAR/quick_grn.html)
 
 [Quick tutorial for identifying evolutionally conserved ligand-receptor
-interaction and cell-cell communications (coming soon)]()
+interaction and cell-cell
+communications](https://jiang-junyao.github.io/CACIMAR/quick_interaction.html)
+
+[Tutorial for build customized orthg database based on
+MGI](https://jiang-junyao.github.io/CACIMAR/build_db.html)
 
 ## Examples
 

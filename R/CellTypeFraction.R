@@ -65,7 +65,7 @@ Identify_ConservedCellTypes <- function(OrthG,Species1_Marker_table,Species2_Mar
   ShMarker3 <- rbind(ShMarker1[[1]],ShMarker2[[1]])
   ### fraction between different species
   Sp1Gene <- Species1_Marker_table$gene
-  if (str_detect('ENS',Sp1Gene[1])) {
+  if (grepl('ENS',as.character(Sp1Gene[1]))) {
     idx1 = 2
     idx2 = 4
   }else{

@@ -140,7 +140,7 @@ identify_conserved_marker <- function(OrthG,Species1_Marker_table,
     conserved_gene = identify_conserved_gene(OrthG,spc1_marker$gene,
                                              spc2_marker$gene,
                                              Species_name1,Species_name2)
-    if (class(conserved_gene)=="matrix") {
+    if (is.matrix(conserved_gene)) {
       conserved_gene = as.data.frame(conserved_gene[,6:7])
     }else{
       conserved_gene = as.data.frame(t(as.data.frame(conserved_gene[6:7])))

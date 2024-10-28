@@ -31,7 +31,8 @@ devtools::install_github("jiang-junyao/CACIMAR")
 
 ## News
 
-2024.10.24: Fixed bugs resulting from a package version update.
+2024.10.28: remove warning message in ‘identify_conserved_marker’
+function 2024.10.24: Fixed bugs resulting from a package version update.
 2024.08.02: Bugs in ‘Identify_CellType’ have been fixed.
 
 ### Version1.0.0: First version of CACIMAR was published!

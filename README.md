@@ -62,10 +62,15 @@ MGI](https://jiang-junyao.github.io/CACIMAR/build_db.html)
 
 ## Citation
 
-[CACIMAR: Cross-species Analysis of Cell Identities, Markers,
-Regulations and Interactions Using Single-cell RNA Sequencing Data.
-(preprint)](https://www.biorxiv.org/content/10.1101/2024.01.23.576964v1)
+[CACIMAR: cross-species analysis of cell identities, markers, regulations, and interactions using single-cell RNA sequencing data. **Briefings in Bioinformatics**, Volume 25, Issue 4, July 2024, bbae283,]([https://www.biorxiv.org/content/10.1101/2024.01.23.576964v1](https://academic.oup.com/bib/article/25/4/bbae283/7690342))
 
 ## Contact
 
 If you find any bugs, please feel free to e-mail me (jyjiang@link.cuhk.edu.hk)
+
+## External links
+
+[Jie Wang Lab](https://jiewanglab.github.io/us/index.html)
+
+[Junyao Jiang](https://jiang-junyao.github.io/)
+

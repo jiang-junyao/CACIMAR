@@ -172,6 +172,27 @@ identify_conserved_marker <- function(OrthG,Species1_Marker_table,
 #' @examples
 identify_conserved_gene <- function(OrthG,spc1_marker,spc2_marker,Species_name1,
                                     Species_name2){
+  ### check species name
+  Species_name1 <- tolower(Species_name1)
+  Species_name2 <- tolower(Species_name2)
+  Spec1 <- colnames(OrthG)[2]
+  Spec2 <- colnames(OrthG)[4]
+  Spec1 <- gsub('_ID','',Spec1)
+  Spec2 <- gsub('_ID','',Spec2)
+  if (Spec1 == Species_name1 & Spec2 == Species_name2) {
+    Species_name <- c(Species_name1,Species_name2)
+    Species1_Marker <- spc1_marker
+    Species2_Marker <- spc2_marker
+  }else if(Spec2 == Species_name1 & Spec1 == Species_name2){
+    Species_name <- c(Species_name2,Species_name1)
+    Species2_Marker <- spc1_marker
+    Species1_Marker <- spc2_marker
+  }else{stop('please input correct Species name')}
+  spc1_marker = Species1_Marker
+  spc2_marker = Species2_Marker
+  Species_name1 = Species_name[1]
+  Species_name2 = Species_name[2]
+
   Species_name1 <- tolower(Species_name1)
   Species_name2 <- tolower(Species_name2)
   Spec1 <- colnames(OrthG)[2]

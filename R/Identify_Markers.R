@@ -12,6 +12,7 @@
 #' @param DifferenceCutoff numeric, indicating the cutoff of difference in marker genes between
 #' clusters to refine marker genes
 #' @param PvalueCutoff numeric, indicating the p.value cutoff of chi-square test to refine marker genes
+#' @param cluster_column_use character, indicating the name of cluster used in your seurat object, default is 'cell_type'
 #' @importFrom Seurat FindAllMarkers
 #' @importFrom Seurat GetAssayData
 #' @importFrom stats fisher.test
@@ -23,12 +24,15 @@
 #' @examples data("pbmc_small")
 #' all.markers <- Identify_Markers(pbmc_small)
 Identify_Markers<-function(Seurat_object, PowerCutoff=0.4,
-                           DifferenceCutoff=0,PvalueCutoff=0.05 ){
+                           DifferenceCutoff=0,PvalueCutoff=0.05,
+                           cluster_column_use = 'cell_type'){
   validInput(Seurat_object,'seurat_object','seuratobject')
   validInput(PowerCutoff,'PowerCutoff','numeric')
   validInput(DifferenceCutoff,'DifferenceCutoff','numeric')
   validInput(PvalueCutoff,'PvalueCutoff','numeric')
   DefaultAssay(Seurat_object) = 'RNA'
+  Seurat_object@active.ident = as.factor(Seurat_object@meta.data[,cluster_column_use])
+  names(Seurat_object@active.ident)=colnames(Seurat_object)
   MarkerRoc<-Identify_Markers1(Seurat_object,PowerCutoff,DifferenceCutoff)
   MarkerRoc<-as.data.frame(MarkerRoc)
   Marker<-Identify_Markers2(Seurat_object,MarkerRoc,PowerThr1=DifferenceCutoff)

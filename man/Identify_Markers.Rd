@@ -8,7 +8,8 @@ Identify_Markers(
   Seurat_object,
   PowerCutoff = 0.4,
   DifferenceCutoff = 0,
-  PvalueCutoff = 0.05
+  PvalueCutoff = 0.05,
+  cluster_column_use = "cell_type"
 )
 }
 \arguments{
@@ -20,6 +21,8 @@ Identify_Markers(
 clusters to refine marker genes}
 
 \item{PvalueCutoff}{numeric, indicating the p.value cutoff of chi-square test to refine marker genes}
+
+\item{cluster_column_use}{character, indicating the name of cluster used in your seurat object, default is 'cell_type'}
 }
 \value{
 Data frame of conserved markers
